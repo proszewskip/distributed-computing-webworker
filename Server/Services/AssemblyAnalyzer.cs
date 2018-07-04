@@ -1,27 +1,47 @@
-﻿using System;
+using System;
+using System.Linq;
 using System.Reflection;
+using DistributedComputing.Common;
+using Server.Models;
 
 namespace Server.Services
 {
-    public static class AssemblyAnalyzer
+    internal static class AssemblyAnalyzer
     {
-        public static T GetTypeFromAssembly<T>(Assembly assembly) where T : class
+        public static SubtaskInfo GetSubtaskInfo(Assembly assembly)
         {
-            // TODO: check if there are multiple implementations of the interface to avoid ambiguities
-            foreach (var assemblyType in assembly.GetTypes())
-            {
-                var typeExample = assemblyType.GetInterface(typeof(T).Name);
-                if (typeExample == null)
-                    continue;
+            var subtaskInfo = new SubtaskInfo();
 
-                T instance = (T)assembly.CreateInstance(assemblyType.FullName);
-                if (instance != null)
-                {
-                    return instance;
-                }
-            }
+            var subtaskType = GetTypeImplementingInterface<ISubtask>(assembly);
 
-            throw new Exception("The assembly does not contain an class that implements the " + typeof(T).Name + " interface");
+            subtaskInfo.AssemblyName = GetAssemblyTitle(assembly);
+            subtaskInfo.ClassName = subtaskType.Name;
+            subtaskInfo.Namespace = subtaskType.Namespace;
+
+
+            return subtaskInfo;
+        }
+
+        public static Type GetTypeImplementingInterface<T>(Assembly assembly) where T : class
+        {
+            var tTypeList = assembly.ExportedTypes.Where(type => type.GetInterface(typeof(T).Name) != null).ToList();
+
+            if (tTypeList.Count == 0)
+                throw new Exception("The assembly does not contain a class that implements the " + typeof(T).Name +
+                                    " interface");
+            if (tTypeList.Count != 1)
+                throw new Exception("The assembly contains multiple classes that implement the " + typeof(T).Name +
+                                    " interface");
+
+            return tTypeList.First();
+        }
+
+        private static string GetAssemblyTitle(Assembly assembly)
+        {
+            var assemblyTitle = assembly.GetCustomAttribute<AssemblyTitleAttribute>();
+            if (assemblyTitle == null) throw new Exception("The assembly does not contain the title attribute.");
+
+            return assemblyTitle.Title;
         }
     }
 }
