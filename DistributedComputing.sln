@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DistributedComputingLibrary", "DistributedComputingLibrary\DistributedComputingLibrary.csproj", "{DC29FBFE-F605-4D45-8CD4-35CCDE3E8526}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FactorialTask", "FactorialTask\FactorialTask.csproj", "{5D0DABC0-73E3-4D8B-9E71-66B72A93DA50}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{39D1171E-F12D-4E73-819B-F32C0DCBFCED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{DC29FBFE-F605-4D45-8CD4-35CCDE3E8526}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC29FBFE-F605-4D45-8CD4-35CCDE3E8526}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC29FBFE-F605-4D45-8CD4-35CCDE3E8526}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D0DABC0-73E3-4D8B-9E71-66B72A93DA50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D0DABC0-73E3-4D8B-9E71-66B72A93DA50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D0DABC0-73E3-4D8B-9E71-66B72A93DA50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D0DABC0-73E3-4D8B-9E71-66B72A93DA50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39D1171E-F12D-4E73-819B-F32C0DCBFCED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39D1171E-F12D-4E73-819B-F32C0DCBFCED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39D1171E-F12D-4E73-819B-F32C0DCBFCED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39D1171E-F12D-4E73-819B-F32C0DCBFCED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
