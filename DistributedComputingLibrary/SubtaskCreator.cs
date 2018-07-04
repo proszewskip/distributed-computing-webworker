@@ -13,7 +13,7 @@ namespace DistributedComputing.Common
             if (classType.GetInterface(nameof(ISubtask)) == null)
                 throw new ArgumentException($"Class {className} does not implement the {nameof(ISubtask)} interface");
 
-            return (ISubtask)Activator.CreateInstance(classType);
+            return (ISubtask) Activator.CreateInstance(classType);
         }
     }
 }
