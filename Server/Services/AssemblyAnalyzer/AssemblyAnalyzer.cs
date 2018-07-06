@@ -4,11 +4,11 @@ using System.Reflection;
 using DistributedComputing.Common;
 using Server.Models;
 
-namespace Server.Services
+namespace Server.Services.AssemblyAnalyzer
 {
-    internal static class AssemblyAnalyzer
+    public class AssemblyAnalyzer : IAssemblyAnalyzer
     {
-        public static SubtaskInfo GetSubtaskInfo(Assembly assembly)
+        public SubtaskInfo GetSubtaskInfo(Assembly assembly)
         {
             var subtaskInfo = new SubtaskInfo();
 
@@ -22,7 +22,7 @@ namespace Server.Services
             return subtaskInfo;
         }
 
-        public static Type GetTypeImplementingInterface<T>(Assembly assembly) where T : class
+        public Type GetTypeImplementingInterface<T>(Assembly assembly) where T : class
         {
             var tTypeList = assembly.ExportedTypes.Where(type => type.GetInterface(typeof(T).Name) != null).ToList();
 
@@ -36,7 +36,7 @@ namespace Server.Services
             return tTypeList.First();
         }
 
-        private static string GetAssemblyTitle(Assembly assembly)
+        private string GetAssemblyTitle(Assembly assembly)
         {
             var assemblyTitle = assembly.GetCustomAttribute<AssemblyTitleAttribute>();
             if (assemblyTitle == null) throw new Exception("The assembly does not contain the title attribute.");
