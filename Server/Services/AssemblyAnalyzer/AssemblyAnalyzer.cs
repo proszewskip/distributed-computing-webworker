@@ -18,7 +18,6 @@ namespace Server.Services.AssemblyAnalyzer
             subtaskInfo.ClassName = subtaskType.Name;
             subtaskInfo.Namespace = subtaskType.Namespace;
 
-
             return subtaskInfo;
         }
 
@@ -29,7 +28,7 @@ namespace Server.Services.AssemblyAnalyzer
             if (tTypeList.Count == 0)
                 throw new Exception("The assembly does not contain a class that implements the " + typeof(T).Name +
                                     " interface");
-            if (tTypeList.Count != 1)
+            if (tTypeList.Count > 1)
                 throw new Exception("The assembly contains multiple classes that implement the " + typeof(T).Name +
                                     " interface");
 
