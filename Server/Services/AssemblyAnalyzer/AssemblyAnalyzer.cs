@@ -14,14 +14,14 @@ namespace Server.Services.AssemblyAnalyzer
 
             var subtaskType = GetTypeImplementingInterface<ISubtask>(assembly);
 
-            subtaskInfo.AssemblyName = GetAssemblyTitle(assembly);
+            subtaskInfo.AssemblyName = GetAssemblyName(assembly);
             subtaskInfo.ClassName = subtaskType.Name;
             subtaskInfo.Namespace = subtaskType.Namespace;
 
             return subtaskInfo;
         }
 
-        public Type GetTypeImplementingInterface<T>(Assembly assembly) where T : class
+        private Type GetTypeImplementingInterface<T>(Assembly assembly) where T : class
         {
             var tTypeList = assembly.ExportedTypes.Where(type => type.GetInterface(typeof(T).Name) != null).ToList();
 
@@ -35,12 +35,9 @@ namespace Server.Services.AssemblyAnalyzer
             return tTypeList.First();
         }
 
-        private string GetAssemblyTitle(Assembly assembly)
+        private string GetAssemblyName(Assembly assembly)
         {
-            var assemblyTitle = assembly.GetCustomAttribute<AssemblyTitleAttribute>();
-            if (assemblyTitle == null) throw new Exception("The assembly does not contain the title attribute.");
-
-            return assemblyTitle.Title;
+            return assembly.FullName;
         }
     }
 }
