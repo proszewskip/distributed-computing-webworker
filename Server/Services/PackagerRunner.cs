@@ -4,7 +4,7 @@ using Server.Services.CommandRunner;
 
 namespace Server.Services
 {
-    internal class PackagerRunner
+    public class PackagerRunner
     {
         private readonly string _inputDirectory;
         private readonly string _monoPackagerPath;
