@@ -14,7 +14,7 @@ namespace Server.Services.AssemblyAnalyzer
 
             var subtaskType = GetTypeImplementingInterface<ISubtask>(assembly);
 
-            subtaskInfo.AssemblyName = GetAssemblyName(assembly);
+            subtaskInfo.AssemblyName = assembly.GetName().Name;
             subtaskInfo.ClassName = subtaskType.Name;
             subtaskInfo.Namespace = subtaskType.Namespace;
 
@@ -33,11 +33,6 @@ namespace Server.Services.AssemblyAnalyzer
                                     " interface");
 
             return tTypeList.First();
-        }
-
-        private string GetAssemblyName(Assembly assembly)
-        {
-            return assembly.FullName;
         }
     }
 }
