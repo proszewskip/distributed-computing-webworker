@@ -1,18 +1,16 @@
 using System;
-using System.Reflection;
-using System.Linq;
 using System.Collections.Generic;
-using NUnit.Framework;
-using Moq;
-
+using System.Reflection;
 using DistributedComputing.Common;
+using Moq;
+using NUnit.Framework;
 using Server.Services.AssemblyAnalyzer;
 
-namespace Server.Services.AssemblyAnalyzer.Tests
+namespace Server.Tests.Services
 {
     public class AssemblyAnalyzerTests
     {
-        private AssemblyAnalyzer _assemblyAnalyzer;
+        private readonly AssemblyAnalyzer _assemblyAnalyzer;
 
         private class ExampleSubtask : ISubtask
         {
@@ -25,8 +23,11 @@ namespace Server.Services.AssemblyAnalyzer.Tests
         private Mock<Assembly> GetAssemblyMock(string assemblyName, List<Type> exportedTypes)
         {
             var assemblyMock = new Mock<Assembly>();
+
+            var assemblyNameObject = new AssemblyName(assemblyName);
+
             assemblyMock.Setup(e => e.ExportedTypes).Returns(exportedTypes);
-            assemblyMock.Setup(e => e.FullName).Returns(assemblyName);
+            assemblyMock.Setup(e => e.GetName()).Returns(assemblyNameObject);
 
             return assemblyMock;
         }
