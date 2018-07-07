@@ -1,30 +1,28 @@
-using Moq;
 using System.Collections.Generic;
-using System.Linq;
-using NUnit.Framework;
 using System.IO;
-
+using System.Threading.Tasks;
+using Moq;
+using NUnit.Framework;
 using Server.Services;
 using Server.Services.CommandRunner;
-using System.Threading.Tasks;
 
-namespace Server.Services.Tests
+namespace Server.Tests.Services
 {
     public class PackagerRunnerTests
     {
         private readonly PackagerRunner _packagerRunner;
 
-        private readonly string _monoPackagerPath = "path";
-        private readonly string _inputDirectory = "input";
-        private readonly string _outputDirectory = "output";
+        private const string MonoPackagerPath = "path";
+        private const string InputDirectory = "input";
+        private const string OutputDirectory = "output";
 
         private string _command;
         private string _commandArgs;
 
         public PackagerRunnerTests()
         {
-            var _commandRunnerMock = new Mock<ICommandRunner>();
-            _commandRunnerMock.Setup(e => e.RunCommandTask(It.IsAny<string>(), It.IsAny<string>()))
+            var commandRunnerMock = new Mock<ICommandRunner>();
+            commandRunnerMock.Setup(e => e.RunCommandTask(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(5)
                 .Callback((string command, string commandArgs) =>
                 {
@@ -33,10 +31,10 @@ namespace Server.Services.Tests
                 });
 
             _packagerRunner = new PackagerRunner(
-                _monoPackagerPath,
-                _inputDirectory,
-                _outputDirectory,
-                _commandRunnerMock.Object
+                MonoPackagerPath,
+                InputDirectory,
+                OutputDirectory,
+                commandRunnerMock.Object
             );
         }
 
@@ -56,9 +54,9 @@ namespace Server.Services.Tests
             await _packagerRunner.PackAssemblyAsync(assemblyPath, assemblyName);
 
             Assert.AreEqual(_commandArgs, string.Join(" ", new List<string>() {
-                _monoPackagerPath,
-                $"-prefix={Path.Join(_inputDirectory, assemblyPath)}",
-                $"-out={Path.Join(_outputDirectory, assemblyPath)}",
+                MonoPackagerPath,
+                $"-prefix={Path.Join(InputDirectory, assemblyPath)}",
+                $"-out={Path.Join(OutputDirectory, assemblyPath)}",
                 assemblyName
             }));
         }
