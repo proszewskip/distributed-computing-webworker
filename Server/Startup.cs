@@ -11,8 +11,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using dotenv.net.DependencyInjection.Extensions;
 
 using Server.Models;
+using Server.Services.PathsProvider;
+using Server.Services.AssemblyAnalyzer;
+using Server.Services.CommandRunner;
+using Server.Services;
 
 namespace Server
 {
@@ -30,8 +35,17 @@ namespace Server
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+            services.AddEnv();
+            services.AddScoped<IAssemblyAnalyzer, AssemblyAnalyzer>()
+                .AddScoped<IAssemblyAnalyzer, AssemblyAnalyzer>()
+                .AddScoped<ICommandRunner, CommandRunner>()
+                .AddScoped<PackagerRunner>();
+
+            services.AddSingleton<IPathsProvider, PathsProvider>();
+
             var connectionString = Configuration.GetConnectionString("DistributedComputingContext");
-            services.AddEntityFrameworkNpgsql().AddDbContext<DistributedComputingDbContext>(options => options.UseNpgsql(connectionString));
+            services.AddEntityFrameworkNpgsql()
+                .AddDbContext<DistributedComputingDbContext>(options => options.UseNpgsql(connectionString));
 
         }
 
