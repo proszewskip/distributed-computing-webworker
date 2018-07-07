@@ -42,8 +42,7 @@ namespace Server.Controllers
         {
             var foundTaskDefinition = _dbContext.DistributedTaskDefinitions
                 .Include(taskDefinition => taskDefinition.SubtaskInfo)
-                .Where(taskDefinition => taskDefinition.Id == id)
-                .FirstOrDefault();
+                .FirstOrDefault(taskDefinition => taskDefinition.Id == id);
 
             if (foundTaskDefinition == null)
             {
@@ -58,8 +57,8 @@ namespace Server.Controllers
         public IActionResult Create([FromForm] CreateDistributedTaskDefinitionDTO body)
         {
             // 1. Validate input data
-            var taskDefinitionExists = _dbContext.DistributedTaskDefinitions.Where(taskDefinition => taskDefinition.Name == body.Name)
-                .Any();
+            var taskDefinitionExists = _dbContext.DistributedTaskDefinitions
+                .Any(taskDefinition => taskDefinition.Name == body.Name);
 
             if (taskDefinitionExists)
             {
