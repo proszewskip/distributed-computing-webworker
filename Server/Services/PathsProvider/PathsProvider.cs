@@ -15,7 +15,7 @@ namespace Server.Services.PathsProvider
 
         public string CompiledTasksDefinitionsDirectoryPath { get; private set; }
 
-        private ILogger<PathsProvider> _logger;
+        private readonly ILogger<PathsProvider> _logger;
 
         private static string MonoPackagerPathVariable = "MONO_PACKAGER_PATH";
         private static string TaskDefinitionsDirectoryPathVariable = "TASK_DEFINITIONS_PATH";
