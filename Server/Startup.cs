@@ -18,6 +18,7 @@ using Server.Services.PathsProvider;
 using Server.Services.AssemblyAnalyzer;
 using Server.Services.CommandRunner;
 using Server.Services;
+using Microsoft.Extensions.FileProviders;
 
 namespace Server
 {
@@ -57,6 +58,14 @@ namespace Server
                 var context = serviceScope.ServiceProvider.GetRequiredService<DistributedComputingDbContext>();
                 context.Database.EnsureCreated();
             }
+
+            var pathsProvider = app.ApplicationServices.GetService<IPathsProvider>();
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(pathsProvider.CompiledTasksDefinitionsDirectoryPath),
+                RequestPath = "/public/task-definitions"
+            });
 
             if (env.IsDevelopment())
             {
