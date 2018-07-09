@@ -4,6 +4,10 @@ namespace Server.Models
     {
         public int Id { get; set; }
 
+        public int SequenceNumber { get; set; }
+
+        public string Token { get; set; }
+
         public int DistributedTaskId { get; set; }
         public DistributedTask DistributedTask { get; set; }
 
