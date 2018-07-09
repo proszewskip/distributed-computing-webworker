@@ -4,6 +4,9 @@ namespace Server.Models
 {
     public class DistributedTaskDefinition
     {
+        // TODO: add GUID to reference the task definition during packaging
+        // (see DistributedTaskDefinitionController.cs)
+
         public int Id { get; set; }
 
         public string Name { get; set; }
