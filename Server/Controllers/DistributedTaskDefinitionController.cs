@@ -130,7 +130,72 @@ namespace Server.Controllers
 
             // 5. Return the info back to the user
 
-            return Ok(distributedTaskDefinition);
+            return CreatedAtRoute(nameof(GetById), new { id = distributedTaskDefinition.Id }, distributedTaskDefinition);
+        }
+
+        [HttpPut("{id}")]
+        [ValidateModel]
+        public IActionResult Put(int id, [FromBody] ModifyDistributedTaskDefinitionDTO body)
+        {
+            var modifiedTaskDefinition = _dbContext.DistributedTaskDefinitions.FirstOrDefault(task => task.Id == id);
+
+            if (modifiedTaskDefinition == null)
+            {
+                ModelState.TryAddModelError(
+                    nameof(id),
+                    $"A task definition with id {id} does not exist."
+                );
+
+                return new ValidationFailedResult(ModelState);
+            }
+
+            if (body.Name != null)
+            {
+                var taskDefinitionExists = _dbContext.DistributedTaskDefinitions.Any(task => task.Name == body.Name);
+
+                if (taskDefinitionExists)
+                {
+                    ModelState.TryAddModelError(
+                        nameof(body.Name),
+                        $"A task definition with name {body.Name} already exists."
+                    );
+
+                    return new ValidationFailedResult(ModelState);
+                }
+
+                modifiedTaskDefinition.Name = body.Name;
+            }
+
+            if (body.Description != null)
+            {
+                modifiedTaskDefinition.Description = body.Description;
+            }
+
+            _dbContext.SaveChanges();
+
+            return Ok(modifiedTaskDefinition);
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var modifiedTaskDefinition = _dbContext.DistributedTaskDefinitions.FirstOrDefault(task => task.Id == id);
+
+            if (modifiedTaskDefinition == null)
+            {
+                ModelState.TryAddModelError(
+                    nameof(id),
+                    $"A task definition with id {id} does not exist."
+                );
+
+                return new ValidationFailedResult(ModelState);
+            }
+
+            // TODO: update ModelBuilder to delete tasks when the task definition is deleted
+            _dbContext.DistributedTaskDefinitions.Remove(modifiedTaskDefinition);
+            _dbContext.SaveChanges();
+
+            return Ok();
         }
     }
 }
