@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -31,28 +32,27 @@ namespace Server.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public IActionResult GetById(int id)
         {
-            var foundTask = await _dbContext.DistributedTasks
+            var foundTask = _dbContext.DistributedTasks
                 .Include(task => task.DistributedTaskDefinition)
                 .Include(task => task.Subtasks)
-                .FirstOrDefaultAsync(task => task.Id == id);
+                .FirstOrDefault(task => task.Id == id);
 
             if (foundTask == null) return NotFound();
 
             return Ok(foundTask);
         }
 
-        // POST: api/DistributedTask
         [HttpPost]
         [ValidateModel]
-        public async Task<IActionResult> Create([FromForm] CreateDistributedTaskDTO body)
+        public IActionResult Create([FromForm] CreateDistributedTaskDTO body)
         {
             // FIXME: handle errors
 
             // 1. Validate input data
-            var taskDefinitionExists = await _dbContext.DistributedTaskDefinitions
-                .AnyAsync(taskDefinition => taskDefinition.Id == body.DistributedTaskDefinitionId);
+            var taskDefinitionExists = _dbContext.DistributedTaskDefinitions
+                .Any(taskDefinition => taskDefinition.Id == body.DistributedTaskDefinitionId);
 
             if (!taskDefinitionExists)
             {
@@ -64,7 +64,7 @@ namespace Server.Controllers
                 return new ValidationFailedResult(ModelState);
             }
 
-            var taskExists = await _dbContext.DistributedTasks.AnyAsync(task => task.Name == body.Name);
+            var taskExists = _dbContext.DistributedTasks.Any(task => task.Name == body.Name);
 
             if (taskExists)
             {
@@ -93,9 +93,9 @@ namespace Server.Controllers
                 Status = DistributedTaskStatus.InProgress
             };
 
-            await _dbContext.DistributedTasks.AddAsync(distributedTask);
+            _dbContext.DistributedTasks.Add(distributedTask);
 
-            await _dbContext.SaveChangesAsync();
+            _dbContext.SaveChanges();
 
             // 5. Return the info back to the user
 
@@ -103,11 +103,12 @@ namespace Server.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromForm] ModifyDistributedTaskDTO body)
+        [ValidateModel]
+        public IActionResult Put(int id, [FromForm] ModifyDistributedTaskDTO body)
         {
             // 1. Validate input data
 
-            var modifiedTask = await _dbContext.DistributedTasks.FirstOrDefaultAsync(task => task.Id == id);
+            var modifiedTask = _dbContext.DistributedTasks.FirstOrDefault(task => task.Id == id);
 
             if (modifiedTask == null)
             {
@@ -119,7 +120,7 @@ namespace Server.Controllers
                 return new ValidationFailedResult(ModelState);
             }
 
-            var taskExists = await _dbContext.DistributedTasks.AnyAsync(task => task.Name == body.Name);
+            var taskExists = _dbContext.DistributedTasks.Any(task => task.Name == body.Name);
 
             if (taskExists)
             {
@@ -135,20 +136,19 @@ namespace Server.Controllers
 
             modifiedTask.Name = body.Name;
 
-            await _dbContext.SaveChangesAsync();
+            _dbContext.SaveChanges();
 
             // 5. Return the info back to the user
 
             return Ok(modifiedTask);
         }
 
-        // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public IActionResult Delete(int id)
         {
             // 1. Validate input data
 
-            var modifiedTask = await _dbContext.DistributedTasks.FirstOrDefaultAsync(task => task.Id == id);
+            var modifiedTask = _dbContext.DistributedTasks.FirstOrDefault(task => task.Id == id);
 
             if (modifiedTask == null)
             {
@@ -164,7 +164,7 @@ namespace Server.Controllers
             // 2. Remove task
             _dbContext.DistributedTasks.Remove(modifiedTask);
 
-            await _dbContext.SaveChangesAsync();
+            _dbContext.SaveChanges();
 
             // 3. Return the info back to the user
 
