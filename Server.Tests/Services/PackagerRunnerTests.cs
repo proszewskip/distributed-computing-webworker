@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using Server.Services.CommandRunner;
+using Server.Services.PathsProvider;
 
 namespace Server.Services.Tests
 {
@@ -29,12 +30,15 @@ namespace Server.Services.Tests
                     _commandArgs = commandArgs;
                 });
 
-            _packagerRunner = new PackagerRunner(
-                MonoPackagerPath,
-                InputDirectory,
-                OutputDirectory,
-                commandRunnerMock.Object
-            );
+            var pathsProvider = new Mock<IPathsProvider>();
+            pathsProvider.Setup(e => e.CompiledTasksDefinitionsDirectoryPath)
+                .Returns(OutputDirectory);
+            pathsProvider.Setup(e => e.MonoPackagerPath)
+                .Returns(MonoPackagerPath);
+            pathsProvider.Setup(e => e.TaskDefinitionsDirectoryPath)
+                .Returns(InputDirectory);
+
+            _packagerRunner = new PackagerRunner(pathsProvider.Object, commandRunnerMock.Object);
         }
 
         [Test]
@@ -54,8 +58,8 @@ namespace Server.Services.Tests
 
             Assert.AreEqual(_commandArgs, string.Join(" ", new List<string>() {
                 MonoPackagerPath,
-                $"-prefix={Path.Join(InputDirectory, assemblyPath)}",
-                $"-out={Path.Join(OutputDirectory, assemblyPath)}",
+                $"-prefix={Path.Combine(InputDirectory, assemblyPath)}",
+                $"-out={Path.Combine(OutputDirectory, assemblyPath)}",
                 assemblyName
             }));
         }

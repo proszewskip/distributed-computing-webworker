@@ -86,7 +86,7 @@ namespace Server.Controllers
 
             // 2. Analyze the DLL
             var taskDefinitionGuid = Guid.NewGuid();
-            var taskDefinitionDirectoryPath = Path.Join(
+            var taskDefinitionDirectoryPath = Path.Combine(
                 _pathsProvider.TaskDefinitionsDirectoryPath,
                 taskDefinitionGuid.ToString()
             );
@@ -94,7 +94,7 @@ namespace Server.Controllers
             Directory.CreateDirectory(taskDefinitionDirectoryPath);
 
             // REFACTOR: extract saving the DLLs
-            var mainDllPath = Path.Join(taskDefinitionDirectoryPath, body.MainDll.FileName);
+            var mainDllPath = Path.Combine(taskDefinitionDirectoryPath, body.MainDll.FileName);
             using (var mainDllFileStream = new FileStream(mainDllPath, FileMode.Create))
             {
                 await body.MainDll.CopyToAsync(mainDllFileStream);
@@ -102,7 +102,7 @@ namespace Server.Controllers
 
             foreach (var additionalDllFile in body.AdditionalDlls)
             {
-                var additionalDllPath = Path.Join(taskDefinitionDirectoryPath, additionalDllFile.FileName);
+                var additionalDllPath = Path.Combine(taskDefinitionDirectoryPath, additionalDllFile.FileName);
                 using (var additionalDllFileStream = new FileStream(additionalDllPath, FileMode.Create))
                 {
                     await additionalDllFile.CopyToAsync(additionalDllFileStream);
