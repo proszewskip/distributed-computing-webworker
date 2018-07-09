@@ -120,11 +120,7 @@ namespace Server.Controllers
             var distributedTaskDefinition = new DistributedTaskDefinition()
             {
                 Name = body.Name,
-                OutputDirectory = Path.Combine(
-                    _pathsProvider.CompiledTasksDefinitionsDirectoryPath,
-                    taskDefinitionGuid.ToString(),
-                    body.MainDll.FileName
-                ),
+                DefinitionGuid = taskDefinitionGuid,
                 SubtaskInfo = subtaskInfo
             };
 
