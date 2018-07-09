@@ -21,6 +21,7 @@ namespace Server.Services
 
         public async Task<int> PackAssemblyAsync(string assemblyDirectoryName, string assemblyName)
         {
+            // TODO: inject packagerOutputPath and assembliesDirectoryPath as parameters
             var packagerOutputPath = Path.Combine(
                 _pathsProvider.CompiledTasksDefinitionsDirectoryPath, assemblyDirectoryName);
             var assembliesDirectoryPath = Path.Combine(
@@ -30,6 +31,7 @@ namespace Server.Services
             var outArg = $"-out={packagerOutputPath}";
             var packCommandArgs = $"{_pathsProvider.MonoPackagerPath} {prefixArg} {outArg} {assemblyName}";
 
+            // TODO: retrieve logs and return them
             var exitCode = await _commandRunner.RunCommandTask(MonoCommand, packCommandArgs);
 
             return exitCode;
