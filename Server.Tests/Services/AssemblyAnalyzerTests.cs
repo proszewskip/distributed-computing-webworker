@@ -4,9 +4,8 @@ using System.Reflection;
 using DistributedComputing.Common;
 using Moq;
 using NUnit.Framework;
-using Server.Services.AssemblyAnalyzer;
 
-namespace Server.Tests.Services
+namespace Server.Services.AssemblyAnalyzer.Tests
 {
     public class AssemblyAnalyzerTests
     {

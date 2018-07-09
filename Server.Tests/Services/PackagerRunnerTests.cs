@@ -3,10 +3,9 @@ using System.IO;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
-using Server.Services;
 using Server.Services.CommandRunner;
 
-namespace Server.Tests.Services
+namespace Server.Services.Tests
 {
     public class PackagerRunnerTests
     {
