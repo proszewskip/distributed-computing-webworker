@@ -9,6 +9,8 @@ namespace Server.Models
 
         public string Name { get; set; }
 
+        public string Description { get; set; } = "";
+
         public List<DistributedTask> DistributedTasks { get; set; }
 
         public Guid DefinitionGuid { get; set; }

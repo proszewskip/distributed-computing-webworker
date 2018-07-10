@@ -120,6 +120,7 @@ namespace Server.Controllers
             var distributedTaskDefinition = new DistributedTaskDefinition()
             {
                 Name = body.Name,
+                Description = body.Description,
                 DefinitionGuid = taskDefinitionGuid,
                 SubtaskInfo = subtaskInfo
             };

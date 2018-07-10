@@ -93,6 +93,9 @@ namespace Server.Controllers
                 Status = DistributedTaskStatus.InProgress
             };
 
+            if (body.Description != null)
+                distributedTask.Description = body.Description;
+
             _dbContext.DistributedTasks.Add(distributedTask);
 
             _dbContext.SaveChanges();
@@ -120,25 +123,29 @@ namespace Server.Controllers
                 return new ValidationFailedResult(ModelState);
             }
 
-            var taskExists = _dbContext.DistributedTasks.Any(task => task.Name == body.Name);
-
-            if (taskExists)
+            if (body.Name != null)
             {
-                ModelState.TryAddModelError(
-                    nameof(body.Name),
-                    $"A task definition with name {body.Name} already exists."
-                );
+                var taskExists = _dbContext.DistributedTasks.Any(task => task.Name == body.Name);
 
-                return new ValidationFailedResult(ModelState);
+                if (taskExists)
+                {
+                    ModelState.TryAddModelError(
+                        nameof(body.Name),
+                        $"A task definition with name {body.Name} already exists."
+                    );
+
+                    return new ValidationFailedResult(ModelState);
+                }
+
+                modifiedTask.Name = body.Name;
             }
 
-            // 2. Update task
-
-            modifiedTask.Name = body.Name;
+            if (body.Description != null)
+            {
+                modifiedTask.Description = body.Description;
+            }
 
             _dbContext.SaveChanges();
-
-            // 5. Return the info back to the user
 
             return Ok(modifiedTask);
         }
