@@ -97,17 +97,16 @@ namespace Server.Controllers
                 distributedTask.Description = body.Description;
 
             _dbContext.DistributedTasks.Add(distributedTask);
-
             _dbContext.SaveChanges();
 
             // 5. Return the info back to the user
 
-            return Ok(distributedTask);
+            return CreatedAtRoute(nameof(GetById), new { id = distributedTask.Id }, distributedTask);
         }
 
         [HttpPut("{id}")]
         [ValidateModel]
-        public IActionResult Put(int id, [FromForm] ModifyDistributedTaskDTO body)
+        public IActionResult Put(int id, [FromBody] ModifyDistributedTaskDTO body)
         {
             // 1. Validate input data
 
@@ -153,8 +152,6 @@ namespace Server.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            // 1. Validate input data
-
             var modifiedTask = _dbContext.DistributedTasks.FirstOrDefault(task => task.Id == id);
 
             if (modifiedTask == null)
@@ -168,12 +165,8 @@ namespace Server.Controllers
             }
 
             //TODO: update ModelBuilder to delete subtasks when task is deleted
-            // 2. Remove task
             _dbContext.DistributedTasks.Remove(modifiedTask);
-
             _dbContext.SaveChanges();
-
-            // 3. Return the info back to the user
 
             return Ok();
         }
