@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Server.DTO;
 using Server.Models;
 using Server.Pagination;
+using Server.Services;
 using Server.Validation;
 
 namespace Server.Controllers
@@ -15,13 +16,25 @@ namespace Server.Controllers
     public class DistributedTaskController : Controller
     {
         private readonly DistributedComputingDbContext _dbContext;
+        private readonly ISubtaskFactoryFactory _subtaskFactoryFactory;
+        private readonly IAssemblyLoader _assemblyLoader;
+        private readonly IPathsProvider _pathsProvider;
+        private readonly IAssemblyAnalyzer _assemblyAnalyzer;
 
 
         public DistributedTaskController(
-            DistributedComputingDbContext dbContext
+            DistributedComputingDbContext dbContext,
+            ISubtaskFactoryFactory subtaskFactoryFactory,
+            IAssemblyLoader assemblyLoader,
+            IPathsProvider pathsProvider,
+            IAssemblyAnalyzer assemblyAnalyzer
         )
         {
             _dbContext = dbContext;
+            _subtaskFactoryFactory = subtaskFactoryFactory;
+            _assemblyLoader = assemblyLoader;
+            _pathsProvider = pathsProvider;
+            _assemblyAnalyzer = assemblyAnalyzer;
         }
 
         [HttpGet]
@@ -46,15 +59,14 @@ namespace Server.Controllers
 
         [HttpPost]
         [ValidateModel]
-        public IActionResult Create([FromForm] CreateDistributedTaskDTO body)
+        public IActionResult Create([FromBody] CreateDistributedTaskDTO body)
         {
             // FIXME: handle errors
 
-            // 1. Validate input data
-            var taskDefinitionExists = _dbContext.DistributedTaskDefinitions
-                .Any(taskDefinition => taskDefinition.Id == body.DistributedTaskDefinitionId);
+            var taskDefinition = _dbContext.DistributedTaskDefinitions
+                .FirstOrDefault(taskDef => taskDef.Id == body.DistributedTaskDefinitionId);
 
-            if (!taskDefinitionExists)
+            if (taskDefinition == null)
             {
                 ModelState.TryAddModelError(
                     nameof(body.DistributedTaskDefinitionId),
@@ -77,13 +89,6 @@ namespace Server.Controllers
             }
 
 
-            // TODO: 2. Create subtasks
-
-            // TODO: 3. Run subtasks
-
-            // TODO: Include subtasks
-            // 4. Add the data to the database
-
             var distributedTask = new DistributedTask
             {
                 Name = body.Name,
@@ -97,9 +102,31 @@ namespace Server.Controllers
                 distributedTask.Description = body.Description;
 
             _dbContext.DistributedTasks.Add(distributedTask);
+
+            var subtaskFactory = _subtaskFactoryFactory.CreateSubtaskFactory(distributedTask.Id);
+            var distributedTaskDllPath = Path.Combine(
+                _pathsProvider.TaskDefinitionsDirectoryPath,
+                taskDefinition.DefinitionGuid.ToString(),
+                taskDefinition.MainDllName
+            );
+
+            var taskAssembly = _assemblyLoader.LoadAssembly(distributedTaskDllPath);
+            var taskInstance = _assemblyAnalyzer.InstantiateTask(taskAssembly);
+            try
+            {
+                taskInstance.DefineTasks(body.InputData, subtaskFactory);
+            }
+            catch
+            {
+                // TODO: handle errors resulting from defining tasks
+            }
+
             _dbContext.SaveChanges();
 
-            // 5. Return the info back to the user
+            // NOTE: Setting those properties is required due to self-referencing loops
+            // which causes errors during serialization to JSON.
+            distributedTask.DistributedTaskDefinition = null;
+            distributedTask.Subtasks = null;
 
             return CreatedAtAction(nameof(GetById), new { id = distributedTask.Id }, distributedTask);
         }

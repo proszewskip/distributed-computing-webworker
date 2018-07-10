@@ -60,7 +60,7 @@ namespace Server.Controllers
         }
 
         [HttpPost]
-        [ValidateModelAttribute]
+        [ValidateModel]
         public async Task<IActionResult> Create([FromForm] CreateDistributedTaskDefinitionDTO body)
         {
             // FIXME: handle errors
@@ -105,18 +105,28 @@ namespace Server.Controllers
             }
 
             var mainDllAssembly = Assembly.LoadFrom(mainDllPath);
+            // TODO: handle errors while creating subtaskInfo
             var subtaskInfo = _assemblyAnalyzer.GetSubtaskInfo(mainDllAssembly);
+            try
+            {
+                _assemblyAnalyzer.InstantiateTask(mainDllAssembly);
+            }
+            catch
+            {
+                // TODO: handle errors here
+            }
 
             // 3. Run packager
             var packagerResults = await _packagerRunner.PackAssemblyAsync(taskDefinitionGuid.ToString(), body.MainDll.FileName);
 
             // 4. Add the data to the database
-            var distributedTaskDefinition = new DistributedTaskDefinition()
+            var distributedTaskDefinition = new DistributedTaskDefinition
             {
                 Name = body.Name,
                 Description = body.Description,
                 DefinitionGuid = taskDefinitionGuid,
-                SubtaskInfo = subtaskInfo
+                SubtaskInfo = subtaskInfo,
+                MainDllName = body.MainDll.FileName
             };
 
             _dbContext.DistributedTaskDefinitions.Add(distributedTaskDefinition);
