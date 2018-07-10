@@ -25,15 +25,14 @@ namespace Server.Controllers
         private readonly DistributedComputingDbContext _dbContext;
         private readonly IPathsProvider _pathsProvider;
         private readonly IAssemblyAnalyzer _assemblyAnalyzer;
-        // TODO: use IPackagerRunner instead of PackagerRunner
-        private readonly PackagerRunner _packagerRunner;
+        private readonly IPackagerRunner _packagerRunner;
 
 
         public DistributedTaskDefinitionController(
             DistributedComputingDbContext dbContext,
             IPathsProvider pathsProvider,
             IAssemblyAnalyzer assemblyAnalyzer,
-            PackagerRunner packagerRunner
+            IPackagerRunner packagerRunner
         )
         {
             _dbContext = dbContext;
