@@ -5,7 +5,7 @@ using Server.Services.PathsProvider;
 
 namespace Server.Services
 {
-    public class PackagerRunner
+    public class PackagerRunner : IPackagerRunner
     {
         private readonly IPathsProvider _pathsProvider;
 

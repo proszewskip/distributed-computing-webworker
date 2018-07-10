@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -40,7 +40,7 @@ namespace Server
             services.AddScoped<IAssemblyAnalyzer, AssemblyAnalyzer>()
                 .AddScoped<IAssemblyAnalyzer, AssemblyAnalyzer>()
                 .AddScoped<ICommandRunner, CommandRunner>()
-                .AddScoped<PackagerRunner>();
+                .AddScoped<IPackagerRunner, PackagerRunner>();
 
             services.AddSingleton<IPathsProvider, PathsProvider>();
 

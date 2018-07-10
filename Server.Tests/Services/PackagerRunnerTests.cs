@@ -10,7 +10,7 @@ namespace Server.Services.Tests
 {
     public class PackagerRunnerTests
     {
-        private readonly PackagerRunner _packagerRunner;
+        private readonly IPackagerRunner _packagerRunner;
 
         private const string MonoPackagerPath = "path";
         private const string InputDirectory = "input";
