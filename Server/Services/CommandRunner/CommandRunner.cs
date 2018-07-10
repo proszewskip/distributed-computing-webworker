@@ -5,9 +5,9 @@ namespace Server.Services.CommandRunner
 {
     public class CommandRunner : ICommandRunner
     {
-        public Task<int> RunCommandTask(string command, string commandArgs)
+        public Task<CommandRunnerResult> RunCommandTask(string command, string commandArgs)
         {
-            var taskCompletionSource = new TaskCompletionSource<int>();
+            var taskCompletionSource = new TaskCompletionSource<CommandRunnerResult>();
 
             var packagerProcess = new Process
             {
@@ -15,14 +15,25 @@ namespace Server.Services.CommandRunner
                 {
                     FileName = command,
                     Arguments = commandArgs,
-                    CreateNoWindow = true
+                    CreateNoWindow = true,
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true
                 },
                 EnableRaisingEvents = true
             };
 
             packagerProcess.Exited += (sender, args) =>
             {
-                taskCompletionSource.SetResult(packagerProcess.ExitCode);
+                string standardOutput = packagerProcess.StandardOutput.ReadToEnd();
+                string standardError = packagerProcess.StandardError.ReadToEnd();
+
+                var commandRunnerResult = new CommandRunnerResult()
+                {
+                    StandardOutput = standardOutput,
+                    StandardError = standardError
+                };
+
+                taskCompletionSource.SetResult(commandRunnerResult);
                 packagerProcess.Dispose();
             };
 
