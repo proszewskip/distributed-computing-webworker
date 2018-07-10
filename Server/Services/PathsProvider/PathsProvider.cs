@@ -41,9 +41,16 @@ namespace Server.Services.PathsProvider
             return value;
         }
 
+        private string GetPathFromEnvironmentVariable(string variableName)
+        {
+            var relativePath = GetEnvironmentVariable(variableName);
+
+            return Path.GetFullPath(relativePath);
+        }
+
         private void InitializePaths()
         {
-            MonoPackagerPath = GetEnvironmentVariable(MonoPackagerPathVariable);
+            MonoPackagerPath = GetPathFromEnvironmentVariable(MonoPackagerPathVariable);
             if (!File.Exists(MonoPackagerPath))
             {
                 _logger.LogError($"The \"{MonoPackagerPathVariable}\" environment variable " +
@@ -51,7 +58,7 @@ namespace Server.Services.PathsProvider
                 throw new InvalidEnvironmentConfigurationException();
             }
 
-            TaskDefinitionsDirectoryPath = GetEnvironmentVariable(TaskDefinitionsDirectoryPathVariable);
+            TaskDefinitionsDirectoryPath = GetPathFromEnvironmentVariable(TaskDefinitionsDirectoryPathVariable);
             if (!Directory.Exists(TaskDefinitionsDirectoryPath))
             {
                 _logger.LogError($"The \"{TaskDefinitionsDirectoryPathVariable}\" environment " +
@@ -59,7 +66,7 @@ namespace Server.Services.PathsProvider
                 throw new InvalidEnvironmentConfigurationException();
             }
 
-            CompiledTasksDefinitionsDirectoryPath = GetEnvironmentVariable(CompiledTasksDefinitionsDirectoryPathVariable);
+            CompiledTasksDefinitionsDirectoryPath = GetPathFromEnvironmentVariable(CompiledTasksDefinitionsDirectoryPathVariable);
             if (!Directory.Exists(CompiledTasksDefinitionsDirectoryPath))
             {
                 _logger.LogError($"The \"{CompiledTasksDefinitionsDirectoryPathVariable}\" environment " +
