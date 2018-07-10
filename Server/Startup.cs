@@ -30,6 +30,8 @@ namespace Server
             services.AddScoped<IAssemblyAnalyzer, AssemblyAnalyzer>()
                 .AddScoped<IAssemblyAnalyzer, AssemblyAnalyzer>()
                 .AddScoped<ICommandRunner, CommandRunner>()
+                .AddScoped<IAssemblyLoader, AssemblyLoader>()
+                .AddScoped<ISubtaskFactoryFactory, SubtaskFactoryFactory>()
                 .AddScoped<IPackagerRunner, PackagerRunner>();
 
             services.AddSingleton<IPathsProvider, PathsProvider>();
