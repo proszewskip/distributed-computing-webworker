@@ -87,12 +87,14 @@ namespace Server.Controllers
             var distributedTask = new DistributedTask
             {
                 Name = body.Name,
-                Description = body.Description,
                 Priority = body.Priority,
                 DistributedTaskDefinitionId = body.DistributedTaskDefinitionId,
                 InputData = body.InputData,
                 Status = DistributedTaskStatus.InProgress
             };
+
+            if (body.Description != null)
+                distributedTask.Description = body.Description;
 
             _dbContext.DistributedTasks.Add(distributedTask);
 
