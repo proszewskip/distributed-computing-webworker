@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 using Server.Exceptions;
 
-namespace Server.Services.PathsProvider
+namespace Server.Services
 {
     public class PathsProvider : IPathsProvider
     {
