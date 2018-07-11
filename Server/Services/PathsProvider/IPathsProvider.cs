@@ -1,4 +1,4 @@
-namespace Server.Services.PathsProvider
+namespace Server.Services
 {
     public interface IPathsProvider
     {

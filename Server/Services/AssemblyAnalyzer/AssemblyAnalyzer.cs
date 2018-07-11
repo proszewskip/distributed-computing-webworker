@@ -4,7 +4,7 @@ using System.Reflection;
 using DistributedComputing.Common;
 using Server.Models;
 
-namespace Server.Services.AssemblyAnalyzer
+namespace Server.Services
 {
     public class AssemblyAnalyzer : IAssemblyAnalyzer
     {

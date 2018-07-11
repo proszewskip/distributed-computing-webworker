@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace Server.Services.CommandRunner
+namespace Server.Services
 {
     public class CommandRunner : ICommandRunner
     {
