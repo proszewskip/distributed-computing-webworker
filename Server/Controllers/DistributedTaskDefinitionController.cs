@@ -4,16 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Server.DTO;
 using Server.Models;
 using Server.Pagination;
 using Server.Services;
-using Server.Services.AssemblyAnalyzer;
-using Server.Services.PathsProvider;
 using Server.Validation;
 
 namespace Server.Controllers
@@ -25,15 +21,14 @@ namespace Server.Controllers
         private readonly DistributedComputingDbContext _dbContext;
         private readonly IPathsProvider _pathsProvider;
         private readonly IAssemblyAnalyzer _assemblyAnalyzer;
-        // TODO: use IPackagerRunner instead of PackagerRunner
-        private readonly PackagerRunner _packagerRunner;
+        private readonly IPackagerRunner _packagerRunner;
 
 
         public DistributedTaskDefinitionController(
             DistributedComputingDbContext dbContext,
             IPathsProvider pathsProvider,
             IAssemblyAnalyzer assemblyAnalyzer,
-            PackagerRunner packagerRunner
+            IPackagerRunner packagerRunner
         )
         {
             _dbContext = dbContext;

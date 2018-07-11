@@ -3,14 +3,12 @@ using System.IO;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
-using Server.Services.CommandRunner;
-using Server.Services.PathsProvider;
 
 namespace Server.Services.Tests
 {
     public class PackagerRunnerTests
     {
-        private readonly PackagerRunner _packagerRunner;
+        private readonly IPackagerRunner _packagerRunner;
 
         private const string MonoPackagerPath = "path";
         private const string InputDirectory = "input";

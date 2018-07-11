@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Server.Services.CommandRunner
+namespace Server.Services
 {
     public interface ICommandRunner
     {
