@@ -19,7 +19,7 @@ namespace Server.Services
             _commandRunner = commandRunner;
         }
 
-        public async Task<CommandRunnerResult> PackAssemblyAsync(string assemblyDirectoryName, string assemblyName)
+        public Task<CommandRunnerResult> PackAssemblyAsync(string assemblyDirectoryName, string assemblyName)
         {
             // TODO: inject packagerOutputPath and assembliesDirectoryPath as parameters
             var packagerOutputPath = Path.Combine(
@@ -31,9 +31,7 @@ namespace Server.Services
             var outArg = $"-out={packagerOutputPath}";
             var packCommandArgs = $"{_pathsProvider.MonoPackagerPath} {prefixArg} {outArg} {assemblyName}";
 
-            var commandRunnerResult = await _commandRunner.RunCommandTask(MonoCommand, packCommandArgs);
-
-            return commandRunnerResult;
+            return _commandRunner.RunCommandTask(MonoCommand, packCommandArgs);
         }
     }
 }
