@@ -1,22 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using dotenv.net.DependencyInjection.Extensions;
 
 using Server.Models;
-using Server.Services.PathsProvider;
-using Server.Services.AssemblyAnalyzer;
-using Server.Services.CommandRunner;
 using Server.Services;
 using Microsoft.Extensions.FileProviders;
 
@@ -40,7 +30,7 @@ namespace Server
             services.AddScoped<IAssemblyAnalyzer, AssemblyAnalyzer>()
                 .AddScoped<IAssemblyAnalyzer, AssemblyAnalyzer>()
                 .AddScoped<ICommandRunner, CommandRunner>()
-                .AddScoped<PackagerRunner>();
+                .AddScoped<IPackagerRunner, PackagerRunner>();
 
             services.AddSingleton<IPathsProvider, PathsProvider>();
 

@@ -1,11 +1,9 @@
 using System.IO;
 using System.Threading.Tasks;
-using Server.Services.CommandRunner;
-using Server.Services.PathsProvider;
 
 namespace Server.Services
 {
-    public class PackagerRunner
+    public class PackagerRunner : IPackagerRunner
     {
         private readonly IPathsProvider _pathsProvider;
 

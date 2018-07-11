@@ -1,7 +1,7 @@
 using System.Reflection;
 using Server.Models;
 
-namespace Server.Services.AssemblyAnalyzer
+namespace Server.Services
 {
     public interface IAssemblyAnalyzer
     {
