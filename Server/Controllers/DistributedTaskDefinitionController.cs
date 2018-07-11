@@ -4,16 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Server.DTO;
 using Server.Models;
 using Server.Pagination;
 using Server.Services;
-using Server.Services.AssemblyAnalyzer;
-using Server.Services.PathsProvider;
 using Server.Validation;
 
 namespace Server.Controllers
