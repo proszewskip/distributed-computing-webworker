@@ -12,7 +12,7 @@ namespace Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DistributedTaskController : ControllerBase
+    public class DistributedTaskController : Controller
     {
         private readonly DistributedComputingDbContext _dbContext;
 
@@ -101,7 +101,7 @@ namespace Server.Controllers
 
             // 5. Return the info back to the user
 
-            return CreatedAtRoute(nameof(GetById), new { id = distributedTask.Id }, distributedTask);
+            return CreatedAtAction(nameof(GetById), new { id = distributedTask.Id }, distributedTask);
         }
 
         [HttpPut("{id}")]
