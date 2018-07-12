@@ -4,6 +4,6 @@ namespace Server.Services
 {
     public interface ICommandRunner
     {
-        Task<int> RunCommandTask(string command, string commandArgs);
+        Task<CommandRunnerResult> RunCommandTask(string command, string commandArgs);
     }
 }

@@ -1,9 +1,10 @@
 using System.Threading.Tasks;
+using Server.Services.CommandRunner;
 
 namespace Server.Services
 {
     public interface IPackagerRunner
     {
-        Task<int> PackAssemblyAsync(string assemblyDirectoryName, string assemblyName);
+        Task<CommandRunnerResult> PackAssemblyAsync(string assemblyDirectoryName, string assemblyName);
     }
 }
