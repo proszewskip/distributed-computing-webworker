@@ -21,7 +21,7 @@ namespace Server.Services.Tests
         {
             var commandRunnerMock = new Mock<ICommandRunner>();
             commandRunnerMock.Setup(e => e.RunCommandTask(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(5)
+                .ReturnsAsync(new CommandRunnerResult() { StandardError = "error", StandardOutput = "output" })
                 .Callback((string command, string commandArgs) =>
                 {
                     _command = command;

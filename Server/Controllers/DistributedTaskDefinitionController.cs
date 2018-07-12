@@ -108,8 +108,7 @@ namespace Server.Controllers
             var subtaskInfo = _assemblyAnalyzer.GetSubtaskInfo(mainDllAssembly);
 
             // 3. Run packager
-            // TODO: display the result of packager
-            await _packagerRunner.PackAssemblyAsync(taskDefinitionGuid.ToString(), body.MainDll.FileName);
+            var packagerResults = await _packagerRunner.PackAssemblyAsync(taskDefinitionGuid.ToString(), body.MainDll.FileName);
 
             // 4. Add the data to the database
             var distributedTaskDefinition = new DistributedTaskDefinition()
@@ -125,7 +124,7 @@ namespace Server.Controllers
 
             // 5. Return the info back to the user
 
-            return CreatedAtRoute(nameof(GetById), new { id = distributedTaskDefinition.Id }, distributedTaskDefinition);
+            return CreatedAtRoute(nameof(GetById), new { id = distributedTaskDefinition.Id }, new { distributedTaskDefinition, packagerResults });
         }
 
         [HttpPut("{id}")]
