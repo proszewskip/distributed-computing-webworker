@@ -25,7 +25,7 @@ namespace Server.Services
         {
             var taskClassType = GetTypeImplementingInterface<ITask>(assembly);
 
-            return (ITask)Activator.CreateInstance(taskClassType);
+            return (ITask) Activator.CreateInstance(taskClassType);
         }
 
         private Type GetTypeImplementingInterface<T>(Assembly assembly) where T : class

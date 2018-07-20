@@ -11,26 +11,6 @@ namespace Server.Services.Tests
     {
         private readonly AssemblyAnalyzer _assemblyAnalyzer;
 
-        private class ExampleSubtask : ISubtask
-        {
-            public string Perform(string input)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        private Mock<Assembly> GetAssemblyMock(string assemblyName, List<Type> exportedTypes)
-        {
-            var assemblyMock = new Mock<Assembly>();
-
-            var assemblyNameObject = new AssemblyName(assemblyName);
-
-            assemblyMock.Setup(e => e.ExportedTypes).Returns(exportedTypes);
-            assemblyMock.Setup(e => e.GetName()).Returns(assemblyNameObject);
-
-            return assemblyMock;
-        }
-
         public AssemblyAnalyzerTests()
         {
             _assemblyAnalyzer = new AssemblyAnalyzer();
@@ -40,7 +20,7 @@ namespace Server.Services.Tests
         public void GetSubtaskInfo_Returns_CorrectValues()
         {
             var assemblyName = "Test";
-            var exportedTypes = new List<Type>() { typeof(ExampleSubtask) };
+            var exportedTypes = new List<Type> {typeof(ExampleSubtask)};
             var assemblyMock = GetAssemblyMock(assemblyName, exportedTypes);
 
             var subtaskInfo = _assemblyAnalyzer.GetSubtaskInfo(assemblyMock.Object);
@@ -61,13 +41,34 @@ namespace Server.Services.Tests
         [Test]
         public void GetSubtaskInfo_ThrowsException_When_AssemblyImplementsTwoSubtasks()
         {
-            var exportedTypes = new List<Type> {
+            var exportedTypes = new List<Type>
+            {
                 typeof(ExampleSubtask),
                 typeof(ExampleSubtask)
             };
             var assemblyMock = GetAssemblyMock("Test", exportedTypes);
 
             Assert.Throws<Exception>(() => _assemblyAnalyzer.GetSubtaskInfo(assemblyMock.Object));
+        }
+
+        private Mock<Assembly> GetAssemblyMock(string assemblyName, List<Type> exportedTypes)
+        {
+            var assemblyMock = new Mock<Assembly>();
+
+            var assemblyNameObject = new AssemblyName(assemblyName);
+
+            assemblyMock.Setup(e => e.ExportedTypes).Returns(exportedTypes);
+            assemblyMock.Setup(e => e.GetName()).Returns(assemblyNameObject);
+
+            return assemblyMock;
+        }
+
+        private class ExampleSubtask : ISubtask
+        {
+            public string Perform(string input)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

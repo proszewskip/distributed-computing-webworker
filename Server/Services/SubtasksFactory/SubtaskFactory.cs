@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using DistributedComputing.Common;
 using Microsoft.Extensions.Logging;
 using Server.Models;
@@ -9,11 +8,12 @@ namespace Server.Services
     internal class SubtaskFactory : ISubtaskFactory
     {
         private readonly DistributedComputingDbContext _dbContext;
-        private readonly ILogger<SubtaskFactory> _logger;
         private readonly int _distributedTaskId;
+        private readonly ILogger<SubtaskFactory> _logger;
         private int _subtaskSequenceNumber;
 
-        public SubtaskFactory(DistributedComputingDbContext dbContext, ILogger<SubtaskFactory> logger, int distributedTaskId)
+        public SubtaskFactory(DistributedComputingDbContext dbContext, ILogger<SubtaskFactory> logger,
+            int distributedTaskId)
         {
             _dbContext = dbContext;
             _logger = logger;

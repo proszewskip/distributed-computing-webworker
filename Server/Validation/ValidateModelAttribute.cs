@@ -6,10 +6,7 @@ namespace Server.Validation
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (!context.ModelState.IsValid)
-            {
-                context.Result = new ValidationFailedResult(context.ModelState);
-            }
+            if (!context.ModelState.IsValid) context.Result = new ValidationFailedResult(context.ModelState);
         }
     }
 }
