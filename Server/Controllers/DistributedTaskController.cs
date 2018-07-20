@@ -123,11 +123,6 @@ namespace Server.Controllers
 
             _dbContext.SaveChanges();
 
-            // NOTE: Setting those properties is required due to self-referencing loops
-            // which causes errors during serialization to JSON.
-            distributedTask.DistributedTaskDefinition = null;
-            distributedTask.Subtasks = null;
-
             return CreatedAtAction(nameof(GetById), new { id = distributedTask.Id }, distributedTask);
         }
 
