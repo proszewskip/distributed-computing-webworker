@@ -15,6 +15,8 @@ namespace Server.Models
 
         public Guid DefinitionGuid { get; set; }
 
+        public string MainDllName { get; set; }
+
         public SubtaskInfo SubtaskInfo { get; set; }
     }
 }

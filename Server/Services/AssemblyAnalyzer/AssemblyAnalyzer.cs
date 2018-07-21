@@ -21,6 +21,13 @@ namespace Server.Services
             return subtaskInfo;
         }
 
+        public ITask InstantiateTask(Assembly assembly)
+        {
+            var taskClassType = GetTypeImplementingInterface<ITask>(assembly);
+
+            return (ITask)Activator.CreateInstance(taskClassType);
+        }
+
         private Type GetTypeImplementingInterface<T>(Assembly assembly) where T : class
         {
             var tTypeList = assembly.ExportedTypes.Where(type => type.GetInterface(typeof(T).Name) != null).ToList();
