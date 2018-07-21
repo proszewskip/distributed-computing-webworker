@@ -1,4 +1,4 @@
-namespace Server.Services.CommandRunner
+namespace Server.Services
 {
     public class CommandRunnerResult
     {

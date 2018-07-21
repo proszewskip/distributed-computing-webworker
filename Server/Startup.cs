@@ -1,3 +1,4 @@
+using System.Buffers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -5,10 +6,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using dotenv.net.DependencyInjection.Extensions;
-
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Server.Models;
 using Server.Services;
 using Microsoft.Extensions.FileProviders;
+using Newtonsoft.Json;
 
 namespace Server
 {
@@ -24,12 +26,22 @@ namespace Server
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc(options =>
+                {
+                    options.OutputFormatters.Clear();
+                    options.OutputFormatters.Add(new JsonOutputFormatter(new JsonSerializerSettings()
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    }, ArrayPool<char>.Shared));
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddEnv();
             services.AddScoped<IAssemblyAnalyzer, AssemblyAnalyzer>()
                 .AddScoped<IAssemblyAnalyzer, AssemblyAnalyzer>()
                 .AddScoped<ICommandRunner, CommandRunner>()
+                .AddScoped<IAssemblyLoader, AssemblyLoader>()
+                .AddScoped<ISubtaskFactoryFactory, SubtaskFactoryFactory>()
                 .AddScoped<IPackagerRunner, PackagerRunner>();
 
             services.AddSingleton<IPathsProvider, PathsProvider>();
