@@ -24,10 +24,10 @@ namespace Server.Services
 
             packagerProcess.Exited += (sender, args) =>
             {
-                string standardOutput = packagerProcess.StandardOutput.ReadToEnd();
-                string standardError = packagerProcess.StandardError.ReadToEnd();
+                var standardOutput = packagerProcess.StandardOutput.ReadToEnd();
+                var standardError = packagerProcess.StandardError.ReadToEnd();
 
-                var commandRunnerResult = new CommandRunnerResult()
+                var commandRunnerResult = new CommandRunnerResult
                 {
                     StandardOutput = standardOutput,
                     StandardError = standardError

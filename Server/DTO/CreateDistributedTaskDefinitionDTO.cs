@@ -12,10 +12,8 @@ namespace Server.DTO
 
         public string Description { get; set; }
 
-        [Required]
-        public IFormFile MainDll { get; set; }
+        [Required] public IFormFile MainDll { get; set; }
 
-        [Required]
-        public List<IFormFile> AdditionalDlls { get; set; }
+        [Required] public List<IFormFile> AdditionalDlls { get; set; }
     }
 }

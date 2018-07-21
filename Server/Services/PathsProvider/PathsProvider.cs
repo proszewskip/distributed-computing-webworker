@@ -1,25 +1,17 @@
 using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
-
 using Server.Exceptions;
 
 namespace Server.Services
 {
     public class PathsProvider : IPathsProvider
     {
-
-        public string MonoPackagerPath { get; private set; }
-
-        public string TaskDefinitionsDirectoryPath { get; private set; }
-
-        public string CompiledTasksDefinitionsDirectoryPath { get; private set; }
+        private static readonly string MonoPackagerPathVariable = "MONO_PACKAGER_PATH";
+        private static readonly string TaskDefinitionsDirectoryPathVariable = "TASK_DEFINITIONS_PATH";
+        private static readonly string CompiledTasksDefinitionsDirectoryPathVariable = "COMPILED_TASK_DEFINITIONS";
 
         private readonly ILogger<PathsProvider> _logger;
-
-        private static string MonoPackagerPathVariable = "MONO_PACKAGER_PATH";
-        private static string TaskDefinitionsDirectoryPathVariable = "TASK_DEFINITIONS_PATH";
-        private static string CompiledTasksDefinitionsDirectoryPathVariable = "COMPILED_TASK_DEFINITIONS";
 
         public PathsProvider(ILogger<PathsProvider> logger)
         {
@@ -27,6 +19,12 @@ namespace Server.Services
 
             InitializePaths();
         }
+
+        public string MonoPackagerPath { get; private set; }
+
+        public string TaskDefinitionsDirectoryPath { get; private set; }
+
+        public string CompiledTasksDefinitionsDirectoryPath { get; private set; }
 
         private string GetEnvironmentVariable(string variableName)
         {
@@ -54,7 +52,7 @@ namespace Server.Services
             if (!File.Exists(MonoPackagerPath))
             {
                 _logger.LogError($"The \"{MonoPackagerPathVariable}\" environment variable " +
-                    "points to a non-existing file");
+                                 "points to a non-existing file");
                 throw new InvalidEnvironmentConfigurationException();
             }
 
@@ -62,15 +60,16 @@ namespace Server.Services
             if (!Directory.Exists(TaskDefinitionsDirectoryPath))
             {
                 _logger.LogError($"The \"{TaskDefinitionsDirectoryPathVariable}\" environment " +
-                    "variable points to a non-existing directory");
+                                 "variable points to a non-existing directory");
                 throw new InvalidEnvironmentConfigurationException();
             }
 
-            CompiledTasksDefinitionsDirectoryPath = GetPathFromEnvironmentVariable(CompiledTasksDefinitionsDirectoryPathVariable);
+            CompiledTasksDefinitionsDirectoryPath =
+                GetPathFromEnvironmentVariable(CompiledTasksDefinitionsDirectoryPathVariable);
             if (!Directory.Exists(CompiledTasksDefinitionsDirectoryPath))
             {
                 _logger.LogError($"The \"{CompiledTasksDefinitionsDirectoryPathVariable}\" environment " +
-                    "variable points to a non-existing directory");
+                                 "variable points to a non-existing directory");
                 throw new InvalidEnvironmentConfigurationException();
             }
         }
