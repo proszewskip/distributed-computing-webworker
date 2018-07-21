@@ -18,10 +18,10 @@ namespace Server.Controllers
     [ApiController]
     public class DistributedTaskDefinitionController : Controller
     {
-        private readonly DistributedComputingDbContext _dbContext;
-        private readonly IPathsProvider _pathsProvider;
         private readonly IAssemblyAnalyzer _assemblyAnalyzer;
+        private readonly DistributedComputingDbContext _dbContext;
         private readonly IPackagerRunner _packagerRunner;
+        private readonly IPathsProvider _pathsProvider;
 
 
         public DistributedTaskDefinitionController(
@@ -35,28 +35,6 @@ namespace Server.Controllers
             _pathsProvider = pathsProvider;
             _assemblyAnalyzer = assemblyAnalyzer;
             _packagerRunner = packagerRunner;
-        }
-
-        [HttpGet]
-        public IEnumerable<DistributedTaskDefinition> Get([FromQuery] QueryArgsBase queryArgs)
-        {
-            return _dbContext.DistributedTaskDefinitions
-                .Paginate(queryArgs);
-        }
-
-        [HttpGet("{id}")]
-        public IActionResult GetById(int id)
-        {
-            var foundTaskDefinition = _dbContext.DistributedTaskDefinitions
-                .Include(taskDefinition => taskDefinition.SubtaskInfo)
-                .FirstOrDefault(taskDefinition => taskDefinition.Id == id);
-
-            if (foundTaskDefinition == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(foundTaskDefinition);
         }
 
         [HttpPost]
@@ -117,7 +95,8 @@ namespace Server.Controllers
             }
 
             // 3. Run packager
-            var packagerResults = await _packagerRunner.PackAssemblyAsync(taskDefinitionGuid.ToString(), body.MainDll.FileName);
+            var packagerResults =
+                await _packagerRunner.PackAssemblyAsync(taskDefinitionGuid.ToString(), body.MainDll.FileName);
 
             // 4. Add the data to the database
             var distributedTaskDefinition = new DistributedTaskDefinition
@@ -134,7 +113,49 @@ namespace Server.Controllers
 
             // 5. Return the info back to the user
 
-            return CreatedAtAction(nameof(GetById), new { id = distributedTaskDefinition.Id }, new { distributedTaskDefinition, packagerResults });
+            return CreatedAtAction(nameof(GetById), new {id = distributedTaskDefinition.Id},
+                new {distributedTaskDefinition, packagerResults});
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var modifiedTaskDefinition = _dbContext.DistributedTaskDefinitions.FirstOrDefault(task => task.Id == id);
+
+            if (modifiedTaskDefinition == null)
+            {
+                ModelState.TryAddModelError(
+                    nameof(id),
+                    $"A task definition with id {id} does not exist."
+                );
+
+                return new ValidationFailedResult(ModelState);
+            }
+
+            // TODO: update ModelBuilder to delete tasks when the task definition is deleted
+            _dbContext.DistributedTaskDefinitions.Remove(modifiedTaskDefinition);
+            _dbContext.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpGet]
+        public IEnumerable<DistributedTaskDefinition> Get([FromQuery] QueryArgsBase queryArgs)
+        {
+            return _dbContext.DistributedTaskDefinitions
+                .Paginate(queryArgs);
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetById(int id)
+        {
+            var foundTaskDefinition = _dbContext.DistributedTaskDefinitions
+                .Include(taskDefinition => taskDefinition.SubtaskInfo)
+                .FirstOrDefault(taskDefinition => taskDefinition.Id == id);
+
+            if (foundTaskDefinition == null) return NotFound();
+
+            return Ok(foundTaskDefinition);
         }
 
         [HttpPut("{id}")]
@@ -170,36 +191,11 @@ namespace Server.Controllers
                 modifiedTaskDefinition.Name = body.Name;
             }
 
-            if (body.Description != null)
-            {
-                modifiedTaskDefinition.Description = body.Description;
-            }
+            if (body.Description != null) modifiedTaskDefinition.Description = body.Description;
 
             _dbContext.SaveChanges();
 
             return Ok(modifiedTaskDefinition);
-        }
-
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
-        {
-            var modifiedTaskDefinition = _dbContext.DistributedTaskDefinitions.FirstOrDefault(task => task.Id == id);
-
-            if (modifiedTaskDefinition == null)
-            {
-                ModelState.TryAddModelError(
-                    nameof(id),
-                    $"A task definition with id {id} does not exist."
-                );
-
-                return new ValidationFailedResult(ModelState);
-            }
-
-            // TODO: update ModelBuilder to delete tasks when the task definition is deleted
-            _dbContext.DistributedTaskDefinitions.Remove(modifiedTaskDefinition);
-            _dbContext.SaveChanges();
-
-            return Ok();
         }
     }
 }

@@ -8,11 +8,10 @@ namespace Server.Services.Tests
 {
     public class PackagerRunnerTests
     {
-        private readonly IPackagerRunner _packagerRunner;
-
         private const string MonoPackagerPath = "path";
         private const string InputDirectory = "input";
         private const string OutputDirectory = "output";
+        private readonly IPackagerRunner _packagerRunner;
 
         private string _command;
         private string _commandArgs;
@@ -21,7 +20,7 @@ namespace Server.Services.Tests
         {
             var commandRunnerMock = new Mock<ICommandRunner>();
             commandRunnerMock.Setup(e => e.RunCommandTask(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new CommandRunnerResult() { StandardError = "error", StandardOutput = "output" })
+                .ReturnsAsync(new CommandRunnerResult {StandardError = "error", StandardOutput = "output"})
                 .Callback((string command, string commandArgs) =>
                 {
                     _command = command;
@@ -54,7 +53,8 @@ namespace Server.Services.Tests
             var assemblyName = "b.dll";
             await _packagerRunner.PackAssemblyAsync(assemblyPath, assemblyName);
 
-            Assert.AreEqual(_commandArgs, string.Join(" ", new List<string>() {
+            Assert.AreEqual(_commandArgs, string.Join(" ", new List<string>
+            {
                 MonoPackagerPath,
                 $"-prefix={Path.Combine(InputDirectory, assemblyPath)}",
                 $"-out={Path.Combine(OutputDirectory, assemblyPath)}",

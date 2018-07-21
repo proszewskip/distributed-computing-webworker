@@ -5,11 +5,10 @@ namespace Server.Services
 {
     public class PackagerRunner : IPackagerRunner
     {
-        private readonly IPathsProvider _pathsProvider;
+        private const string MonoCommand = "mono";
 
         private readonly ICommandRunner _commandRunner;
-
-        private const string MonoCommand = "mono";
+        private readonly IPathsProvider _pathsProvider;
 
         public PackagerRunner(IPathsProvider pathsProvider, ICommandRunner commandRunner)
         {
