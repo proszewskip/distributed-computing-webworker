@@ -66,26 +66,5 @@ namespace Server.Controllers
 
             return Ok(restartedSubtask);
         }
-
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
-        {
-            var deletedSubtask = _dbContext.Subtasks.FirstOrDefault(subtask => subtask.Id == id);
-
-            if (deletedSubtask == null)
-            {
-                ModelState.TryAddModelError(
-                    nameof(id),
-                    $"A subtask with id {id} does not exist."
-                );
-
-                return new ValidationFailedResult(ModelState);
-            }
-
-            _dbContext.Subtasks.Remove(deletedSubtask);
-            _dbContext.SaveChanges();
-
-            return Ok();
-        }
     }
 }
