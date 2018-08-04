@@ -50,15 +50,6 @@ namespace Server.Controllers
         {
             // FIXME: handle errors
 
-            // 1. Validate input data
-            var taskDefinitionExists = await _dbContext.DistributedTaskDefinitions
-                .AnyAsync(taskDefinition => taskDefinition.Name == body.Name);
-
-            if (taskDefinitionExists)
-            {
-                return Error(new Error(400, $"A task definition with the name {body.Name} already exists"));
-            }
-
             // 2. Analyze the DLL
             var taskDefinitionGuid = Guid.NewGuid();
             var mainDllPath = await SaveDlls(body, taskDefinitionGuid);
