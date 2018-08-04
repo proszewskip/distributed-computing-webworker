@@ -8,6 +8,11 @@ namespace Server.Models
         {
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<DistributedTaskDefinition>().OwnsOne(p => p.SubtaskInfo);
+        }
+
         public DbSet<DistributedTaskDefinition> DistributedTaskDefinitions { get; set; }
 
         public DbSet<DistributedTask> DistributedTasks { get; set; }

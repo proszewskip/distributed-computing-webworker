@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using dotenv.net.DependencyInjection.Extensions;
+using JsonApiDotNetCore.Extensions;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Server.Models;
 using Server.Services;
@@ -49,7 +50,7 @@ namespace Server
             var connectionString = Configuration.GetConnectionString("DistributedComputingContext");
             services.AddEntityFrameworkNpgsql()
                 .AddDbContext<DistributedComputingDbContext>(options => options.UseNpgsql(connectionString));
-
+            services.AddJsonApi<DistributedComputingDbContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -79,7 +80,7 @@ namespace Server
             }
 
             app.UseHttpsRedirection();
-            app.UseMvc();
+            app.UseJsonApi();
         }
     }
 }
