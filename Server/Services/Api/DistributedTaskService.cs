@@ -56,6 +56,7 @@ namespace Server.Services.Api
             try
             {
                 taskInstance.DefineTasks(resource.InputData, subtaskFactory);
+                await _dbContext.SaveChangesAsync();
             }
             catch
             {
