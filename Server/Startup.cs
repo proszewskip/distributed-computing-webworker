@@ -46,7 +46,8 @@ namespace Server
                 .AddScoped<IAssemblyLoader, AssemblyLoader>()
                 .AddScoped<ISubtaskFactoryFactory, SubtaskFactoryFactory>()
                 .AddScoped<IPackagerRunner, PackagerRunner>()
-                .AddScoped<IResourceService<DistributedTaskDefinition>, DistributedTaskDefinitionService>();
+                .AddScoped<IResourceService<DistributedTaskDefinition>, DistributedTaskDefinitionService>()
+                .AddScoped<IResourceService<DistributedTask>, DistributedTaskService>();
 
             services.AddSingleton<IPathsProvider, PathsProvider>();
 
