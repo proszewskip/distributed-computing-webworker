@@ -34,7 +34,10 @@ namespace Server.Services.Api
 
         public override async Task<DistributedTaskDefinition> UpdateAsync(int id, DistributedTaskDefinition resource)
         {
-            await EnsureUniqueName(resource.Name);
+            if (resource.Name != null)
+            {
+                await EnsureUniqueName(resource.Name);
+            }
 
             return await base.UpdateAsync(id, resource);
         }
