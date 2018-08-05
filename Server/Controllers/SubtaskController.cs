@@ -1,70 +1,45 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
+using JsonApiDotNetCore.Controllers;
+using JsonApiDotNetCore.Internal;
+using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Server.Models;
-using Server.Pagination;
-using Server.Validation;
 
 namespace Server.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class SubtaskController : Controller
+    public class SubtaskController : JsonApiController<Subtask>
     {
-        private readonly DistributedComputingDbContext _dbContext;
-
+        private readonly IResourceService<Subtask> _resourceService;
 
         public SubtaskController(
-            DistributedComputingDbContext dbContext
-        )
+            IJsonApiContext jsonApiContext,
+            IResourceService<Subtask> resourceService
+        ) : base(jsonApiContext, getAll: resourceService, getById: resourceService, getRelationship: resourceService, getRelationships: resourceService, update: resourceService)
         {
-            _dbContext = dbContext;
+            _resourceService = resourceService;
         }
 
-        [HttpGet]
-        public IEnumerable<Subtask> Get([FromQuery] QueryArgsBase queryArgs)
+        [HttpPatch("{id}")]
+        public override Task<IActionResult> PatchAsync(int id, Subtask entity)
         {
-            return _dbContext.Subtasks
-                .Paginate(queryArgs);
-        }
+            var errorActionResult = Error(new Error(400, "Updating the subtask is not allowed"));
 
-        [HttpGet("{id}")]
-        public IActionResult GetById(int id)
-        {
-            var foundSubtask = _dbContext.Subtasks
-                .Include(subtask => subtask.DistributedTask)
-                .FirstOrDefault(subtask => subtask.Id == id);
-
-            if (foundSubtask == null) return NotFound();
-
-            return Ok(foundSubtask);
+            return Task.FromResult(errorActionResult);
         }
 
         [HttpPost("{id}/restart")]
-        [ValidateModel]
-        public IActionResult Restart(int id)
+        public Task<IActionResult> RestartAsync(int id)
         {
-            var restartedSubtask = _dbContext.Subtasks.FirstOrDefault(subtask => subtask.Id == id);
-
-            if (restartedSubtask == null)
+            var restartedSubtask = new Subtask
             {
-                ModelState.TryAddModelError(
-                    nameof(id),
-                    $"A subtask with id {id} does not exist."
-                );
+                Status = SubtaskStatus.WaitingForExecution,
+                Result = null,
+                Token = Guid.NewGuid().ToString()
+            };
 
-                return new ValidationFailedResult(ModelState);
-            }
-
-            restartedSubtask.Status = SubtaskStatus.WaitingForExecution;
-            restartedSubtask.Result = null;
-            restartedSubtask.Token = Guid.NewGuid().ToString();
-
-            _dbContext.SaveChanges();
-
-            return Ok(restartedSubtask);
+            return base.PatchAsync(id, restartedSubtask);
         }
     }
 }
