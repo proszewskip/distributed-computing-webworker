@@ -4,6 +4,6 @@ namespace Server.Services
 {
     public interface IPackagerRunner
     {
-        Task<CommandRunnerResult> PackAssemblyAsync(string assemblyDirectoryName, string assemblyName);
+        Task<CommandRunnerResult> PackAssemblyAsync(string assemblyDirectoryPath, string outputDirectoryPath, string assemblyName);
     }
 }

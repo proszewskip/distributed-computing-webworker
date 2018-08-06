@@ -32,8 +32,6 @@ namespace Server.Services.Tests
                 .Returns(OutputDirectory);
             pathsProvider.Setup(e => e.MonoPackagerPath)
                 .Returns(MonoPackagerPath);
-            pathsProvider.Setup(e => e.TaskDefinitionsDirectoryPath)
-                .Returns(InputDirectory);
 
             _packagerRunner = new PackagerRunner(pathsProvider.Object, commandRunnerMock.Object);
         }
@@ -41,7 +39,7 @@ namespace Server.Services.Tests
         [Test]
         public async Task PackAssemblyAsync_Should_UseCorrectCommand()
         {
-            await _packagerRunner.PackAssemblyAsync("assembly", "b.dll");
+            await _packagerRunner.PackAssemblyAsync(InputDirectory, OutputDirectory, "b.dll");
 
             Assert.AreEqual(_command, "mono");
         }
@@ -49,15 +47,14 @@ namespace Server.Services.Tests
         [Test]
         public async Task PackAssemblyAsync_Should_UseCorrectCommandArguments()
         {
-            var assemblyPath = "assembly";
             var assemblyName = "b.dll";
-            await _packagerRunner.PackAssemblyAsync(assemblyPath, assemblyName);
+            await _packagerRunner.PackAssemblyAsync(InputDirectory, OutputDirectory, assemblyName);
 
             Assert.AreEqual(_commandArgs, string.Join(" ", new List<string>
             {
                 MonoPackagerPath,
-                $"-prefix={Path.Combine(InputDirectory, assemblyPath)}",
-                $"-out={Path.Combine(OutputDirectory, assemblyPath)}",
+                $"-prefix={InputDirectory}",
+                $"-out={OutputDirectory}",
                 assemblyName
             }));
         }

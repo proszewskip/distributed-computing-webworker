@@ -44,10 +44,8 @@ namespace Server.Services.Api
             var distributedTask = await base.CreateAsync(resource);
 
             var subtaskFactory = _subtaskFactoryFactory.CreateSubtaskFactory(distributedTask.Id);
-            // TODO: use PathsProvider to get the DLL path
             var distributedTaskDllPath = Path.Combine(
-                _pathsProvider.TaskDefinitionsDirectoryPath,
-                taskDefinition.DefinitionGuid.ToString(),
+                _pathsProvider.GetTaskDefinitionDirectoryPath(taskDefinition.DefinitionGuid),
                 taskDefinition.MainDllName
             );
 
