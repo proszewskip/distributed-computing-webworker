@@ -11,14 +11,11 @@ namespace Server.Controllers
 {
     public class SubtaskController : JsonApiController<Subtask>
     {
-        private readonly IResourceService<Subtask> _resourceService;
-
         public SubtaskController(
             IJsonApiContext jsonApiContext,
             IResourceService<Subtask> resourceService
         ) : base(jsonApiContext, getAll: resourceService, getById: resourceService, getRelationship: resourceService, getRelationships: resourceService, update: resourceService)
         {
-            _resourceService = resourceService;
         }
 
         [HttpPatch("{id}")]

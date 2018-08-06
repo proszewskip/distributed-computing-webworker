@@ -10,6 +10,7 @@ namespace Server.Models
         public int SequenceNumber { get; set; }
 
         [Required]
+        // TODO: use Guid instead of string
         public string Token { get; set; }
 
         public int DistributedTaskId { get; set; }
