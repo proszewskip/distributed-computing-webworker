@@ -9,6 +9,7 @@ using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Server.DTO;
+using Server.Exceptions;
 using Server.Models;
 using Server.Services;
 using Server.Validation;
@@ -18,8 +19,11 @@ namespace Server.Controllers
     public class DistributedTaskDefinitionController : JsonApiController<DistributedTaskDefinition>
     {
         private readonly IAssemblyAnalyzer _assemblyAnalyzer;
+        private readonly IAssemblyLoader _assemblyLoader;
         private readonly IPackagerRunner _packagerRunner;
+        private readonly IFileStorage _fileStorage;
         private readonly IPathsProvider _pathsProvider;
+        private readonly ILogger<DistributedTaskDefinitionController> _logger;
 
 
         public DistributedTaskDefinitionController(
@@ -28,12 +32,18 @@ namespace Server.Controllers
             ILoggerFactory loggerFactory,
             IPathsProvider pathsProvider,
             IAssemblyAnalyzer assemblyAnalyzer,
-            IPackagerRunner packagerRunner
+            IAssemblyLoader assemblyLoader,
+            IPackagerRunner packagerRunner,
+            IFileStorage fileStorage
         ) : base(jsonApiContext, resourceService, loggerFactory)
         {
             _pathsProvider = pathsProvider;
             _assemblyAnalyzer = assemblyAnalyzer;
+            _assemblyLoader = assemblyLoader;
             _packagerRunner = packagerRunner;
+            _fileStorage = fileStorage;
+
+            _logger = loggerFactory.CreateLogger<DistributedTaskDefinitionController>();
         }
 
         // TODO: come up with a better name for the endpoint
@@ -41,31 +51,29 @@ namespace Server.Controllers
         [ValidateModel]
         public async Task<IActionResult> PostAsync([FromForm] CreateDistributedTaskDefinitionDTO body)
         {
-            // FIXME: handle errors
-
-            // 2. Analyze the DLL
             var taskDefinitionGuid = Guid.NewGuid();
-            var mainDllPath = await SaveDlls(body, taskDefinitionGuid);
+            var mainDllPath = await SaveDllsAsync(body, taskDefinitionGuid);
+            var mainDllAssembly = _assemblyLoader.LoadAssembly(mainDllPath);
+            SubtaskInfo subtaskInfo;
 
-            var mainDllAssembly = Assembly.LoadFrom(mainDllPath);
-            // TODO: handle errors while creating subtaskInfo
-            var subtaskInfo = _assemblyAnalyzer.GetSubtaskInfo(mainDllAssembly);
             try
             {
-                _assemblyAnalyzer.InstantiateTask(mainDllAssembly);
+                subtaskInfo = AnalyzeAssembly(mainDllAssembly);
             }
-            catch
+            catch (InvalidAssemblyException exception)
             {
-                return Error(new Error(400,
-                    $"Cannot instantiate a task. Make sure the assembly contains a class that implements the {nameof(ITask)} interface"));
+                return Error(new Error(400, exception.Message));
+            }
+            catch (Exception exception)
+            {
+                _logger.LogWarning(exception, "Exception occurred when analyzing the assembly");
+                return Error(new Error(500, "Internal Server Error when analyzing the assembly"));
             }
 
-            // 3. Run packager
+            
             // TODO: handle packager errors and display them to the user
-            var packagerResults =
-                await _packagerRunner.PackAssemblyAsync(taskDefinitionGuid.ToString(), body.MainDll.FileName);
+            var assemblyPackingResult = await PackAssemblyAsync(body, taskDefinitionGuid);
 
-            // 4. Add the data to the database
             var distributedTaskDefinition = new DistributedTaskDefinition
             {
                 Name = body.Name,
@@ -79,33 +87,26 @@ namespace Server.Controllers
             return await base.PostAsync(distributedTaskDefinition);
         }
 
-        private async Task<string> SaveDlls(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
+        private Task<CommandRunnerResult> PackAssemblyAsync(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
         {
-            // TODO: extract computing paths to PathsProvider
-            var taskDefinitionDirectoryPath = Path.Combine(
-                _pathsProvider.TaskDefinitionsDirectoryPath,
-                taskDefinitionGuid.ToString()
-            );
+            return _packagerRunner.PackAssemblyAsync(_pathsProvider.GetTaskDefinitionDirectoryPath(taskDefinitionGuid), _pathsProvider.GetCompiledTaskDefinitionDirectoryPath(taskDefinitionGuid), body.MainDll.FileName);
+        }
 
-            Directory.CreateDirectory(taskDefinitionDirectoryPath);
+        private async Task<string> SaveDllsAsync(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
+        {
+            var taskDefinitionDirectoryPath = _pathsProvider.GetTaskDefinitionDirectoryPath(taskDefinitionGuid);
+            var saveMainDllFileTask = _fileStorage.SaveFileAsync(taskDefinitionDirectoryPath, body.MainDll);
 
-            // TODO: extract saving the DLLs
-            var mainDllPath = Path.Combine(taskDefinitionDirectoryPath, body.MainDll.FileName);
-            using (var mainDllFileStream = new FileStream(mainDllPath, FileMode.Create))
-            {
-                await body.MainDll.CopyToAsync(mainDllFileStream);
-            }
+            await Task.WhenAll(saveMainDllFileTask,
+                _fileStorage.SaveFilesAsync(taskDefinitionDirectoryPath, body.AdditionalDlls));
 
-            foreach (var additionalDllFile in body.AdditionalDlls)
-            {
-                var additionalDllPath = Path.Combine(taskDefinitionDirectoryPath, additionalDllFile.FileName);
-                using (var additionalDllFileStream = new FileStream(additionalDllPath, FileMode.Create))
-                {
-                    await additionalDllFile.CopyToAsync(additionalDllFileStream);
-                }
-            }
+            return saveMainDllFileTask.Result;
+        }
 
-            return mainDllPath;
+        private SubtaskInfo AnalyzeAssembly(Assembly assembly)
+        {
+            _assemblyAnalyzer.InstantiateTask(assembly);
+            return _assemblyAnalyzer.GetSubtaskInfo(assembly);
         }
     }
 }

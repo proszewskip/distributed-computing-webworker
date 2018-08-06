@@ -22,9 +22,19 @@ namespace Server.Services
 
         public string MonoPackagerPath { get; private set; }
 
-        public string TaskDefinitionsDirectoryPath { get; private set; }
-
         public string CompiledTasksDefinitionsDirectoryPath { get; private set; }
+
+        private string TaskDefinitionsDirectoryPath { get; set; }
+
+        public string GetTaskDefinitionDirectoryPath(Guid guid)
+        {
+            return Path.Combine(TaskDefinitionsDirectoryPath, guid.ToString());
+        }
+
+        public string GetCompiledTaskDefinitionDirectoryPath(Guid guid)
+        {
+            return Path.Combine(CompiledTasksDefinitionsDirectoryPath, guid.ToString());
+        }
 
         private string GetEnvironmentVariable(string variableName)
         {
@@ -48,6 +58,7 @@ namespace Server.Services
 
         private void InitializePaths()
         {
+            // TODO: improve error reporting (report all errors before exiting)
             MonoPackagerPath = GetPathFromEnvironmentVariable(MonoPackagerPathVariable);
             if (!File.Exists(MonoPackagerPath))
             {

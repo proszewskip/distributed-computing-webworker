@@ -4,6 +4,7 @@ using System.Reflection;
 using DistributedComputing.Common;
 using Moq;
 using NUnit.Framework;
+using Server.Exceptions;
 
 namespace Server.Services.Tests
 {
@@ -35,7 +36,7 @@ namespace Server.Services.Tests
         {
             var assemblyMock = GetAssemblyMock("Test", new List<Type>());
 
-            Assert.Throws<Exception>(() => _assemblyAnalyzer.GetSubtaskInfo(assemblyMock.Object));
+            Assert.Throws<InvalidAssemblyException>(() => _assemblyAnalyzer.GetSubtaskInfo(assemblyMock.Object));
         }
 
         [Test]
@@ -48,7 +49,7 @@ namespace Server.Services.Tests
             };
             var assemblyMock = GetAssemblyMock("Test", exportedTypes);
 
-            Assert.Throws<Exception>(() => _assemblyAnalyzer.GetSubtaskInfo(assemblyMock.Object));
+            Assert.Throws<InvalidAssemblyException>(() => _assemblyAnalyzer.GetSubtaskInfo(assemblyMock.Object));
         }
 
         private Mock<Assembly> GetAssemblyMock(string assemblyName, List<Type> exportedTypes)
