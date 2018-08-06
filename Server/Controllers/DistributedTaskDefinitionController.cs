@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using DistributedComputing.Common;
@@ -9,11 +7,9 @@ using JsonApiDotNetCore.Controllers;
 using JsonApiDotNetCore.Internal;
 using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Server.DTO;
 using Server.Models;
-using Server.Pagination;
 using Server.Services;
 using Server.Validation;
 
@@ -23,21 +19,18 @@ namespace Server.Controllers
     {
         private readonly IAssemblyAnalyzer _assemblyAnalyzer;
         private readonly IPackagerRunner _packagerRunner;
-        private readonly DistributedComputingDbContext _dbContext;
         private readonly IPathsProvider _pathsProvider;
 
 
         public DistributedTaskDefinitionController(
             IJsonApiContext jsonApiContext,
             IResourceService<DistributedTaskDefinition> resourceService,
-            DistributedComputingDbContext dbContext,
             ILoggerFactory loggerFactory,
             IPathsProvider pathsProvider,
             IAssemblyAnalyzer assemblyAnalyzer,
             IPackagerRunner packagerRunner
         ) : base(jsonApiContext, resourceService, loggerFactory)
         {
-            _dbContext = dbContext;
             _pathsProvider = pathsProvider;
             _assemblyAnalyzer = assemblyAnalyzer;
             _packagerRunner = packagerRunner;
