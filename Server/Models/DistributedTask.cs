@@ -24,14 +24,12 @@ namespace Server.Models
         public virtual DistributedTaskDefinition DistributedTaskDefinition { get; set; }
 
         [Required]
-        [Attr("input-data", isImmutable: true, isFilterable: false, isSortable: false)]
-        public string InputData { get; set; }
+        public byte[] InputData { get; set; }
 
         [Attr("status", isImmutable: true)]
         public DistributedTaskStatus Status { get; set; } = DistributedTaskStatus.InProgress;
 
-        [Attr("result", isImmutable: true)]
-        public string Result { get; set; }
+        public byte[] Result { get; set; }
 
         [HasMany("subtasks")]
         public virtual List<Subtask> Subtasks { get; set; }

@@ -4,13 +4,13 @@ namespace Server.Models
 {
     public class DistributedComputingDbContext : DbContext
     {
-        public DistributedComputingDbContext(DbContextOptions<DistributedComputingDbContext> options) : base(options)
+        public DistributedComputingDbContext(DbContextOptions options) : base(options)
         {
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<DistributedTaskDefinition>().OwnsOne(p => p.SubtaskInfo);
+            modelBuilder.Entity<DistributedTaskDefinition>().OwnsOne(p => p.ProblemPluginInfo);
         }
 
         public DbSet<DistributedTaskDefinition> DistributedTaskDefinitions { get; set; }
