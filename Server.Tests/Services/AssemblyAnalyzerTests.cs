@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using DistributedComputing.Common;
+using DistributedComputing;
 using Moq;
 using NUnit.Framework;
 using Server.Exceptions;
@@ -18,38 +18,34 @@ namespace Server.Services.Tests
         }
 
         [Test]
-        public void GetSubtaskInfo_Returns_CorrectValues()
+        public void GetProblemPluginInfo_Returns_CorrectValues()
         {
             var assemblyName = "Test";
-            var exportedTypes = new List<Type> {typeof(ExampleSubtask)};
+            var exportedTypes = new List<Type> { typeof(ExampleProblemPlugin) };
             var assemblyMock = GetAssemblyMock(assemblyName, exportedTypes);
 
-            var subtaskInfo = _assemblyAnalyzer.GetSubtaskInfo(assemblyMock.Object);
+            var problemPluginInfo = _assemblyAnalyzer.GetProblemPluginInfo(assemblyMock.Object);
 
-            Assert.AreEqual(subtaskInfo.AssemblyName, assemblyName);
-            Assert.AreEqual(subtaskInfo.ClassName, nameof(ExampleSubtask));
-            Assert.AreEqual(subtaskInfo.Namespace, typeof(ExampleSubtask).Namespace);
+            Assert.AreEqual(problemPluginInfo.AssemblyName, assemblyName);
+            Assert.AreEqual(problemPluginInfo.ClassName, nameof(ExampleProblemPlugin));
+            Assert.AreEqual(problemPluginInfo.Namespace, typeof(ExampleProblemPlugin).Namespace);
         }
 
         [Test]
-        public void GetSubtaskInfo_ThrowsException_When_AssemblyDoesNotImplementSubtask()
+        public void GetProblemPluginInfo_ThrowsException_When_AssemblyDoesNotImplementProblemInfo()
         {
             var assemblyMock = GetAssemblyMock("Test", new List<Type>());
 
-            Assert.Throws<InvalidAssemblyException>(() => _assemblyAnalyzer.GetSubtaskInfo(assemblyMock.Object));
+            Assert.Throws<InvalidAssemblyException>(() => _assemblyAnalyzer.GetProblemPluginInfo(assemblyMock.Object));
         }
 
         [Test]
-        public void GetSubtaskInfo_ThrowsException_When_AssemblyImplementsTwoSubtasks()
+        public void GetProblemPluginInfo_ThrowsException_When_AssemblyImplementsTwoProblemInfos()
         {
-            var exportedTypes = new List<Type>
-            {
-                typeof(ExampleSubtask),
-                typeof(ExampleSubtask)
-            };
+            var exportedTypes = new List<Type> { typeof(ExampleProblemPlugin), typeof(ExampleProblemPlugin) };
             var assemblyMock = GetAssemblyMock("Test", exportedTypes);
 
-            Assert.Throws<InvalidAssemblyException>(() => _assemblyAnalyzer.GetSubtaskInfo(assemblyMock.Object));
+            Assert.Throws<InvalidAssemblyException>(() => _assemblyAnalyzer.GetProblemPluginInfo(assemblyMock.Object));
         }
 
         private Mock<Assembly> GetAssemblyMock(string assemblyName, List<Type> exportedTypes)
@@ -64,9 +60,29 @@ namespace Server.Services.Tests
             return assemblyMock;
         }
 
-        private class ExampleSubtask : ISubtask
+        private class ExampleProblemPlugin : IProblemPlugin
         {
-            public string Perform(string input)
+            public object ParseTask(byte[] data)
+            {
+                throw new NotImplementedException();
+            }
+
+            public byte[] SerializeTaskResult(object taskResult)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerable<object> DivideTask(object task)
+            {
+                throw new NotImplementedException();
+            }
+
+            public object JoinSubtaskResults(IEnumerable<object> subtaskResults)
+            {
+                throw new NotImplementedException();
+            }
+
+            public object Compute(object subtask)
             {
                 throw new NotImplementedException();
             }

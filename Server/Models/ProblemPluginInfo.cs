@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace Server.Models
 {
-    public class SubtaskInfo
+    public class ProblemPluginInfo
     {
         [JsonProperty("assembly-name")]
         public string AssemblyName { get; set; }

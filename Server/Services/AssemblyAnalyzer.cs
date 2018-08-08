@@ -1,33 +1,42 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using DistributedComputing.Common;
+using DistributedComputing;
 using Server.Exceptions;
 using Server.Models;
 
 namespace Server.Services
 {
+    public interface IAssemblyAnalyzer
+    {
+        ProblemPluginInfo GetProblemPluginInfo(Assembly assembly);
+
+        IProblemPlugin InstantiateProblemPlugin(Assembly assembly);
+    }
+
     public class AssemblyAnalyzer : IAssemblyAnalyzer
     {
-        public SubtaskInfo GetSubtaskInfo(Assembly assembly)
+        public ProblemPluginInfo GetProblemPluginInfo(Assembly assembly)
         {
-            var subtaskInfo = new SubtaskInfo();
-            var subtaskType = GetTypeImplementingInterface<ISubtask>(assembly);
+            var problemPluginInfo = new ProblemPluginInfo();
+            // TODO: test if implementations with provided generic IProblemPlugin parameters will be matched
+            // with this type of reflection
+            var problemPluginType = GetTypeImplementingInterface<IProblemPlugin>(assembly);
 
-            subtaskInfo.AssemblyName = assembly.GetName().Name;
-            subtaskInfo.ClassName = subtaskType.Name;
-            subtaskInfo.Namespace = subtaskType.Namespace;
+            problemPluginInfo.AssemblyName = assembly.GetName().Name;
+            problemPluginInfo.ClassName = problemPluginType.Name;
+            problemPluginInfo.Namespace = problemPluginType.Namespace;
 
-            return subtaskInfo;
+            return problemPluginInfo;
         }
 
-        public ITask InstantiateTask(Assembly assembly)
+        public IProblemPlugin InstantiateProblemPlugin(Assembly assembly)
         {
-            var taskClassType = GetTypeImplementingInterface<ITask>(assembly);
+            var taskClassType = GetTypeImplementingInterface<IProblemPlugin>(assembly);
 
             try
             {
-                return (ITask) Activator.CreateInstance(taskClassType);
+                return (IProblemPlugin) Activator.CreateInstance(taskClassType);
             }
             catch (Exception exception)
             {

@@ -1,8 +1,6 @@
 using System;
-using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using DistributedComputing.Common;
 using JsonApiDotNetCore.Controllers;
 using JsonApiDotNetCore.Internal;
 using JsonApiDotNetCore.Services;
@@ -54,11 +52,11 @@ namespace Server.Controllers
             var taskDefinitionGuid = Guid.NewGuid();
             var mainDllPath = await SaveDllsAsync(body, taskDefinitionGuid);
             var mainDllAssembly = _assemblyLoader.LoadAssembly(mainDllPath);
-            SubtaskInfo subtaskInfo;
+            ProblemPluginInfo problemPluginInfo;
 
             try
             {
-                subtaskInfo = AnalyzeAssembly(mainDllAssembly);
+                problemPluginInfo = AnalyzeAssembly(mainDllAssembly);
             }
             catch (InvalidAssemblyException exception)
             {
@@ -72,6 +70,7 @@ namespace Server.Controllers
 
             
             // TODO: handle packager errors and display them to the user
+            // TODO: try to use packager as a DLL instead of an external command
             var assemblyPackingResult = await PackAssemblyAsync(body, taskDefinitionGuid);
 
             var distributedTaskDefinition = new DistributedTaskDefinition
@@ -79,7 +78,7 @@ namespace Server.Controllers
                 Name = body.Name,
                 Description = body.Description,
                 DefinitionGuid = taskDefinitionGuid,
-                SubtaskInfo = subtaskInfo,
+                ProblemPluginInfo = problemPluginInfo,
                 MainDllName = body.MainDll.FileName
             };
 
@@ -103,10 +102,12 @@ namespace Server.Controllers
             return saveMainDllFileTask.Result;
         }
 
-        private SubtaskInfo AnalyzeAssembly(Assembly assembly)
+        private ProblemPluginInfo AnalyzeAssembly(Assembly assembly)
         {
-            _assemblyAnalyzer.InstantiateTask(assembly);
-            return _assemblyAnalyzer.GetSubtaskInfo(assembly);
+            // TODO: test for instantiation errors
+            _assemblyAnalyzer.InstantiateProblemPlugin(assembly);
+
+            return _assemblyAnalyzer.GetProblemPluginInfo(assembly);
         }
     }
 }
