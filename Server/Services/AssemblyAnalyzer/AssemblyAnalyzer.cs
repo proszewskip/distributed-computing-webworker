@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using DistributedComputing.Common;
+using Server.Exceptions;
 using Server.Models;
 
 namespace Server.Services
@@ -11,7 +12,6 @@ namespace Server.Services
         public SubtaskInfo GetSubtaskInfo(Assembly assembly)
         {
             var subtaskInfo = new SubtaskInfo();
-
             var subtaskType = GetTypeImplementingInterface<ISubtask>(assembly);
 
             subtaskInfo.AssemblyName = assembly.GetName().Name;
@@ -25,7 +25,14 @@ namespace Server.Services
         {
             var taskClassType = GetTypeImplementingInterface<ITask>(assembly);
 
-            return (ITask) Activator.CreateInstance(taskClassType);
+            try
+            {
+                return (ITask) Activator.CreateInstance(taskClassType);
+            }
+            catch (Exception exception)
+            {
+                throw new InvalidAssemblyException($"Cannot create an instance of {taskClassType.Name}", exception);
+            }
         }
 
         private Type GetTypeImplementingInterface<T>(Assembly assembly) where T : class
@@ -33,11 +40,9 @@ namespace Server.Services
             var tTypeList = assembly.ExportedTypes.Where(type => type.GetInterface(typeof(T).Name) != null).ToList();
 
             if (tTypeList.Count == 0)
-                throw new Exception("The assembly does not contain a class that implements the " + typeof(T).Name +
-                                    " interface");
+                throw new InvalidAssemblyException($"The assembly does not contain a class that implements the {typeof(T).Name} interface");
             if (tTypeList.Count > 1)
-                throw new Exception("The assembly contains multiple classes that implement the " + typeof(T).Name +
-                                    " interface");
+                throw new InvalidAssemblyException($"The assembly contains multiple classes that implement the {typeof(T).Name} interface");
 
             return tTypeList.First();
         }
