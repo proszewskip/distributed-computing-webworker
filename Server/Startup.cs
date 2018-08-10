@@ -6,11 +6,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using dotenv.net.DependencyInjection.Extensions;
+using JsonApiDotNetCore.Extensions;
+using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Server.Models;
 using Server.Services;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
+using Server.Services.Api;
 
 namespace Server
 {
@@ -42,14 +45,16 @@ namespace Server
                 .AddScoped<ICommandRunner, CommandRunner>()
                 .AddScoped<IAssemblyLoader, AssemblyLoader>()
                 .AddScoped<ISubtaskFactoryFactory, SubtaskFactoryFactory>()
-                .AddScoped<IPackagerRunner, PackagerRunner>();
+                .AddScoped<IPackagerRunner, PackagerRunner>()
+                .AddScoped<IResourceService<DistributedTaskDefinition>, DistributedTaskDefinitionService>()
+                .AddScoped<IResourceService<DistributedTask>, DistributedTaskService>();
 
             services.AddSingleton<IPathsProvider, PathsProvider>();
 
             var connectionString = Configuration.GetConnectionString("DistributedComputingContext");
             services.AddEntityFrameworkNpgsql()
                 .AddDbContext<DistributedComputingDbContext>(options => options.UseNpgsql(connectionString));
-
+            services.AddJsonApi<DistributedComputingDbContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -79,7 +84,7 @@ namespace Server
             }
 
             app.UseHttpsRedirection();
-            app.UseMvc();
+            app.UseJsonApi();
         }
     }
 }
