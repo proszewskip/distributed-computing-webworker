@@ -27,8 +27,8 @@ namespace Server.Models
         [Attr("main-dll-name", isImmutable: true)]
         public string MainDllName { get; set; }
 
-        [Attr("subtask-info", isImmutable: true)]
+        [Attr("problem-plugin-info", isImmutable: true)]
         [Required]
-        public SubtaskInfo SubtaskInfo { get; set; }
+        public ProblemPluginInfo ProblemPluginInfo { get; set; }
     }
 }

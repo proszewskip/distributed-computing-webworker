@@ -35,8 +35,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FactorialSubtask.cs" />
-    <Compile Include="FactorialTask.cs" />
+    <Compile Include="FactorialSumPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

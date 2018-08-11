@@ -26,6 +26,7 @@ namespace Server.Controllers
             return Task.FromResult(errorActionResult);
         }
 
+        // TODO: decide if restarting is needed (it probably is not, it should take care of itself)
         [HttpPost("{id}/restart")]
         public Task<IActionResult> RestartAsync(int id)
         {
@@ -33,7 +34,7 @@ namespace Server.Controllers
             {
                 Status = SubtaskStatus.WaitingForExecution,
                 Result = null,
-                Token = Guid.NewGuid().ToString()
+                Token = Guid.NewGuid()
             };
 
             return base.PatchAsync(id, restartedSubtask);
