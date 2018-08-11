@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
@@ -10,5 +7,7 @@ namespace Server.Services
     {
         Task<string> SaveFileAsync(string directoryPath, IFormFile file);
         Task<string[]> SaveFilesAsync(string directoryPath, IFormFileCollection files);
+
+        void DeleteDirectory(string directoryPath);
     }
 }
