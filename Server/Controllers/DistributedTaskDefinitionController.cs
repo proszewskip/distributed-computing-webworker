@@ -60,10 +60,12 @@ namespace Server.Controllers
             }
             catch (InvalidAssemblyException exception)
             {
+                DeleteSavedDlls(taskDefinitionGuid);
                 return Error(new Error(400, exception.Message));
             }
             catch (Exception exception)
             {
+                DeleteSavedDlls(taskDefinitionGuid);
                 _logger.LogWarning(exception, "Exception occurred when analyzing the assembly");
                 return Error(new Error(500, "Internal Server Error when analyzing the assembly"));
             }
@@ -82,8 +84,16 @@ namespace Server.Controllers
                 MainDllName = body.MainDll.FileName
             };
 
-            // TODO: handle PostAsync errors, remove saved DLL files when they occur
-            return await base.PostAsync(distributedTaskDefinition);
+            try
+            {
+                return await base.PostAsync(distributedTaskDefinition);
+            }
+            catch
+            {
+                DeleteSavedDlls(taskDefinitionGuid);
+                DeletePackagerResults(taskDefinitionGuid);
+                throw;
+            }
         }
 
         private Task<CommandRunnerResult> PackAssemblyAsync(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
@@ -102,9 +112,21 @@ namespace Server.Controllers
             return saveMainDllFileTask.Result;
         }
 
+        private void DeleteSavedDlls(Guid taskDefinitionGuid)
+        {
+            var taskDefinitionDirectoryPath = _pathsProvider.GetTaskDefinitionDirectoryPath(taskDefinitionGuid);
+            _fileStorage.DeleteDirectory(taskDefinitionDirectoryPath);
+        }
+
+        private void DeletePackagerResults(Guid taskDefinitionGuid)
+        {
+            var packagerResultsDirectoryPath =
+                _pathsProvider.GetCompiledTaskDefinitionDirectoryPath(taskDefinitionGuid);
+            _fileStorage.DeleteDirectory(packagerResultsDirectoryPath);
+        }
+
         private ProblemPluginInfo AnalyzeAssembly(Assembly assembly)
         {
-            // TODO: test for instantiation errors
             _assemblyAnalyzer.InstantiateProblemPlugin(assembly);
 
             return _assemblyAnalyzer.GetProblemPluginInfo(assembly);
