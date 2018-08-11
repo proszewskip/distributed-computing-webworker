@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using JsonApiDotNetCore.Models;
 
@@ -10,8 +11,7 @@ namespace Server.Models
         public int SequenceNumber { get; set; }
 
         [Required]
-        // TODO: use Guid instead of string
-        public string Token { get; set; }
+        public Guid Token { get; set; }
 
         public int DistributedTaskId { get; set; }
 
@@ -20,11 +20,9 @@ namespace Server.Models
         public DistributedTask DistributedTask { get; set; }
 
         [Required]
-        [Attr("input-data", isImmutable: true)]
-        public string InputData { get; set; }
+        public byte[] InputData { get; set; }
 
-        [Attr("result", isImmutable: true)]
-        public string Result { get; set; }
+        public byte[] Result { get; set; }
 
         [Required]
         [Attr("subtask-status", isImmutable: true)]
