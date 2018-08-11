@@ -8,7 +8,9 @@ using JsonApiDotNetCore.Internal;
 using JsonApiDotNetCore.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Server.Exceptions;
 using Server.Models;
+using DistributedComputing;
 
 namespace Server.Services.Api
 {
@@ -44,19 +46,33 @@ namespace Server.Services.Api
             var taskDefinition = await GetTaskDefinitionById(resource.DistributedTaskDefinitionId);
             await EnsureUniqueName(resource.Name);
 
-            // TODO: use transactions to add task and subtasks
-            var distributedTask = await base.CreateAsync(resource);
+            DistributedTask distributedTask;
 
-            try
+            using (var transaction = await _dbContext.Database.BeginTransactionAsync())
             {
-                var subtasks = CreateSubtasks(taskDefinition, distributedTask);
+                try
+                {
+                    distributedTask = await base.CreateAsync(resource);
 
-                await _dbContext.Subtasks.AddRangeAsync(subtasks);
-                await _dbContext.SaveChangesAsync();
-            }
-            catch
-            {
-                // TODO: handle errors
+                    var subtasks = CreateSubtasks(taskDefinition, distributedTask);
+
+                    await _dbContext.Subtasks.AddRangeAsync(subtasks);
+                    await _dbContext.SaveChangesAsync();
+
+                    transaction.Commit();
+                }
+                catch (TaskDataParsingException exception)
+                {
+                    throw new JsonApiException(400, exception.Message, exception);
+                }
+                catch (TaskDivisionException exception)
+                {
+                    throw new JsonApiException(400, exception.Message, exception);
+                }
+                catch (Exception exception)
+                {
+                    throw new JsonApiException(400, "Cannot create the task", exception);
+                }
             }
 
             return distributedTask;
@@ -106,8 +122,8 @@ namespace Server.Services.Api
             var taskAssembly = _assemblyLoader.LoadAssembly(distributedTaskDllPath);
             var problemPlugin = _assemblyAnalyzer.InstantiateProblemPlugin(taskAssembly);
 
-            var parsedTaskData = problemPlugin.ParseTask(distributedTask.InputData);
-            var subtasksData = problemPlugin.DivideTask(parsedTaskData);
+            var parsedTaskData = ParseTaskData(distributedTask, problemPlugin);
+            var subtasksData = DivideTask(problemPlugin, parsedTaskData);
 
             return subtasksData.Select((subtaskData, index) => new Subtask
             {
@@ -117,6 +133,36 @@ namespace Server.Services.Api
                 Status = SubtaskStatus.WaitingForExecution,
                 Token = Guid.NewGuid(),
             });
+        }
+
+        private static IEnumerable<object> DivideTask(IProblemPlugin problemPlugin, object parsedTaskData)
+        {
+            IEnumerable<object> subtasksData;
+            try
+            {
+                subtasksData = problemPlugin.DivideTask(parsedTaskData);
+            }
+            catch (Exception exception)
+            {
+                throw new TaskDivisionException(exception);
+            }
+
+            return subtasksData;
+        }
+
+        private static object ParseTaskData(DistributedTask distributedTask, IProblemPlugin problemPlugin)
+        {
+            object parsedTaskData;
+            try
+            {
+                parsedTaskData = problemPlugin.ParseTask(distributedTask.InputData);
+            }
+            catch (Exception exception)
+            {
+                throw new TaskDataParsingException(exception);
+            }
+
+            return parsedTaskData;
         }
     }
 }
