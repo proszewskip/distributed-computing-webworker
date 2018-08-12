@@ -18,5 +18,7 @@ namespace Server.Models
         public DbSet<DistributedTask> DistributedTasks { get; set; }
 
         public DbSet<Subtask> Subtasks { get; set; }
+
+        public DbSet<SubtaskInProgress> SubtasksInProgress { get; set; }
     }
 }

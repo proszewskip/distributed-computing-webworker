@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using JsonApiDotNetCore.Models;
 
@@ -9,9 +9,6 @@ namespace Server.Models
         [Required]
         [Attr("sequence-number", isImmutable: true)]
         public int SequenceNumber { get; set; }
-
-        [Required]
-        public Guid Token { get; set; }
 
         public int DistributedTaskId { get; set; }
 
@@ -27,5 +24,8 @@ namespace Server.Models
         [Required]
         [Attr("subtask-status", isImmutable: true)]
         public SubtaskStatus Status { get; set; }
+
+        [HasMany("subtasks-in-progress")]
+        public virtual List<SubtaskInProgress> SubtasksInProgress { get; set; }
     }
 }
