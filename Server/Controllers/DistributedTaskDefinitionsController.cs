@@ -18,7 +18,6 @@ namespace Server.Controllers
     {
         private readonly IAssemblyAnalyzer _assemblyAnalyzer;
         private readonly IAssemblyLoader _assemblyLoader;
-        private readonly IPackagerRunner _packagerRunner;
         private readonly IFileStorage _fileStorage;
         private readonly IPathsProvider _pathsProvider;
         private readonly ILogger<DistributedTaskDefinitionsController> _logger;
@@ -31,14 +30,12 @@ namespace Server.Controllers
             IPathsProvider pathsProvider,
             IAssemblyAnalyzer assemblyAnalyzer,
             IAssemblyLoader assemblyLoader,
-            IPackagerRunner packagerRunner,
             IFileStorage fileStorage
         ) : base(jsonApiContext, resourceService, loggerFactory)
         {
             _pathsProvider = pathsProvider;
             _assemblyAnalyzer = assemblyAnalyzer;
             _assemblyLoader = assemblyLoader;
-            _packagerRunner = packagerRunner;
             _fileStorage = fileStorage;
 
             _logger = loggerFactory.CreateLogger<DistributedTaskDefinitionsController>();
