@@ -14,8 +14,4 @@ namespace DistributedComputing
 
         TSubtaskResult Compute(TSubtask subtask);
     }
-
-    public interface IProblemPlugin : IProblemPlugin<object, object, object, object>
-    {
-    }
 }

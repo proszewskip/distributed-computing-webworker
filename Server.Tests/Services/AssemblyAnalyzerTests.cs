@@ -8,6 +8,8 @@ using Server.Exceptions;
 
 namespace Server.Services.Tests
 {
+    using GenericIProblemPlugin = IProblemPlugin<object, object, object, object>;
+
     public class AssemblyAnalyzerTests
     {
         private readonly AssemblyAnalyzer _assemblyAnalyzer;
@@ -60,7 +62,7 @@ namespace Server.Services.Tests
             return assemblyMock;
         }
 
-        private class ExampleProblemPlugin : IProblemPlugin
+        private class ExampleProblemPlugin : GenericIProblemPlugin
         {
             public object ParseTask(byte[] data)
             {

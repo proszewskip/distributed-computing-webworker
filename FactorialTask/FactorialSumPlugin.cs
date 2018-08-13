@@ -24,7 +24,7 @@ namespace FactorialTask
         {
             return task.Split(',')
                 .Select(int.Parse)
-                .ToArray();
+                .ToList();
         }
 
         public int JoinSubtaskResults(IEnumerable<int> subtaskResults)
