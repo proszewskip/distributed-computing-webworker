@@ -1,10 +1,14 @@
-﻿using System;
+/* Source code of Packager class is downloaded from mono repository: https://github.com/mono/mono
+ * Exact file location: https://github.com/mono/mono/blob/master/sdks/wasm/packager.cs
+ */
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Mono.Cecil;
 
-public class Driver
+public class Packager
 {
     private const string BINDINGS_ASM_NAME = "bindings";
     private static bool enable_debug;
