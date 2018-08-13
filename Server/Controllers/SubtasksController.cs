@@ -5,7 +5,7 @@ using Server.Models;
 namespace Server.Controllers
 {
     [HttpReadOnly]
-    public class SubtasksController : JsonApiController<Subtask>
+    public class SubtasksController : BaseJsonApiController<Subtask>
     {
         public SubtasksController(
             IJsonApiContext jsonApiContext,

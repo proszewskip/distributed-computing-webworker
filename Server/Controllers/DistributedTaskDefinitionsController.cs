@@ -17,7 +17,7 @@ namespace Server.Controllers
 {
     public class DistributedTaskDefinitionsController : JsonApiController<DistributedTaskDefinition>
     {
-        private readonly IAssemblyAnalyzer _assemblyAnalyzer;
+        private readonly IProblemPluginFacadeFactory _problemPluginFacadeFactory;
         private readonly IAssemblyLoader _assemblyLoader;
         private readonly IFileStorage _fileStorage;
         private readonly IPackager _packager;
@@ -30,13 +30,13 @@ namespace Server.Controllers
             IResourceService<DistributedTaskDefinition> resourceService,
             ILoggerFactory loggerFactory,
             IPathsProvider pathsProvider,
-            IAssemblyAnalyzer assemblyAnalyzer,
+            IProblemPluginFacadeFactory problemPluginFacadeFactory,
             IAssemblyLoader assemblyLoader,
             IFileStorage fileStorage
         ) : base(jsonApiContext, resourceService, loggerFactory)
         {
             _pathsProvider = pathsProvider;
-            _assemblyAnalyzer = assemblyAnalyzer;
+            _problemPluginFacadeFactory = problemPluginFacadeFactory;
             _assemblyLoader = assemblyLoader;
             _fileStorage = fileStorage;
 
@@ -132,9 +132,9 @@ namespace Server.Controllers
 
         private ProblemPluginInfo AnalyzeAssembly(Assembly assembly)
         {
-            _assemblyAnalyzer.InstantiateProblemPlugin(assembly);
+            var problemPluginFacade = _problemPluginFacadeFactory.Create(assembly);
 
-            return _assemblyAnalyzer.GetProblemPluginInfo(assembly);
+            return problemPluginFacade.GetProblemPluginInfo();
         }
     }
 }

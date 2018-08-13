@@ -10,7 +10,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Server.Exceptions;
 using Server.Models;
-using DistributedComputing;
 
 namespace Server.Services.Api
 {
@@ -19,7 +18,7 @@ namespace Server.Services.Api
         private readonly DistributedComputingDbContext _dbContext;
         private readonly IPathsProvider _pathsProvider;
         private readonly IAssemblyLoader _assemblyLoader;
-        private readonly IAssemblyAnalyzer _assemblyAnalyzer;
+        private readonly IProblemPluginFacadeFactory _problemPluginFacadeFactory;
         private readonly IDataFormatter<object> _dataFormatter;
 
         public DistributedTaskService(
@@ -29,14 +28,14 @@ namespace Server.Services.Api
             DistributedComputingDbContext dbContext,
             IPathsProvider pathsProvider,
             IAssemblyLoader assemblyLoader,
-            IAssemblyAnalyzer assemblyAnalyzer,
+            IProblemPluginFacadeFactory problemPluginFacadeFactory,
             IDataFormatter<object> dataFormatter
         ) : base(jsonApiContext, repository, loggerFactory)
         {
             _dbContext = dbContext;
             _pathsProvider = pathsProvider;
             _assemblyLoader = assemblyLoader;
-            _assemblyAnalyzer = assemblyAnalyzer;
+            _problemPluginFacadeFactory = problemPluginFacadeFactory;
             _dataFormatter = dataFormatter;
         }
 
@@ -120,10 +119,9 @@ namespace Server.Services.Api
             );
 
             var taskAssembly = _assemblyLoader.LoadAssembly(distributedTaskDllPath);
-            var problemPlugin = _assemblyAnalyzer.InstantiateProblemPlugin(taskAssembly);
+            var problemPluginFacade = _problemPluginFacadeFactory.Create(taskAssembly);
 
-            var parsedTaskData = ParseTaskData(distributedTask, problemPlugin);
-            var subtasksData = DivideTask(problemPlugin, parsedTaskData);
+            var subtasksData = problemPluginFacade.GetSubtasksFromData(distributedTask.InputData);
 
             return subtasksData.Select((subtaskData, index) => new Subtask
             {
@@ -132,36 +130,6 @@ namespace Server.Services.Api
                 SequenceNumber = index,
                 Status = SubtaskStatus.WaitingForExecution,
             });
-        }
-
-        private static IEnumerable<object> DivideTask(IProblemPlugin problemPlugin, object parsedTaskData)
-        {
-            IEnumerable<object> subtasksData;
-            try
-            {
-                subtasksData = problemPlugin.DivideTask(parsedTaskData);
-            }
-            catch (Exception exception)
-            {
-                throw new TaskDivisionException(exception);
-            }
-
-            return subtasksData;
-        }
-
-        private static object ParseTaskData(DistributedTask distributedTask, IProblemPlugin problemPlugin)
-        {
-            object parsedTaskData;
-            try
-            {
-                parsedTaskData = problemPlugin.ParseTask(distributedTask.InputData);
-            }
-            catch (Exception exception)
-            {
-                throw new TaskDataParsingException(exception);
-            }
-
-            return parsedTaskData;
         }
     }
 }
