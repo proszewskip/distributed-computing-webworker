@@ -71,11 +71,9 @@ namespace Server
         {
             services.AddScoped<IAssemblyAnalyzer, AssemblyAnalyzer>()
                 .AddScoped<IAssemblyAnalyzer, AssemblyAnalyzer>()
-                .AddScoped<ICommandRunner, CommandRunner>()
                 .AddScoped<IAssemblyLoader, AssemblyLoader>()
                 // TODO: should generics be used here? Maybe consider DataFormatterFactory with a CreateDataFormatter<T>
                 .AddScoped<IDataFormatter<object>, DataFormatter<object>>()
-                .AddScoped<IPackagerRunner, PackagerRunner>()
                 .AddScoped<IFileStorage, FileStorage>()
                 .AddScoped<IResourceService<DistributedTaskDefinition>, DistributedTaskDefinitionService>()
                 .AddScoped<IResourceService<DistributedTask>, DistributedTaskService>();
