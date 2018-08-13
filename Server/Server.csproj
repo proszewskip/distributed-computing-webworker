@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DistributedComputingLibrary\DistributedComputingLibrary.csproj" />
+    <ProjectReference Include="..\Packager\Packager.csproj" />
   </ItemGroup>
 
 </Project>

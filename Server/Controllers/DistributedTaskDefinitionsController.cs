@@ -70,10 +70,9 @@ namespace Server.Controllers
                 return Error(new Error(500, "Internal Server Error when analyzing the assembly"));
             }
 
-            
+
             // TODO: handle packager errors and display them to the user
-            // TODO: try to use packager as a DLL instead of an external command
-            var assemblyPackingResult = await PackAssemblyAsync(body, taskDefinitionGuid);
+            PackAssembly(body, taskDefinitionGuid);
 
             var distributedTaskDefinition = new DistributedTaskDefinition
             {
@@ -96,9 +95,15 @@ namespace Server.Controllers
             }
         }
 
-        private Task<CommandRunnerResult> PackAssemblyAsync(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
+        private void PackAssembly(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
         {
-            return _packagerRunner.PackAssemblyAsync(_pathsProvider.GetTaskDefinitionDirectoryPath(taskDefinitionGuid), _pathsProvider.GetCompiledTaskDefinitionDirectoryPath(taskDefinitionGuid), body.MainDll.FileName);
+            string[] args =
+            {
+                $"-prefix={_pathsProvider.GetTaskDefinitionDirectoryPath(taskDefinitionGuid)}", $"-out={_pathsProvider.GetCompiledTaskDefinitionDirectoryPath(taskDefinitionGuid)}",
+                body.MainDll.FileName
+            };
+
+            Driver.Main(args);
         }
 
         private async Task<string> SaveDllsAsync(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
