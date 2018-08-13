@@ -100,7 +100,7 @@ namespace Server.Controllers
                 body.MainDll.FileName
             };
 
-            Driver.Main(args);
+            Packager.Main(args);
         }
 
         private async Task<string> SaveDllsAsync(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
