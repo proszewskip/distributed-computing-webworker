@@ -1,32 +1,24 @@
-using System;
-using System.Linq;
-using System.IO;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Mono.Cecil;
-
 
 public class Driver
 {
-    static bool enable_debug;
-    static string app_prefix, framework_prefix, bcl_prefix, out_prefix;
-    static HashSet<string> asm_list = new HashSet<string>();
-    static List<string> file_list = new List<string>();
+    private const string BINDINGS_ASM_NAME = "bindings";
+    private static bool enable_debug;
+    private static string app_prefix, framework_prefix, bcl_prefix, out_prefix;
+    private static readonly HashSet<string> asm_list = new HashSet<string>();
+    private static readonly List<string> file_list = new List<string>();
 
-    const string BINDINGS_ASM_NAME = "bindings";
-    enum AssemblyKind
-    {
-        User,
-        Framework,
-        Bcl,
-        None,
-    }
-
-    static void Usage()
+    private static void Usage()
     {
         Console.WriteLine("Valid arguments:");
         Console.WriteLine("\t-help         Show this help message");
         Console.WriteLine("\t-debug        Enable Debugging (default false)");
-        Console.WriteLine("\t-debugrt      Use the debug runtime (default release) - this has nothing to do with C# debugging");
+        Console.WriteLine(
+            "\t-debugrt      Use the debug runtime (default release) - this has nothing to do with C# debugging");
         Console.WriteLine("\t-nobinding    Disable binding engine (default include engine)");
         Console.WriteLine("\t-prefix=x     Set the input assembly prefix to 'x' (default to the current directory)");
         Console.WriteLine("\t-out=x        Set the output directory to 'x' (default to the current directory)");
@@ -36,30 +28,31 @@ public class Driver
         Console.WriteLine("foo.dll         Include foo.dll as one of the root assemblies");
     }
 
-    static void Debug(string s)
+    private static void Debug(string s)
     {
         Console.WriteLine(s);
     }
 
-    static string FindFrameworkAssembly(string asm)
+    private static string FindFrameworkAssembly(string asm)
     {
         return asm;
     }
 
-    static bool Try(string prefix, string name, out string out_res)
+    private static bool Try(string prefix, string name, out string out_res)
     {
         out_res = null;
 
-        string res = (Path.Combine(prefix, name));
+        var res = Path.Combine(prefix, name);
         if (File.Exists(res))
         {
             out_res = Path.GetFullPath(res);
             return true;
         }
+
         return false;
     }
 
-    static string ResolveWithExtension(string prefix, string name)
+    private static string ResolveWithExtension(string prefix, string name)
     {
         string res = null;
 
@@ -72,22 +65,22 @@ public class Driver
         return null;
     }
 
-    static string ResolveUser(string asm_name)
+    private static string ResolveUser(string asm_name)
     {
         return ResolveWithExtension(app_prefix, asm_name);
     }
 
-    static string ResolveFramework(string asm_name)
+    private static string ResolveFramework(string asm_name)
     {
         return ResolveWithExtension(framework_prefix, asm_name);
     }
 
-    static string ResolveBcl(string asm_name)
+    private static string ResolveBcl(string asm_name)
     {
         return ResolveWithExtension(bcl_prefix, asm_name);
     }
 
-    static string Resolve(string asm_name, out AssemblyKind kind)
+    private static string Resolve(string asm_name, out AssemblyKind kind)
     {
         Console.WriteLine(Directory.GetCurrentDirectory());
 
@@ -110,14 +103,11 @@ public class Driver
         throw new Exception($"Could not resolve {asm_name}");
     }
 
-    static void Import(string ra, AssemblyKind kind)
+    private static void Import(string ra, AssemblyKind kind)
     {
-        ReaderParameters rp = new ReaderParameters();
-        bool add_pdb = enable_debug && File.Exists(Path.ChangeExtension(ra, "pdb"));
-        if (add_pdb)
-        {
-            rp.ReadSymbols = true;
-        }
+        var rp = new ReaderParameters();
+        var add_pdb = enable_debug && File.Exists(Path.ChangeExtension(ra, "pdb"));
+        if (add_pdb) rp.ReadSymbols = true;
 
         rp.InMemory = true;
 
@@ -169,9 +159,10 @@ public class Driver
                 root_assemblies.Add(a);
                 continue;
             }
-            var kv = a.Split(new char[] { '=' });
-            string key = kv[0].Substring(1);
-            string value = kv.Length > 1 ? kv[1] : null;
+
+            var kv = a.Split('=');
+            var key = kv[0].Substring(1);
+            var value = kv.Length > 1 ? kv[1] : null;
             switch (key)
             {
                 case "debug":
@@ -212,6 +203,7 @@ public class Driver
             var resolved = Resolve(ra, out kind);
             Import(resolved, kind);
         }
+
         if (add_binding)
             Import(ResolveFramework(BINDINGS_ASM_NAME + ".dll"), AssemblyKind.Framework);
 
@@ -250,7 +242,7 @@ public class Driver
         File.Delete(runtime_js);
         File.WriteAllText(runtime_js, template);
 
-        string runtime_dir = Path.Combine(tool_prefix, use_release_runtime ? "release" : "debug");
+        var runtime_dir = Path.Combine(tool_prefix, use_release_runtime ? "release" : "debug");
         File.Delete(Path.Combine(out_prefix, "mono.js"));
         File.Delete(Path.Combine(out_prefix, "mono.wasm"));
 
@@ -262,4 +254,11 @@ public class Driver
             Path.Combine(out_prefix, "mono.wasm"));
     }
 
+    private enum AssemblyKind
+    {
+        User,
+        Framework,
+        Bcl,
+        None
+    }
 }
