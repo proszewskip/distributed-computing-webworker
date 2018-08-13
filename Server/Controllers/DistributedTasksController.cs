@@ -5,9 +5,9 @@ using Server.Models;
 
 namespace Server.Controllers
 {
-    public class DistributedTaskController : JsonApiController<DistributedTask>
+    public class DistributedTasksController : JsonApiController<DistributedTask>
     {
-        public DistributedTaskController(
+        public DistributedTasksController(
             IJsonApiContext jsonApiContext,
             IResourceService<DistributedTask> resourceService,
             ILoggerFactory loggerFactory
