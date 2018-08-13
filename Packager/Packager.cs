@@ -8,7 +8,12 @@ using System.IO;
 using System.Linq;
 using Mono.Cecil;
 
-public class Packager
+public interface IPackager
+{
+    void Run(string[] args);
+}
+
+public class Packager : IPackager
 {
     private const string BINDINGS_ASM_NAME = "bindings";
     private static bool enable_debug;
@@ -16,122 +21,7 @@ public class Packager
     private static readonly HashSet<string> asm_list = new HashSet<string>();
     private static readonly List<string> file_list = new List<string>();
 
-    private static void Usage()
-    {
-        Console.WriteLine("Valid arguments:");
-        Console.WriteLine("\t-help         Show this help message");
-        Console.WriteLine("\t-debug        Enable Debugging (default false)");
-        Console.WriteLine(
-            "\t-debugrt      Use the debug runtime (default release) - this has nothing to do with C# debugging");
-        Console.WriteLine("\t-nobinding    Disable binding engine (default include engine)");
-        Console.WriteLine("\t-prefix=x     Set the input assembly prefix to 'x' (default to the current directory)");
-        Console.WriteLine("\t-out=x        Set the output directory to 'x' (default to the current directory)");
-        Console.WriteLine("\t-deploy=x     Set the deploy prefix to 'x' (default to 'managed')");
-        Console.WriteLine("\t-vfs=x        Set the VFS prefix to 'x' (default to 'managed')");
-
-        Console.WriteLine("foo.dll         Include foo.dll as one of the root assemblies");
-    }
-
-    private static void Debug(string s)
-    {
-        Console.WriteLine(s);
-    }
-
-    private static string FindFrameworkAssembly(string asm)
-    {
-        return asm;
-    }
-
-    private static bool Try(string prefix, string name, out string out_res)
-    {
-        out_res = null;
-
-        var res = Path.Combine(prefix, name);
-        if (File.Exists(res))
-        {
-            out_res = Path.GetFullPath(res);
-            return true;
-        }
-
-        return false;
-    }
-
-    private static string ResolveWithExtension(string prefix, string name)
-    {
-        string res = null;
-
-        if (Try(prefix, name, out res))
-            return res;
-        if (Try(prefix, name + ".dll", out res))
-            return res;
-        if (Try(prefix, name + ".exe", out res))
-            return res;
-        return null;
-    }
-
-    private static string ResolveUser(string asm_name)
-    {
-        return ResolveWithExtension(app_prefix, asm_name);
-    }
-
-    private static string ResolveFramework(string asm_name)
-    {
-        return ResolveWithExtension(framework_prefix, asm_name);
-    }
-
-    private static string ResolveBcl(string asm_name)
-    {
-        return ResolveWithExtension(bcl_prefix, asm_name);
-    }
-
-    private static string Resolve(string asm_name, out AssemblyKind kind)
-    {
-        Console.WriteLine(Directory.GetCurrentDirectory());
-
-        kind = AssemblyKind.User;
-        var asm = ResolveUser(asm_name);
-        if (asm != null)
-            return asm;
-
-        kind = AssemblyKind.Framework;
-        asm = ResolveFramework(asm_name);
-        if (asm != null)
-            return asm;
-
-        kind = AssemblyKind.Bcl;
-        asm = ResolveBcl(asm_name);
-        if (asm != null)
-            return asm;
-
-        kind = AssemblyKind.None;
-        throw new Exception($"Could not resolve {asm_name}");
-    }
-
-    private static void Import(string ra, AssemblyKind kind)
-    {
-        var rp = new ReaderParameters();
-        var add_pdb = enable_debug && File.Exists(Path.ChangeExtension(ra, "pdb"));
-        if (add_pdb) rp.ReadSymbols = true;
-
-        rp.InMemory = true;
-
-        var image = ModuleDefinition.ReadModule(ra, rp);
-        if (!asm_list.Add(ra))
-            return;
-        file_list.Add(ra);
-        Debug($"Processing {ra} debug {add_pdb}");
-
-        if (add_pdb && kind == AssemblyKind.User)
-            file_list.Add(Path.ChangeExtension(ra, "pdb"));
-
-        foreach (var ar in image.AssemblyReferences)
-        {
-            var resolve = Resolve(ar.Name, out kind);
-            Import(resolve, kind);
-        }
-    }
-
-    public static void Main(string[] args)
+    public void Run(string[] args)
     {
         var root_assemblies = new List<string>();
         enable_debug = false;
@@ -256,6 +146,121 @@ public class Packager
         File.Copy(
             Path.Combine(runtime_dir, "mono.wasm"),
             Path.Combine(out_prefix, "mono.wasm"));
+    }
+
+    private void Usage()
+    {
+        Console.WriteLine("Valid arguments:");
+        Console.WriteLine("\t-help         Show this help message");
+        Console.WriteLine("\t-debug        Enable Debugging (default false)");
+        Console.WriteLine(
+            "\t-debugrt      Use the debug runtime (default release) - this has nothing to do with C# debugging");
+        Console.WriteLine("\t-nobinding    Disable binding engine (default include engine)");
+        Console.WriteLine("\t-prefix=x     Set the input assembly prefix to 'x' (default to the current directory)");
+        Console.WriteLine("\t-out=x        Set the output directory to 'x' (default to the current directory)");
+        Console.WriteLine("\t-deploy=x     Set the deploy prefix to 'x' (default to 'managed')");
+        Console.WriteLine("\t-vfs=x        Set the VFS prefix to 'x' (default to 'managed')");
+
+        Console.WriteLine("foo.dll         Include foo.dll as one of the root assemblies");
+    }
+
+    private void Debug(string s)
+    {
+        Console.WriteLine(s);
+    }
+
+    private string FindFrameworkAssembly(string asm)
+    {
+        return asm;
+    }
+
+    private bool Try(string prefix, string name, out string out_res)
+    {
+        out_res = null;
+
+        var res = Path.Combine(prefix, name);
+        if (File.Exists(res))
+        {
+            out_res = Path.GetFullPath(res);
+            return true;
+        }
+
+        return false;
+    }
+
+    private string ResolveWithExtension(string prefix, string name)
+    {
+        string res = null;
+
+        if (Try(prefix, name, out res))
+            return res;
+        if (Try(prefix, name + ".dll", out res))
+            return res;
+        if (Try(prefix, name + ".exe", out res))
+            return res;
+        return null;
+    }
+
+    private string ResolveUser(string asm_name)
+    {
+        return ResolveWithExtension(app_prefix, asm_name);
+    }
+
+    private string ResolveFramework(string asm_name)
+    {
+        return ResolveWithExtension(framework_prefix, asm_name);
+    }
+
+    private string ResolveBcl(string asm_name)
+    {
+        return ResolveWithExtension(bcl_prefix, asm_name);
+    }
+
+    private string Resolve(string asm_name, out AssemblyKind kind)
+    {
+        Console.WriteLine(Directory.GetCurrentDirectory());
+
+        kind = AssemblyKind.User;
+        var asm = ResolveUser(asm_name);
+        if (asm != null)
+            return asm;
+
+        kind = AssemblyKind.Framework;
+        asm = ResolveFramework(asm_name);
+        if (asm != null)
+            return asm;
+
+        kind = AssemblyKind.Bcl;
+        asm = ResolveBcl(asm_name);
+        if (asm != null)
+            return asm;
+
+        kind = AssemblyKind.None;
+        throw new Exception($"Could not resolve {asm_name}");
+    }
+
+    private void Import(string ra, AssemblyKind kind)
+    {
+        var rp = new ReaderParameters();
+        var add_pdb = enable_debug && File.Exists(Path.ChangeExtension(ra, "pdb"));
+        if (add_pdb) rp.ReadSymbols = true;
+
+        rp.InMemory = true;
+
+        var image = ModuleDefinition.ReadModule(ra, rp);
+        if (!asm_list.Add(ra))
+            return;
+        file_list.Add(ra);
+        Debug($"Processing {ra} debug {add_pdb}");
+
+        if (add_pdb && kind == AssemblyKind.User)
+            file_list.Add(Path.ChangeExtension(ra, "pdb"));
+
+        foreach (var ar in image.AssemblyReferences)
+        {
+            var resolve = Resolve(ar.Name, out kind);
+            Import(resolve, kind);
+        }
     }
 
     private enum AssemblyKind
