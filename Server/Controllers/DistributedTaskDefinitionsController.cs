@@ -5,6 +5,7 @@ using JsonApiDotNetCore.Controllers;
 using JsonApiDotNetCore.Internal;
 using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyModel.Resolution;
 using Microsoft.Extensions.Logging;
 using Server.DTO;
 using Server.Exceptions;
@@ -19,6 +20,7 @@ namespace Server.Controllers
         private readonly IAssemblyAnalyzer _assemblyAnalyzer;
         private readonly IAssemblyLoader _assemblyLoader;
         private readonly IFileStorage _fileStorage;
+        private readonly IPackager _packager;
         private readonly IPathsProvider _pathsProvider;
         private readonly ILogger<DistributedTaskDefinitionsController> _logger;
 
@@ -99,8 +101,7 @@ namespace Server.Controllers
                 $"-prefix={_pathsProvider.GetTaskDefinitionDirectoryPath(taskDefinitionGuid)}", $"-out={_pathsProvider.GetCompiledTaskDefinitionDirectoryPath(taskDefinitionGuid)}",
                 body.MainDll.FileName
             };
-
-            Packager.Main(args);
+            _packager.Run(args);
         }
 
         private async Task<string> SaveDllsAsync(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
