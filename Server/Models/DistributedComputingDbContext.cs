@@ -11,6 +11,9 @@ namespace Server.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<DistributedTaskDefinition>().OwnsOne(p => p.ProblemPluginInfo);
+            modelBuilder.Entity<DistributedTaskDefinition>().HasIndex(definition => definition.Name).IsUnique();
+
+            modelBuilder.Entity<DistributedTask>().HasIndex(task => task.Name).IsUnique();
         }
 
         public DbSet<DistributedTaskDefinition> DistributedTaskDefinitions { get; set; }
