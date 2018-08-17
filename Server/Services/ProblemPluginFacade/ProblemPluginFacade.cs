@@ -43,7 +43,7 @@ namespace Server.Services
             var taskResult = GetProblemPluginMethod("JoinSubtaskResults")
                 .Invoke(instance, new[] { subtasksDeserializedData });
 
-            return (byte[]) GetProblemPluginMethod("SerializeTaskResult").Invoke(instance, new[] { taskResult });
+            return (byte[])GetProblemPluginMethod("SerializeTaskResult").Invoke(instance, new[] { taskResult });
         }
 
         public ProblemPluginInfo GetProblemPluginInfo()
