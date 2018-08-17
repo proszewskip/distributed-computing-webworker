@@ -7,10 +7,6 @@ namespace DistributedComputing
     public static class ProblemPluginFactory
     {
         public static IProblemPlugin<TTask, TTaskResult, TSubtask, TSubtaskResult> CreateProblemPlugin<TTask, TTaskResult, TSubtask, TSubtaskResult>(string assemblyName, string className)
-            where TTask : class
-            where TTaskResult : class
-            where TSubtask : class
-            where TSubtaskResult : class
         {
             var assembly = Assembly.Load(assemblyName);
             var classType = assembly.GetType(className);

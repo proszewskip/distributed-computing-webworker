@@ -5,7 +5,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Server.Services
 {
-    public interface IDataFormatter<T> where T : class
+    public interface IDataFormatter<T> 
     {
         T Deserialize(byte[] data);
         byte[] Serialize(T data);
