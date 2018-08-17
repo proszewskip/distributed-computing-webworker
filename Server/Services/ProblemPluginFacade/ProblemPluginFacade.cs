@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using DistributedComputing;
 using Server.Models;
 
 namespace Server.Services
@@ -14,56 +15,36 @@ namespace Server.Services
         ProblemPluginInfo GetProblemPluginInfo();
     }
 
-    public class ProblemPluginFacade : IProblemPluginFacade
+    public class ProblemPluginFacade<Task, TaskResult, Subtask, SubtaskResult> : IProblemPluginFacade
     {
-        private readonly IDataFormatter<object> _dataFormatter;
-        private readonly Type _problemPluginType;
+        private readonly IDataFormatter<Subtask> _dataFormatter;
+        private readonly IProblemPlugin<Task, TaskResult, Subtask, SubtaskResult> _problemPluginInstance;
 
-        public ProblemPluginFacade(IDataFormatter<object> dataFormatter, Type problemPluginType)
+        public ProblemPluginFacade(IDataFormatter<Subtask> dataFormatter, IProblemPlugin<Task, TaskResult, Subtask, SubtaskResult> problemPluginInstance)
         {
             _dataFormatter = dataFormatter;
-            _problemPluginType = problemPluginType;
+            _problemPluginInstance = problemPluginInstance;
         }
 
         public IEnumerable<byte[]> GetSubtasksFromData(byte[] taskData)
         {
-            var instance = GetProblemPluginInstance();
-
-            var parsedTask = GetProblemPluginMethod("ParseTask").Invoke(instance, new[] { taskData });
-            var subtasksData = (IEnumerable<object>)GetProblemPluginMethod("DivideTask").Invoke(instance, new[] { parsedTask });
+            var parsedTask = _problemPluginInstance.ParseTask(taskData);
+            var subtasksData = _problemPluginInstance.DivideTask(parsedTask);
 
             return subtasksData.Select(_dataFormatter.Serialize);
         }
 
         public byte[] JoinSubtaskResults(IEnumerable<byte[]> subtaskResults)
         {
-            var instance = GetProblemPluginInstance();
-
             var subtasksDeserializedData = subtaskResults.Select(_dataFormatter.Deserialize);
-            var taskResult = GetProblemPluginMethod("JoinSubtaskResults")
-                .Invoke(instance, new[] { subtasksDeserializedData });
+            var taskResult = _problemPluginInstance.JoinSubtaskResults(subtasksDeserializedData);
 
-            return (byte[])GetProblemPluginMethod("SerializeTaskResult").Invoke(instance, new[] { taskResult });
+            return _problemPluginInstance.SerializeTaskResult(taskResult);
         }
 
         public ProblemPluginInfo GetProblemPluginInfo()
         {
-            return new ProblemPluginInfo
-            {
-                AssemblyName = _problemPluginType.Assembly.GetName().Name,
-                ClassName = _problemPluginType.Name,
-                Namespace = _problemPluginType.Namespace,
-            };
-        }
-
-        private object GetProblemPluginInstance()
-        {
-            return Activator.CreateInstance(_problemPluginType);
-        }
-
-        private MethodInfo GetProblemPluginMethod(string name)
-        {
-            return _problemPluginType.GetMethod(name);
+            throw new NotImplementedException();
         }
     }
 }

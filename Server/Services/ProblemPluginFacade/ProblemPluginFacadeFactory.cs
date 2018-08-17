@@ -23,8 +23,12 @@ namespace Server.Services
         public IProblemPluginFacade Create(Assembly assembly)
         {
             var problemPluginType = GetImplementedProblemPluginType(assembly);
+	    var iface = problemPluginType.GetInterface(typeof(IProblemPlugin<,,,>).Name);
 
-            return new ProblemPluginFacade(_dataFormatter, problemPluginType);
+	    var types = iface.GenericTypeArguments;
+	    var pluginInstance = problemPluginType.GetConstructor(new Type[] {}).Invoke(new object[] {});
+
+            return (IProblemPluginFacade)(typeof(ProblemPluginFacade<,,,>).GetConstructor(types).Invoke(new object[] {null, pluginInstance}));
         }
 
         private Type GetImplementedProblemPluginType(Assembly assembly)
