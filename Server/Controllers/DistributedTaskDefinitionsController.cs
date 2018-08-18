@@ -71,7 +71,7 @@ namespace Server.Controllers
 
 
             // TODO: handle packager errors and display them to the user
-            PackAssembly(body, taskDefinitionGuid);
+            await PackAssembly(body, taskDefinitionGuid);
 
             var distributedTaskDefinition = new DistributedTaskDefinition
             {
@@ -94,14 +94,16 @@ namespace Server.Controllers
             }
         }
 
-        private void PackAssembly(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
+        private Task PackAssembly(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
         {
             string[] args =
             {
-                $"-prefix={_pathsProvider.GetTaskDefinitionDirectoryPath(taskDefinitionGuid)}", $"-out={_pathsProvider.GetCompiledTaskDefinitionDirectoryPath(taskDefinitionGuid)}",
+                $"-prefix={_pathsProvider.GetTaskDefinitionDirectoryPath(taskDefinitionGuid)}",
+                $"-out={_pathsProvider.GetCompiledTaskDefinitionDirectoryPath(taskDefinitionGuid)}",
                 body.MainDll.FileName
             };
-            _packager.Run(args);
+
+            return Task.Run(() => _packager.Run(args));
         }
 
         private async Task<string> SaveDllsAsync(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
