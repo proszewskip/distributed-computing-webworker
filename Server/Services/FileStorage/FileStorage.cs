@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,6 +17,11 @@ namespace Server.Services
         public Task<string[]> SaveFilesAsync(string directoryPath, IFormFileCollection files)
         {
             return Task.WhenAll(files.Select(file => UnsafeSaveFileAsync(directoryPath, file)));
+        }
+
+        public void DeleteDirectory(string directoryPath)
+        {
+            Directory.Delete(directoryPath);
         }
 
         private void CreateDirectoryIfNotExists(string path)
