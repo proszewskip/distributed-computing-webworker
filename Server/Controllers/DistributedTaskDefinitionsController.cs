@@ -71,7 +71,7 @@ namespace Server.Controllers
 
 
             // TODO: handle packager errors and display them to the user
-            await PackAssembly(body, taskDefinitionGuid);
+            await PackAssemblyAsync(body, taskDefinitionGuid);
 
             var distributedTaskDefinition = new DistributedTaskDefinition
             {
@@ -94,7 +94,7 @@ namespace Server.Controllers
             }
         }
 
-        private Task PackAssembly(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
+        private Task PackAssemblyAsync(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
         {
             string[] args =
             {
