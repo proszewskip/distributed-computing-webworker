@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using JsonApiDotNetCore.Extensions;
 using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Server.Models;
 using Server.Services;
 using Microsoft.Extensions.FileProviders;
@@ -71,11 +72,10 @@ namespace Server
         {
             services.AddScoped<IAssemblyAnalyzer, AssemblyAnalyzer>()
                 .AddScoped<IAssemblyAnalyzer, AssemblyAnalyzer>()
-                .AddScoped<ICommandRunner, CommandRunner>()
                 .AddScoped<IAssemblyLoader, AssemblyLoader>()
+                .AddScoped<IPackager, Packager>()
                 // TODO: should generics be used here? Maybe consider DataFormatterFactory with a CreateDataFormatter<T>
                 .AddScoped<IDataFormatter<object>, DataFormatter<object>>()
-                .AddScoped<IPackagerRunner, PackagerRunner>()
                 .AddScoped<IFileStorage, FileStorage>()
                 .AddScoped<IResourceService<DistributedTaskDefinition>, DistributedTaskDefinitionService>()
                 .AddScoped<IResourceService<DistributedTask>, DistributedTaskService>();

@@ -5,6 +5,7 @@ using JsonApiDotNetCore.Controllers;
 using JsonApiDotNetCore.Internal;
 using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyModel.Resolution;
 using Microsoft.Extensions.Logging;
 using Server.DTO;
 using Server.Exceptions;
@@ -18,8 +19,8 @@ namespace Server.Controllers
     {
         private readonly IAssemblyAnalyzer _assemblyAnalyzer;
         private readonly IAssemblyLoader _assemblyLoader;
-        private readonly IPackagerRunner _packagerRunner;
         private readonly IFileStorage _fileStorage;
+        private readonly IPackager _packager;
         private readonly IPathsProvider _pathsProvider;
         private readonly ILogger<DistributedTaskDefinitionsController> _logger;
 
@@ -31,14 +32,12 @@ namespace Server.Controllers
             IPathsProvider pathsProvider,
             IAssemblyAnalyzer assemblyAnalyzer,
             IAssemblyLoader assemblyLoader,
-            IPackagerRunner packagerRunner,
             IFileStorage fileStorage
         ) : base(jsonApiContext, resourceService, loggerFactory)
         {
             _pathsProvider = pathsProvider;
             _assemblyAnalyzer = assemblyAnalyzer;
             _assemblyLoader = assemblyLoader;
-            _packagerRunner = packagerRunner;
             _fileStorage = fileStorage;
 
             _logger = loggerFactory.CreateLogger<DistributedTaskDefinitionsController>();
@@ -70,10 +69,9 @@ namespace Server.Controllers
                 return Error(new Error(500, "Internal Server Error when analyzing the assembly"));
             }
 
-            
+
             // TODO: handle packager errors and display them to the user
-            // TODO: try to use packager as a DLL instead of an external command
-            var assemblyPackingResult = await PackAssemblyAsync(body, taskDefinitionGuid);
+            await PackAssemblyAsync(body, taskDefinitionGuid);
 
             var distributedTaskDefinition = new DistributedTaskDefinition
             {
@@ -96,9 +94,16 @@ namespace Server.Controllers
             }
         }
 
-        private Task<CommandRunnerResult> PackAssemblyAsync(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
+        private Task PackAssemblyAsync(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
         {
-            return _packagerRunner.PackAssemblyAsync(_pathsProvider.GetTaskDefinitionDirectoryPath(taskDefinitionGuid), _pathsProvider.GetCompiledTaskDefinitionDirectoryPath(taskDefinitionGuid), body.MainDll.FileName);
+            string[] args =
+            {
+                $"-prefix={_pathsProvider.GetTaskDefinitionDirectoryPath(taskDefinitionGuid)}",
+                $"-out={_pathsProvider.GetCompiledTaskDefinitionDirectoryPath(taskDefinitionGuid)}",
+                body.MainDll.FileName
+            };
+
+            return Task.Run(() => _packager.Run(args));
         }
 
         private async Task<string> SaveDllsAsync(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)

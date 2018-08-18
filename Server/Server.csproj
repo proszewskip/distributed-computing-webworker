@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DistributedComputingLibrary\DistributedComputingLibrary.csproj" />
+    <ProjectReference Include="..\Packager\Packager.csproj" />
   </ItemGroup>
 
 </Project>
