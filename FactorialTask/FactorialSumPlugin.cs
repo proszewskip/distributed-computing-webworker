@@ -6,7 +6,7 @@ using DistributedComputing;
 
 namespace FactorialTask
 {
-    public class FactorialSumPlugin : IProblemPlugin<string, ValueTypeWrapper<int>, ValueTypeWrapper<int>, ValueTypeWrapper<int>>
+    public class FactorialSumPlugin : IProblemPlugin<string, int, int, int>
     {
         private readonly Encoding _encoding = new ASCIIEncoding();
 
@@ -15,24 +15,23 @@ namespace FactorialTask
             return _encoding.GetString(data);
         }
 
-        public byte[] SerializeTaskResult(ValueTypeWrapper<int> taskResult)
+        public byte[] SerializeTaskResult(int taskResult)
         {
             return _encoding.GetBytes(taskResult.ToString());
         }
 
-        public IEnumerable<ValueTypeWrapper<int>> DivideTask(string task)
+        public IEnumerable<int> DivideTask(string task)
         {
             return task.Split(',')
-                .Select(int.Parse)
-                .Select(value => new ValueTypeWrapper<int>(value));
+                .Select(int.Parse);
         }
 
-        public ValueTypeWrapper<int> JoinSubtaskResults(IEnumerable<ValueTypeWrapper<int>> subtaskResults)
+        public int JoinSubtaskResults(IEnumerable<int> subtaskResults)
         {
-            return subtaskResults.Sum(result => result.Value);
+            return subtaskResults.Sum();
         }
 
-        public ValueTypeWrapper<int> Compute(ValueTypeWrapper<int> subtask)
+        public int Compute(int subtask)
         {
             return Factorial(subtask);
         }
