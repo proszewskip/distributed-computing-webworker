@@ -131,7 +131,6 @@ namespace Server.Services.Api
                 InputData = _dataFormatter.Serialize(subtaskData),
                 SequenceNumber = index,
                 Status = SubtaskStatus.WaitingForExecution,
-                Token = Guid.NewGuid(),
             });
         }
 

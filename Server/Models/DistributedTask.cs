@@ -17,6 +17,10 @@ namespace Server.Models
         [Attr("priority")]
         public int Priority { get; set; }
 
+        [Required]
+        [Attr("trust-level-to-complete")]
+        public double TrustLevelToComplete { get; set; }
+
         public int DistributedTaskDefinitionId { get; set; }
 
         [Required]
