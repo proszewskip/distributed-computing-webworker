@@ -1,21 +1,23 @@
 using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Server.Exceptions;
+using Server.Models;
 
 namespace Server.Services
 {
     public class PathsProvider : IPathsProvider
     {
-        private static readonly string MonoPackagerPathVariable = "MONO_PACKAGER_PATH";
-        private static readonly string TaskDefinitionsDirectoryPathVariable = "TASK_DEFINITIONS_PATH";
-        private static readonly string CompiledTasksDefinitionsDirectoryPathVariable = "COMPILED_TASK_DEFINITIONS";
-
         private readonly ILogger<PathsProvider> _logger;
+        private readonly ServerConfig _serverConfig;
 
-        public PathsProvider(ILogger<PathsProvider> logger)
+        public PathsProvider(
+            ILogger<PathsProvider> logger,
+            IOptions<ServerConfig> serverConfigAccessor)
         {
             _logger = logger;
+            _serverConfig = serverConfigAccessor.Value;
 
             InitializePaths();
         }
@@ -36,53 +38,38 @@ namespace Server.Services
             return Path.Combine(CompiledTasksDefinitionsDirectoryPath, guid.ToString());
         }
 
-        private string GetEnvironmentVariable(string variableName)
-        {
-            var value = Environment.GetEnvironmentVariable(variableName);
-
-            if (string.IsNullOrEmpty(value))
-            {
-                _logger.LogError($"The \"{variableName}\" environment variable is not provided");
-                throw new InvalidEnvironmentConfigurationException();
-            }
-
-            return value;
-        }
-
-        private string GetPathFromEnvironmentVariable(string variableName)
-        {
-            var relativePath = GetEnvironmentVariable(variableName);
-
-            return Path.GetFullPath(relativePath);
-        }
-
         private void InitializePaths()
         {
             // TODO: improve error reporting (report all errors before exiting)
-            MonoPackagerPath = GetPathFromEnvironmentVariable(MonoPackagerPathVariable);
+            MonoPackagerPath = GetFullPath(_serverConfig.MonoPackagerPath);
             if (!File.Exists(MonoPackagerPath))
             {
-                _logger.LogError($"The \"{MonoPackagerPathVariable}\" environment variable " +
+                _logger.LogError($"The \"{nameof(_serverConfig.MonoPackagerPath)}\" option " +
                                  "points to a non-existing file");
                 throw new InvalidEnvironmentConfigurationException();
             }
 
-            TaskDefinitionsDirectoryPath = GetPathFromEnvironmentVariable(TaskDefinitionsDirectoryPathVariable);
+            TaskDefinitionsDirectoryPath = GetFullPath(_serverConfig.TaskDefinitionsDirectoryPath);
             if (!Directory.Exists(TaskDefinitionsDirectoryPath))
             {
-                _logger.LogError($"The \"{TaskDefinitionsDirectoryPathVariable}\" environment " +
-                                 "variable points to a non-existing directory");
+                _logger.LogError($"The \"{nameof(_serverConfig.TaskDefinitionsDirectoryPath)}\" option " +
+                                 "points to a non-existing directory");
                 throw new InvalidEnvironmentConfigurationException();
             }
 
             CompiledTasksDefinitionsDirectoryPath =
-                GetPathFromEnvironmentVariable(CompiledTasksDefinitionsDirectoryPathVariable);
+                GetFullPath(_serverConfig.CompiledTaskDefinitionsDirectoryPath);
             if (!Directory.Exists(CompiledTasksDefinitionsDirectoryPath))
             {
-                _logger.LogError($"The \"{CompiledTasksDefinitionsDirectoryPathVariable}\" environment " +
-                                 "variable points to a non-existing directory");
+                _logger.LogError($"The \"{_serverConfig.CompiledTaskDefinitionsDirectoryPath}\" option " +
+                                 "points to a non-existing directory");
                 throw new InvalidEnvironmentConfigurationException();
             }
+        }
+
+        private string GetFullPath(string value)
+        {
+            return Path.GetFullPath(value);
         }
     }
 }
