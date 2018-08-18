@@ -11,7 +11,7 @@ namespace Server.Services
         byte[] Serialize(T data);
     }
 
-    public class DataFormatter<T> : IDataFormatter<T> where T : class
+    public class DataFormatter<T> : IDataFormatter<T>
     {
         private readonly IFormatter _formatter = new BinaryFormatter();
 
