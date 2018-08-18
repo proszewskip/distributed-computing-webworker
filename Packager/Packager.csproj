@@ -37,7 +37,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Cecil">
-      <HintPath>..\..\distributed-computing-webworker-poc\mono-wasm-sdk\Mono.Cecil.dll</HintPath>
+      <HintPath>mono-wasm-sdk\Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
