@@ -14,17 +14,17 @@ using Server.Validation;
 
 namespace Server.Controllers
 {
-    public class DistributedTaskDefinitionController : JsonApiController<DistributedTaskDefinition>
+    public class DistributedTaskDefinitionsController : JsonApiController<DistributedTaskDefinition>
     {
         private readonly IAssemblyAnalyzer _assemblyAnalyzer;
         private readonly IAssemblyLoader _assemblyLoader;
         private readonly IPackagerRunner _packagerRunner;
         private readonly IFileStorage _fileStorage;
         private readonly IPathsProvider _pathsProvider;
-        private readonly ILogger<DistributedTaskDefinitionController> _logger;
+        private readonly ILogger<DistributedTaskDefinitionsController> _logger;
 
 
-        public DistributedTaskDefinitionController(
+        public DistributedTaskDefinitionsController(
             IJsonApiContext jsonApiContext,
             IResourceService<DistributedTaskDefinition> resourceService,
             ILoggerFactory loggerFactory,
@@ -41,7 +41,7 @@ namespace Server.Controllers
             _packagerRunner = packagerRunner;
             _fileStorage = fileStorage;
 
-            _logger = loggerFactory.CreateLogger<DistributedTaskDefinitionController>();
+            _logger = loggerFactory.CreateLogger<DistributedTaskDefinitionsController>();
         }
 
         // TODO: come up with a better name for the endpoint

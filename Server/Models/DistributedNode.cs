@@ -7,13 +7,15 @@ namespace Server.Models
 {
     public class DistributedNode : Identifiable<Guid>
     {
+        private static readonly double DefaultTrustLevel = 1;
+
         [Required]
-        [Attr("last-keep-alive-time", isImmutable: true)]
+        [Attr("last-keep-alive-time")]
         public DateTime LastKeepAliveTime { get; set; }
 
         [Required]
         [Attr("trust-level")]
-        public double TrustLevel { get; set; } = 1;
+        public double TrustLevel { get; set; } = DefaultTrustLevel;
 
         [HasMany("subtasks-in-progress")]
         public virtual List<SubtaskInProgress> SubtasksInProgress { get; set; }
