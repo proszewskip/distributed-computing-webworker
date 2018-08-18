@@ -40,13 +40,14 @@ namespace Server.Services
 
         private void InitializePaths()
         {
-            // TODO: improve error reporting (report all errors before exiting)
+            bool invalidEnvironmentConfiguration = false;
+
             MonoPackagerPath = GetFullPath(_serverConfig.MonoPackagerPath);
             if (!File.Exists(MonoPackagerPath))
             {
                 _logger.LogError($"The \"{nameof(_serverConfig.MonoPackagerPath)}\" option " +
                                  "points to a non-existing file");
-                throw new InvalidEnvironmentConfigurationException();
+                invalidEnvironmentConfiguration = true;
             }
 
             TaskDefinitionsDirectoryPath = GetFullPath(_serverConfig.TaskDefinitionsDirectoryPath);
@@ -54,7 +55,7 @@ namespace Server.Services
             {
                 _logger.LogError($"The \"{nameof(_serverConfig.TaskDefinitionsDirectoryPath)}\" option " +
                                  "points to a non-existing directory");
-                throw new InvalidEnvironmentConfigurationException();
+                invalidEnvironmentConfiguration = true;
             }
 
             CompiledTasksDefinitionsDirectoryPath =
@@ -63,6 +64,11 @@ namespace Server.Services
             {
                 _logger.LogError($"The \"{_serverConfig.CompiledTaskDefinitionsDirectoryPath}\" option " +
                                  "points to a non-existing directory");
+                invalidEnvironmentConfiguration = true;
+            }
+
+            if (invalidEnvironmentConfiguration)
+            {
                 throw new InvalidEnvironmentConfigurationException();
             }
         }
