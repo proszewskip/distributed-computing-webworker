@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace DistributedComputing
 {
-    public interface IProblemPlugin<TTask, TTaskResult, TSubtask, out TSubtaskResult>
+    public interface IProblemPlugin<TTask, TTaskResult, TSubtask, TSubtaskResult>
     {
         TTask ParseTask(byte[] data);
 
@@ -10,7 +10,7 @@ namespace DistributedComputing
 
         IEnumerable<TSubtask> DivideTask(TTask task);
 
-        TTaskResult JoinSubtaskResults(IEnumerable<TSubtask> subtaskResults);
+        TTaskResult JoinSubtaskResults(IEnumerable<TSubtaskResult> subtaskResults);
 
         TSubtaskResult Compute(TSubtask subtask);
     }
