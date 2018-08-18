@@ -13,22 +13,25 @@ namespace Server.Services
 
     public class ProblemPluginFacadeFactory : IProblemPluginFacadeFactory
     {
-        private readonly IDataFormatter<object> _dataFormatter;
+        private readonly IDataFormatterFactory _dataFormatterFactory;
 
-        public ProblemPluginFacadeFactory(IDataFormatter<object> dataFormatter)
+        public ProblemPluginFacadeFactory(IDataFormatterFactory dataFormatterFactory)
         {
-            _dataFormatter = dataFormatter;
+            _dataFormatterFactory = dataFormatterFactory;
         }
 
         public IProblemPluginFacade Create(Assembly assembly)
         {
             var problemPluginType = GetImplementedProblemPluginType(assembly);
-	    var iface = problemPluginType.GetInterface(typeof(IProblemPlugin<,,,>).Name);
+            var problemPluginInterface = problemPluginType.GetInterface(typeof(IProblemPlugin<,,,>).Name);
 
-	    var types = iface.GenericTypeArguments;
-	    var pluginInstance = problemPluginType.GetConstructor(new Type[] {}).Invoke(new object[] {});
+            var genericTypes = problemPluginInterface.GenericTypeArguments;
+            var pluginInstance = Activator.CreateInstance(problemPluginType);
 
-            return (IProblemPluginFacade)(typeof(ProblemPluginFacade<,,,>).GetConstructor(types).Invoke(new object[] {null, pluginInstance}));
+            var typedProblemPluginFacadeType = typeof(ProblemPluginFacade<,,,>).MakeGenericType(genericTypes);
+
+            return (IProblemPluginFacade)Activator.CreateInstance(typedProblemPluginFacadeType, _dataFormatterFactory,
+                pluginInstance);
         }
 
         private Type GetImplementedProblemPluginType(Assembly assembly)
