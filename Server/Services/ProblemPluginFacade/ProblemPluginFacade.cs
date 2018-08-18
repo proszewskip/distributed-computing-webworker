@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using DistributedComputing;
+using Server.Exceptions;
 using Server.Models;
 
 namespace Server.Services
@@ -29,8 +31,8 @@ namespace Server.Services
 
         public IEnumerable<byte[]> GetSubtasksFromData(byte[] taskData)
         {
-            var parsedTask = _problemPluginInstance.ParseTask(taskData);
-            var subtasksData = _problemPluginInstance.DivideTask(parsedTask);
+            var parsedTask = ParseTask(taskData);
+            var subtasksData = DivideTask(parsedTask);
 
             var subtasksDataFormatter = _dataFormatterFactory.Create<TSubtask>();
 
@@ -41,7 +43,7 @@ namespace Server.Services
         {
             var subtaskResultsDataFormatter = _dataFormatterFactory.Create<TSubtaskResult>();
             var subtasksDeserializedData = subtaskResults.Select(subtaskResultsDataFormatter.Deserialize);
-            var taskResult = _problemPluginInstance.JoinSubtaskResults(subtasksDeserializedData);
+            var taskResult = JoinSubtaskResults(subtasksDeserializedData);
 
             return _problemPluginInstance.SerializeTaskResult(taskResult);
         }
@@ -56,6 +58,42 @@ namespace Server.Services
                 ClassName = problemPluginType.Name,	
                 Namespace = problemPluginType.Namespace,	
             };
+        }
+
+        private TTask ParseTask(byte[] taskData)
+        {
+            try
+            {
+                return _problemPluginInstance.ParseTask(taskData);
+            }
+            catch (Exception exception)
+            {
+                throw new TaskDataParsingException(exception);
+            }
+        }
+
+        private IEnumerable<TSubtask> DivideTask(TTask task)
+        {
+            try
+            {
+                return _problemPluginInstance.DivideTask(task);
+            }
+            catch (Exception exception)
+            {
+                throw new TaskDivisionException(exception);
+            }
+        }
+
+        private TTaskResult JoinSubtaskResults(IEnumerable<TSubtaskResult> subtaskResults)
+        {
+            try
+            {
+                return _problemPluginInstance.JoinSubtaskResults(subtaskResults);
+            }
+            catch (Exception exception)
+            {
+                throw new SubtaskResultsJoiningException(exception);
+            }
         }
     }
 }
