@@ -19,7 +19,6 @@ namespace Server.Services.Api
         private readonly IPathsProvider _pathsProvider;
         private readonly IAssemblyLoader _assemblyLoader;
         private readonly IProblemPluginFacadeFactory _problemPluginFacadeFactory;
-        private readonly IDataFormatter<object> _dataFormatter;
 
         public DistributedTaskService(
             IJsonApiContext jsonApiContext,
@@ -28,15 +27,13 @@ namespace Server.Services.Api
             DistributedComputingDbContext dbContext,
             IPathsProvider pathsProvider,
             IAssemblyLoader assemblyLoader,
-            IProblemPluginFacadeFactory problemPluginFacadeFactory,
-            IDataFormatter<object> dataFormatter
+            IProblemPluginFacadeFactory problemPluginFacadeFactory
         ) : base(jsonApiContext, repository, loggerFactory)
         {
             _dbContext = dbContext;
             _pathsProvider = pathsProvider;
             _assemblyLoader = assemblyLoader;
             _problemPluginFacadeFactory = problemPluginFacadeFactory;
-            _dataFormatter = dataFormatter;
         }
 
         // TODO: handle InputData file uploads (or another way to send blobs, maybe base64)
@@ -126,7 +123,7 @@ namespace Server.Services.Api
             return subtasksData.Select((subtaskData, index) => new Subtask
             {
                 DistributedTaskId = distributedTask.Id,
-                InputData = _dataFormatter.Serialize(subtaskData),
+                InputData = subtaskData,
                 SequenceNumber = index,
                 Status = SubtaskStatus.WaitingForExecution,
             });
