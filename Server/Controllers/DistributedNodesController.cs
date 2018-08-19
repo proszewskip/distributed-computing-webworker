@@ -20,7 +20,7 @@ namespace Server.Controllers
         }
 
         [HttpPost("register")]
-        public Task<DistributedNode> Register()
+        public Task<IActionResult> Register()
         {
             var distributedNode = new DistributedNode
             {
@@ -28,11 +28,11 @@ namespace Server.Controllers
                 LastKeepAliveTime = DateTime.Now
             };
 
-            return _resourceService.CreateAsync(distributedNode);
+            return base.PostAsync(distributedNode);
         }
 
         [HttpPost("{id}/keep-alive")]
-        public async Task<ActionResult> KeepAlive(Guid id)
+        public async Task<IActionResult> KeepAlive(Guid id)
         {
             var distributedNode = await _resourceService.GetAsync(id);
 

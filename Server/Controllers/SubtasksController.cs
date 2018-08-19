@@ -1,5 +1,6 @@
 using JsonApiDotNetCore.Controllers;
 using JsonApiDotNetCore.Services;
+using Microsoft.Extensions.Logging;
 using Server.Models;
 
 namespace Server.Controllers
@@ -9,8 +10,9 @@ namespace Server.Controllers
     {
         public SubtasksController(
             IJsonApiContext jsonApiContext,
-            IResourceService<Subtask> resourceService
-        ) : base(jsonApiContext, resourceService)
+            IResourceService<Subtask> resourceService,
+            ILoggerFactory loggerFactory
+        ) : base(jsonApiContext, resourceService, loggerFactory)
         {
         }
     }
