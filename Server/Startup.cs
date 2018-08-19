@@ -70,12 +70,11 @@ namespace Server
 
         private static void ConfigureDependencyInjection(IServiceCollection services)
         {
-            services.AddScoped<IAssemblyAnalyzer, AssemblyAnalyzer>()
-                .AddScoped<IAssemblyAnalyzer, AssemblyAnalyzer>()
+            services
                 .AddScoped<IAssemblyLoader, AssemblyLoader>()
                 .AddScoped<IPackager, Packager>()
-                // TODO: should generics be used here? Maybe consider DataFormatterFactory with a CreateDataFormatter<T>
-                .AddScoped<IDataFormatter<object>, DataFormatter<object>>()
+                .AddScoped<IDataFormatterFactory, DataFormatterFactory>()
+                .AddScoped<IProblemPluginFacadeFactory, ProblemPluginFacadeFactory>()
                 .AddScoped<IFileStorage, FileStorage>()
                 .AddScoped<IResourceService<DistributedTaskDefinition>, DistributedTaskDefinitionService>()
                 .AddScoped<IResourceService<DistributedTask>, DistributedTaskService>();

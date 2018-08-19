@@ -5,13 +5,13 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Server.Services
 {
-    public interface IDataFormatter<T> where T : class
+    public interface IDataFormatter<T> 
     {
         T Deserialize(byte[] data);
         byte[] Serialize(T data);
     }
 
-    public class DataFormatter<T> : IDataFormatter<T> where T : class
+    public class DataFormatter<T> : IDataFormatter<T>
     {
         private readonly IFormatter _formatter = new BinaryFormatter();
 

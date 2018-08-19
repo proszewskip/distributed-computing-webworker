@@ -23,8 +23,7 @@ namespace FactorialTask
         public IEnumerable<int> DivideTask(string task)
         {
             return task.Split(',')
-                .Select(int.Parse)
-                .ToArray();
+                .Select(int.Parse);
         }
 
         public int JoinSubtaskResults(IEnumerable<int> subtaskResults)
