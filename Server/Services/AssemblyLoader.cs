@@ -1,3 +1,4 @@
+using System.IO;
 using System.Reflection;
 
 namespace Server.Services
@@ -13,7 +14,7 @@ namespace Server.Services
 
         public Assembly LoadAssembly(string path)
         {
-            return Assembly.LoadFile(path);
+            return Assembly.Load(File.ReadAllBytes(path));
         }
     }
 }
