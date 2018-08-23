@@ -32,13 +32,15 @@ namespace Server.Controllers
             IPathsProvider pathsProvider,
             IProblemPluginFacadeFactory problemPluginFacadeFactory,
             IAssemblyLoader assemblyLoader,
-            IFileStorage fileStorage
+            IFileStorage fileStorage,
+            IPackager packager
         ) : base(jsonApiContext, resourceService, loggerFactory)
         {
             _pathsProvider = pathsProvider;
             _problemPluginFacadeFactory = problemPluginFacadeFactory;
             _assemblyLoader = assemblyLoader;
             _fileStorage = fileStorage;
+            _packager = packager;
 
             _logger = loggerFactory.CreateLogger<DistributedTaskDefinitionsController>();
         }
