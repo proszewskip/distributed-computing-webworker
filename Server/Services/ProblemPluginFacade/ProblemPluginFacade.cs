@@ -46,7 +46,7 @@ namespace Server.Services
             var subtasksDeserializedData = subtaskResults.Select(subtaskResultsDataFormatter.Deserialize);
             var taskResult = JoinSubtaskResults(subtasksDeserializedData);
 
-            return _problemPluginInstance.TaskResultDataFormatter.Serialize(taskResult);
+            return _problemPluginInstance.GetTaskResultFormatter().Serialize(taskResult);
         }
 
         public ProblemPluginInfo GetProblemPluginInfo()
@@ -65,7 +65,7 @@ namespace Server.Services
         {
             try
             {
-                return _problemPluginInstance.TaskDataFormatter.Deserialize(taskData);
+                return _problemPluginInstance.GetTaskFormatter().Deserialize(taskData);
             }
             catch (Exception exception)
             {
