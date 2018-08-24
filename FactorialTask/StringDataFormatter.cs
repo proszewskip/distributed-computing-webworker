@@ -3,7 +3,7 @@ using DistributedComputing;
 
 namespace FactorialTask
 {
-    class StringBinarySerializer : IBinarySerializer<string>
+    class StringDataFormatter : IDataFormatter<string>
     {
         private readonly Encoding _encoding = new ASCIIEncoding();
 
