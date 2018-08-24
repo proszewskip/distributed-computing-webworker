@@ -1,6 +1,6 @@
 namespace DistributedComputing
 {
-    public interface IBinarySerializer<T>
+    public interface IDataFormatter<T>
     {
         byte[] Serialize(T data);
 
