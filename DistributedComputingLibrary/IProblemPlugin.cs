@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace DistributedComputing
 {
-    public interface IProblemPlugin<TTask, TTaskResult, TSubtask, TSubtaskResult>
+    public interface IProblemPlugin<TTask, TTaskResult, TSubtask, TSubtaskResult> 
     {
         IEnumerable<TSubtask> DivideTask(TTask task);
 
@@ -10,9 +10,9 @@ namespace DistributedComputing
 
         TSubtaskResult Compute(TSubtask subtask);
 
-        IDataFormatter<TTask> GetTaskFormatter();
-        IDataFormatter<TTaskResult> GetTaskResultFormatter();
-        IDataFormatter<TSubtask> GetSubtaskFormatter();
-        IDataFormatter<TSubtaskResult> GetSubtaskResultFormatter();
+        IDataFormatter<TTask> TaskDataFormatter { get; }
+        IDataFormatter<TTaskResult> TaskResultDataFormatter { get; }
+        IDataFormatter<TSubtask> SubtaskDataFormatter { get; }
+        IDataFormatter<TSubtaskResult> SubtaskResultDataFormatter { get; }
     }
 }
