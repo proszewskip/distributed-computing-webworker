@@ -21,7 +21,7 @@ namespace Server.Services
 
         public void DeleteDirectory(string directoryPath)
         {
-            Directory.Delete(directoryPath);
+            Directory.Delete(directoryPath, true);
         }
 
         private void CreateDirectoryIfNotExists(string path)

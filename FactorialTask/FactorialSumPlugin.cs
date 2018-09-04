@@ -8,17 +8,8 @@ namespace FactorialTask
 {
     public class FactorialSumPlugin : IProblemPlugin<string, int, int, int>
     {
-        private readonly Encoding _encoding = new ASCIIEncoding();
-
-        public string ParseTask(byte[] data)
-        {
-            return _encoding.GetString(data);
-        }
-
-        public byte[] SerializeTaskResult(int taskResult)
-        {
-            return _encoding.GetBytes(taskResult.ToString());
-        }
+        private readonly IntDataFormatter _intDataFormatter = new IntDataFormatter();
+        private readonly StringDataFormatter _stringDataFormatter = new StringDataFormatter();
 
         public IEnumerable<int> DivideTask(string task)
         {
@@ -35,6 +26,11 @@ namespace FactorialTask
         {
             return Factorial(subtask);
         }
+
+        public IDataFormatter<string> TaskDataFormatter => _stringDataFormatter;
+        public IDataFormatter<int> TaskResultDataFormatter => _intDataFormatter;
+        public IDataFormatter<int> SubtaskDataFormatter => _intDataFormatter;
+        public IDataFormatter<int> SubtaskResultDataFormatter => _intDataFormatter;
 
         private int Factorial(int x)
         {

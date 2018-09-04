@@ -16,10 +16,10 @@ public interface IPackager
 public class Packager : IPackager
 {
     private const string BINDINGS_ASM_NAME = "bindings";
-    private static bool enable_debug;
-    private static string app_prefix, framework_prefix, bcl_prefix, out_prefix;
-    private static readonly HashSet<string> asm_list = new HashSet<string>();
-    private static readonly List<string> file_list = new List<string>();
+    private bool enable_debug;
+    private string app_prefix, framework_prefix, bcl_prefix, out_prefix;
+    private readonly HashSet<string> asm_list = new HashSet<string>();
+    private readonly List<string> file_list = new List<string>();
 
     public void Run(string[] args)
     {
@@ -31,6 +31,9 @@ public class Packager : IPackager
         var deploy_prefix = "managed";
         var vfs_prefix = "managed";
         var use_release_runtime = true;
+
+        file_list.Clear();
+        asm_list.Clear();
 
         var tool_prefix = Path.Combine(Directory.GetCurrentDirectory(), "../mono-wasm-sdk/");
 

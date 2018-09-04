@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using DistributedComputing;
 using Server.Exceptions;
 using Server.Models;
@@ -45,7 +46,7 @@ namespace Server.Services
             var subtasksDeserializedData = subtaskResults.Select(subtaskResultsDataFormatter.Deserialize);
             var taskResult = JoinSubtaskResults(subtasksDeserializedData);
 
-            return _problemPluginInstance.SerializeTaskResult(taskResult);
+            return _problemPluginInstance.TaskResultDataFormatter.Serialize(taskResult);
         }
 
         public ProblemPluginInfo GetProblemPluginInfo()
@@ -54,9 +55,9 @@ namespace Server.Services
 
             return new ProblemPluginInfo
             {
-                AssemblyName = problemPluginType.Assembly.GetName().Name,	
-                ClassName = problemPluginType.Name,	
-                Namespace = problemPluginType.Namespace,	
+                AssemblyName = problemPluginType.Assembly.GetName().Name,
+                ClassName = problemPluginType.Name,
+                Namespace = problemPluginType.Namespace,
             };
         }
 
@@ -64,7 +65,7 @@ namespace Server.Services
         {
             try
             {
-                return _problemPluginInstance.ParseTask(taskData);
+                return _problemPluginInstance.TaskDataFormatter.Deserialize(taskData);
             }
             catch (Exception exception)
             {
