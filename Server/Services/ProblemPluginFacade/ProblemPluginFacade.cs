@@ -77,7 +77,7 @@ namespace Server.Services
         {
             try
             {
-                return _problemPluginInstance.DivideTask(task);
+                return _problemPluginInstance.DivideTask(task).ToList();
             }
             catch (Exception exception)
             {
