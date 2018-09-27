@@ -21,7 +21,7 @@ public class Packager : IPackager
     private string app_prefix, framework_prefix, bcl_prefix, out_prefix;
     private readonly HashSet<string> asm_list = new HashSet<string>();
     private readonly List<string> file_list = new List<string>();
-    private readonly StringBuilder packager_logs_builder = new StringBuilder();
+    private readonly StringBuilder _packagerLogsBuilder = new StringBuilder();
 
     public string Run(string[] args)
     {
@@ -36,7 +36,7 @@ public class Packager : IPackager
 
         file_list.Clear();
         asm_list.Clear();
-        packager_logs_builder.Clear();
+        _packagerLogsBuilder.Clear();
 
         var tool_prefix = Path.Combine(Directory.GetCurrentDirectory(), "../mono-wasm-sdk/");
 
@@ -88,9 +88,9 @@ public class Packager : IPackager
                     break;
                 case "help":
                     Usage();
-                    return packager_logs_builder.ToString();
+                    return _packagerLogsBuilder.ToString();
                 default:
-                    packager_logs_builder.AppendLine($"Invalid parameter {key}");
+                    _packagerLogsBuilder.AppendLine($"Invalid parameter {key}");
                     Usage();
                     Environment.Exit(-1);
                     break;
@@ -116,7 +116,7 @@ public class Packager : IPackager
         Directory.CreateDirectory(bcl_dir);
         foreach (var f in file_list)
         {
-            packager_logs_builder.AppendLine($"cp {f} -> {Path.Combine(bcl_dir, Path.GetFileName(f))}");
+            _packagerLogsBuilder.AppendLine($"cp {f} -> {Path.Combine(bcl_dir, Path.GetFileName(f))}");
             File.Copy(f, Path.Combine(bcl_dir, Path.GetFileName(f)));
         }
 
@@ -153,28 +153,28 @@ public class Packager : IPackager
             Path.Combine(runtime_dir, "mono.wasm"),
             Path.Combine(out_prefix, "mono.wasm"));
 
-        return packager_logs_builder.ToString();
+        return _packagerLogsBuilder.ToString();
     }
 
     private void Usage()
     {
-        packager_logs_builder.AppendLine("Valid arguments:");
-        packager_logs_builder.AppendLine("\t-help         Show this help message");
-        packager_logs_builder.AppendLine("\t-debug        Enable Debugging (default false)");
-        packager_logs_builder.AppendLine(
+        _packagerLogsBuilder.AppendLine("Valid arguments:");
+        _packagerLogsBuilder.AppendLine("\t-help         Show this help message");
+        _packagerLogsBuilder.AppendLine("\t-debug        Enable Debugging (default false)");
+        _packagerLogsBuilder.AppendLine(
            "\t-debugrt      Use the debug runtime (default release) - this has nothing to do with C# debugging");
-        packager_logs_builder.AppendLine("\t-nobinding    Disable binding engine (default include engine)");
-        packager_logs_builder.AppendLine("\t-prefix=x     Set the input assembly prefix to 'x' (default to the current directory)");
-        packager_logs_builder.AppendLine("\t-out=x        Set the output directory to 'x' (default to the current directory)");
-        packager_logs_builder.AppendLine("\t-deploy=x     Set the deploy prefix to 'x' (default to 'managed')");
-        packager_logs_builder.AppendLine("\t-vfs=x        Set the VFS prefix to 'x' (default to 'managed')");
+        _packagerLogsBuilder.AppendLine("\t-nobinding    Disable binding engine (default include engine)");
+        _packagerLogsBuilder.AppendLine("\t-prefix=x     Set the input assembly prefix to 'x' (default to the current directory)");
+        _packagerLogsBuilder.AppendLine("\t-out=x        Set the output directory to 'x' (default to the current directory)");
+        _packagerLogsBuilder.AppendLine("\t-deploy=x     Set the deploy prefix to 'x' (default to 'managed')");
+        _packagerLogsBuilder.AppendLine("\t-vfs=x        Set the VFS prefix to 'x' (default to 'managed')");
 
-        packager_logs_builder.AppendLine("foo.dll         Include foo.dll as one of the root assemblies");
+        _packagerLogsBuilder.AppendLine("foo.dll         Include foo.dll as one of the root assemblies");
     }
 
     private void Debug(string s)
     {
-        packager_logs_builder.AppendLine(s);
+        _packagerLogsBuilder.AppendLine(s);
     }
 
     private string FindFrameworkAssembly(string asm)
@@ -226,7 +226,7 @@ public class Packager : IPackager
 
     private string Resolve(string asm_name, out AssemblyKind kind)
     {
-        packager_logs_builder.AppendLine(Directory.GetCurrentDirectory());
+        _packagerLogsBuilder.AppendLine(Directory.GetCurrentDirectory());
 
         kind = AssemblyKind.User;
         var asm = ResolveUser(asm_name);
