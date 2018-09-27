@@ -30,5 +30,8 @@ namespace Server.Models
         [Attr("problem-plugin-info", isImmutable: true)]
         [Required]
         public ProblemPluginInfo ProblemPluginInfo { get; set; }
+
+        [Attr("packager-logs")]
+        public string PackagerLogs { get; set; } = "";
     }
 }
