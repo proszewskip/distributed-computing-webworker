@@ -73,7 +73,7 @@ namespace Server.Controllers
 
 
             // TODO: handle packager errors and display them to the user
-            await PackAssemblyAsync(body, taskDefinitionGuid);
+            string packagerLogs = await PackAssemblyAsync(body, taskDefinitionGuid);
 
             var distributedTaskDefinition = new DistributedTaskDefinition
             {
@@ -81,7 +81,8 @@ namespace Server.Controllers
                 Description = body.Description,
                 DefinitionGuid = taskDefinitionGuid,
                 ProblemPluginInfo = problemPluginInfo,
-                MainDllName = body.MainDll.FileName
+                MainDllName = body.MainDll.FileName,
+                PackagerLogs = packagerLogs
             };
 
             try
@@ -96,7 +97,7 @@ namespace Server.Controllers
             }
         }
 
-        private Task PackAssemblyAsync(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
+        private Task<string> PackAssemblyAsync(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
         {
             string[] args =
             {
