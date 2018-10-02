@@ -15,17 +15,20 @@ namespace Server.Controllers
     public class SubtaskOperationsController : Controller
     {
         private readonly IResourceService<DistributedNode, Guid> _distributedNodeResourceService;
-        private readonly IResourceService<SubtaskInProgress> _subtaskInProgResourceService;
+        private readonly IResourceService<SubtaskInProgress> _subtaskInProgressResourceService;
+        private readonly IResourceService<Subtask> _subtaskResourceService;
         private readonly DistributedComputingDbContext _dbContext;
 
         public SubtaskOperationsController(
             IResourceService<DistributedNode, Guid> distributedNodeResourceService,
-            IResourceService<SubtaskInProgress> subtaskInProgResourceService,
+            IResourceService<SubtaskInProgress> subtaskInProgressResourceService,
+            IResourceService<Subtask> subtaskResourceService,
             DistributedComputingDbContext dbContext
         )
         {
             _distributedNodeResourceService = distributedNodeResourceService;
-            _subtaskInProgResourceService = subtaskInProgResourceService;
+            _subtaskInProgressResourceService = subtaskInProgressResourceService;
+            _subtaskResourceService = subtaskResourceService;
             _dbContext = dbContext;
         }
 
@@ -33,15 +36,17 @@ namespace Server.Controllers
         [ValidateModel]
         public async Task<IActionResult> AssignNextAsync([FromBody] AssignNextSubtaskDTO body)
         {
+            // TODO: fix parsing the GUID
             var distributedNode = await _distributedNodeResourceService.GetAsync(body.DistributedNodeId);
 
+            // TODO: use JSON API response format instead of a regular NotFound
             if (distributedNode == null)
-                return NotFound();
+                return NotFound(); // TODO: specify the reason
 
             var nextSubtask = await GetNextSubtaskAsync();
 
             if (nextSubtask == null)
-                return NotFound(); // TODO: provide information about no subtasks
+                return NotFound(); // TODO: specify the reason
 
             var subtaskInProgress = new SubtaskInProgress
             {
@@ -50,14 +55,20 @@ namespace Server.Controllers
                 Subtask = nextSubtask,
             };
 
-            return Ok(await _subtaskInProgResourceService.CreateAsync(subtaskInProgress));
+            var createdSubtaskInProgress = await _subtaskInProgressResourceService.CreateAsync(subtaskInProgress);
+
+            await _subtaskResourceService.UpdateAsync(subtaskInProgress.SubtaskId,
+                new Subtask { Status = SubtaskStatus.Executing });
+
+            return Ok(createdSubtaskInProgress);
         }
 
         private Task<Subtask> GetNextSubtaskAsync()
         {
+            // TODO: add sorting by DistributedTask priority
             return _dbContext.Subtasks.FirstOrDefaultAsync(subtask =>
-                subtask.SubtasksInProgress.Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel) <
-                subtask.DistributedTask.TrustLevelToComplete);
+                (subtask.Status == SubtaskStatus.WaitingForExecution || subtask.Status == SubtaskStatus.Executing) &&
+                subtask.SubtasksInProgress.Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel) < subtask.DistributedTask.TrustLevelToComplete);
         }
     }
 }
