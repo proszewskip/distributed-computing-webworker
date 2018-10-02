@@ -5,6 +5,7 @@ using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Server.DTO;
+using Server.Exceptions;
 using Server.Models;
 using Server.Validation;
 
@@ -12,12 +13,15 @@ namespace Server.Controllers
 {
     public class DistributedTasksController : JsonApiController<DistributedTask>
     {
+        private readonly IResourceService<DistributedTask, int> _resourceService;
+
         public DistributedTasksController(
             IJsonApiContext jsonApiContext,
             IResourceService<DistributedTask> resourceService,
             ILoggerFactory loggerFactory
         ) : base(jsonApiContext, resourceService, loggerFactory)
         {
+            _resourceService = resourceService;
         }
 
         [HttpPost("add")]
@@ -38,6 +42,33 @@ namespace Server.Controllers
             await body.InputData.CopyToAsync(memoryStream);
 
             return await base.PostAsync(distributedTask);
+        }
+
+        [HttpGet("{id}/input-data")]
+        public async Task<IActionResult> DownloadInputData(int id)
+        {
+            var distributedTask = await _resourceService.GetAsync(id);
+
+            if (distributedTask == null)
+                return NotFound();
+
+            return File(distributedTask.InputData, "application/octet-stream", $"{distributedTask.Name}-input-data");
+        }
+
+        [HttpGet("{id}/result")]
+        public async Task<IActionResult> DownloadResult(int id)
+        {
+            var distributedTask = await _resourceService.GetAsync(id);
+
+            if (distributedTask == null)
+                return NotFound();
+
+            if (distributedTask.Result == null)
+            {
+                throw new NullResultException();
+            }
+
+            return File(distributedTask.Result, "application/octet-stream", $"{distributedTask.Name}-result");
         }
     }
 }
