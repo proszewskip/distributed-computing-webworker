@@ -24,7 +24,6 @@ namespace Server.Controllers
         {
             var distributedNode = new DistributedNode
             {
-                Id = Guid.NewGuid(),
                 LastKeepAliveTime = DateTime.Now
             };
 
@@ -37,7 +36,7 @@ namespace Server.Controllers
             var distributedNode = await _resourceService.GetAsync(id);
 
             if (distributedNode == null)
-                return NotFound();
+                return NotFound(); // TODO: use JSON API response format
 
             distributedNode.LastKeepAliveTime = DateTime.Now;
             await _resourceService.UpdateAsync(id, distributedNode);
