@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using JsonApiDotNetCore.Models;
+using Newtonsoft.Json;
 
 namespace Server.Models
 {
@@ -25,6 +26,7 @@ namespace Server.Models
         [Attr("status", isImmutable: true)]
         public SubtaskStatus Status { get; set; } = SubtaskStatus.Executing;
 
+        [JsonIgnore]
         public byte[] Result { get; set; }
 
         // TODO: verify that string[] is the correct type here
