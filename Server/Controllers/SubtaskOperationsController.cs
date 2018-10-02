@@ -36,10 +36,12 @@ namespace Server.Controllers
         [ValidateModel]
         public async Task<IActionResult> AssignNextAsync([FromBody] AssignNextSubtaskDTO body)
         {
-            // TODO: fix parsing the GUID
-            var distributedNode = await _distributedNodeResourceService.GetAsync(body.DistributedNodeId);
-
             // TODO: use JSON API response format instead of a regular NotFound
+            if (!Guid.TryParse(body.DistributedNodeId, out var distributedNodeId))
+                return BadRequest(); // TODO: specify the reason
+
+            var distributedNode = await _distributedNodeResourceService.GetAsync(distributedNodeId);
+
             if (distributedNode == null)
                 return NotFound(); // TODO: specify the reason
 
@@ -68,7 +70,7 @@ namespace Server.Controllers
             // TODO: add sorting by DistributedTask priority
             return _dbContext.Subtasks.FirstOrDefaultAsync(subtask =>
                 (subtask.Status == SubtaskStatus.WaitingForExecution || subtask.Status == SubtaskStatus.Executing) &&
-                subtask.SubtasksInProgress.Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel) < subtask.DistributedTask.TrustLevelToComplete);
+                !subtask.SubtasksInProgress.Any() || subtask.SubtasksInProgress.Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel) < subtask.DistributedTask.TrustLevelToComplete);
         }
     }
 }

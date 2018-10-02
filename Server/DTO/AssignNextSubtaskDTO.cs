@@ -5,12 +5,14 @@ using System.Linq;
 using System.Net.Http.Formatting;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Server.DTO
 {
     public class AssignNextSubtaskDTO
     {
         [Required]
-        public Guid DistributedNodeId { get; set; }
+        [JsonProperty("distributed-node-id")]
+        public string DistributedNodeId { get; set; }
     }
 }
