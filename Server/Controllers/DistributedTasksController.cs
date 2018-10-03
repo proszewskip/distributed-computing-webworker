@@ -1,11 +1,11 @@
 using System.IO;
 using System.Threading.Tasks;
 using JsonApiDotNetCore.Controllers;
+using JsonApiDotNetCore.Internal;
 using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Server.DTO;
-using Server.Exceptions;
 using Server.Models;
 using Server.Validation;
 
@@ -13,15 +13,15 @@ namespace Server.Controllers
 {
     public class DistributedTasksController : JsonApiController<DistributedTask>
     {
-        private readonly IResourceService<DistributedTask, int> _resourceService;
+        private readonly IResourceService<DistributedTask> _distributedTaskResourceService;
 
         public DistributedTasksController(
             IJsonApiContext jsonApiContext,
-            IResourceService<DistributedTask> resourceService,
+            IResourceService<DistributedTask> distributedTaskResourceService,
             ILoggerFactory loggerFactory
-        ) : base(jsonApiContext, resourceService, loggerFactory)
+        ) : base(jsonApiContext, distributedTaskResourceService, loggerFactory)
         {
-            _resourceService = resourceService;
+            _distributedTaskResourceService = distributedTaskResourceService;
         }
 
         [HttpPost("add")]
@@ -47,7 +47,7 @@ namespace Server.Controllers
         [HttpGet("{id}/input-data")]
         public async Task<IActionResult> DownloadInputData(int id)
         {
-            var distributedTask = await _resourceService.GetAsync(id);
+            var distributedTask = await _distributedTaskResourceService.GetAsync(id);
 
             if (distributedTask == null)
                 return NotFound();
@@ -58,15 +58,13 @@ namespace Server.Controllers
         [HttpGet("{id}/result")]
         public async Task<IActionResult> DownloadResult(int id)
         {
-            var distributedTask = await _resourceService.GetAsync(id);
+            var distributedTask = await _distributedTaskResourceService.GetAsync(id);
 
             if (distributedTask == null)
                 return NotFound();
 
             if (distributedTask.Result == null)
-            {
-                throw new NullResultException();
-            }
+                return Error(new Error(400, "The result is currently not available."));
 
             return File(distributedTask.Result, "application/octet-stream", $"{distributedTask.Name}-result");
         }
