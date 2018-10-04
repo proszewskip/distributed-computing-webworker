@@ -1,4 +1,5 @@
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using JsonApiDotNetCore.Controllers;
 using JsonApiDotNetCore.Internal;
@@ -14,19 +15,22 @@ namespace Server.Controllers
     public class DistributedTasksController : JsonApiController<DistributedTask>
     {
         private readonly IResourceService<DistributedTask> _distributedTaskResourceService;
+        private readonly IJsonApiSerializer _jsonApiSerializer;
 
         public DistributedTasksController(
             IJsonApiContext jsonApiContext,
             IResourceService<DistributedTask> distributedTaskResourceService,
-            ILoggerFactory loggerFactory
+            ILoggerFactory loggerFactory,
+            IJsonApiSerializer jsonApiSerializer
         ) : base(jsonApiContext, distributedTaskResourceService, loggerFactory)
         {
             _distributedTaskResourceService = distributedTaskResourceService;
+            _jsonApiSerializer = jsonApiSerializer;
         }
 
         [HttpPost("add")]
         [ValidateModel]
-        public async Task<IActionResult> PostAsync([FromForm] CreateDistributedTaskDTO body)
+        public async Task PostAsync([FromForm] CreateDistributedTaskDTO body)
         {
             var distributedTask = new DistributedTask
             {
@@ -41,7 +45,13 @@ namespace Server.Controllers
             var memoryStream = new MemoryStream(distributedTask.InputData);
             await body.InputData.CopyToAsync(memoryStream);
 
-            return await base.PostAsync(distributedTask);
+            var createdDistributedTask = await _distributedTaskResourceService.CreateAsync(distributedTask);
+
+            var serializedResult = _jsonApiSerializer.Serialize(createdDistributedTask);
+
+            HttpContext.Response.ContentType = Constants.ContentType;
+            HttpContext.Response.StatusCode = 201;
+            await HttpContext.Response.Body.WriteAsync(Encoding.UTF8.GetBytes(serializedResult));
         }
 
         [HttpGet("{id}/input-data")]
