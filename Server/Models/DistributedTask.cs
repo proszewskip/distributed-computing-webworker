@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using JsonApiDotNetCore.Models;
-using Newtonsoft.Json;
 
 namespace Server.Models
 {
@@ -29,13 +28,11 @@ namespace Server.Models
         public virtual DistributedTaskDefinition DistributedTaskDefinition { get; set; }
 
         [Required]
-        [JsonIgnore]
         public byte[] InputData { get; set; }
 
         [Attr("status", isImmutable: true)]
         public DistributedTaskStatus Status { get; set; } = DistributedTaskStatus.InProgress;
 
-        [JsonIgnore]
         public byte[] Result { get; set; }
 
         [HasMany("subtasks")]
