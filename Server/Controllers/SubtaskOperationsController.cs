@@ -14,13 +14,13 @@ namespace Server.Controllers
     [Route("subtasks")]
     public class SubtaskOperationsController : Controller
     {
+        private readonly IAssemblyLoader _assemblyLoader;
+        private readonly DistributedComputingDbContext _dbContext;
         private readonly IResourceService<DistributedNode, Guid> _distributedNodeResourceService;
+        private readonly IPathsProvider _pathsProvider;
+        private readonly IProblemPluginFacadeFactory _problemPluginFacadeFactory;
         private readonly IResourceService<SubtaskInProgress> _subtaskInProgressResourceService;
         private readonly IResourceService<Subtask> _subtaskResourceService;
-        private readonly IProblemPluginFacadeFactory _problemPluginFacadeFactory;
-        private readonly IAssemblyLoader _assemblyLoader;
-        private readonly IPathsProvider _pathsProvider;
-        private readonly DistributedComputingDbContext _dbContext;
 
         public SubtaskOperationsController(
             IResourceService<DistributedNode, Guid> distributedNodeResourceService,
@@ -63,13 +63,13 @@ namespace Server.Controllers
             {
                 Node = distributedNode,
                 Status = SubtaskStatus.Executing,
-                Subtask = nextSubtask,
+                Subtask = nextSubtask
             };
 
             var createdSubtaskInProgress = await _subtaskInProgressResourceService.CreateAsync(subtaskInProgress);
 
             await _subtaskResourceService.UpdateAsync(subtaskInProgress.SubtaskId,
-                new Subtask { Status = SubtaskStatus.Executing });
+                new Subtask {Status = SubtaskStatus.Executing});
 
             return Ok(createdSubtaskInProgress);
         }
@@ -107,9 +107,7 @@ namespace Server.Controllers
                     await FinishSubtaskAsync(finishedSubtaskInProgress);
 
                     if (IsTaskFullyComputed(finishedSubtaskInProgress.Subtask.DistributedTaskId))
-                    {
                         await FinishTaskAsync(finishedSubtaskInProgress);
-                    }
                 }
 
                 transaction.Commit();
@@ -125,7 +123,8 @@ namespace Server.Controllers
                 (subtask.Status == SubtaskStatus.WaitingForExecution || subtask.Status == SubtaskStatus.Executing) &&
                 !subtask.SubtasksInProgress.Any() || subtask.SubtasksInProgress
                     .Where(subtaskInProgress => subtaskInProgress.Status != SubtaskStatus.Error)
-                    .Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel) < subtask.DistributedTask.TrustLevelToComplete);
+                    .Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel) <
+                subtask.DistributedTask.TrustLevelToComplete);
         }
 
         private async Task UpdateSubtaskInProgressAsync(FinishSubtaskDTO body, SubtaskInProgress subtaskInProgress)
@@ -163,7 +162,8 @@ namespace Server.Controllers
             catch (Exception exception)
             {
                 finishedSubtaskInProgress.Subtask.DistributedTask.Status = DistributedTaskStatus.Error;
-                finishedSubtaskInProgress.Subtask.DistributedTask.Errors = finishedSubtaskInProgress.Subtask.DistributedTask.Errors.Append(exception.InnerException.ToString()).ToArray();
+                finishedSubtaskInProgress.Subtask.DistributedTask.Errors = finishedSubtaskInProgress.Subtask
+                    .DistributedTask.Errors.Append(exception.InnerException.ToString()).ToArray();
             }
 
             await _dbContext.SaveChangesAsync();
@@ -173,7 +173,8 @@ namespace Server.Controllers
         {
             var subtasksInProgress = _dbContext.SubtasksInProgress.Where(subtaskInProgress =>
                 subtaskInProgress.SubtaskId == finishedSubtaskInProgress.SubtaskId);
-            if (subtasksInProgress.Any(subtaskInProgress => subtaskInProgress.Result != finishedSubtaskInProgress.Result))
+            if (subtasksInProgress.Any(
+                subtaskInProgress => subtaskInProgress.Result != finishedSubtaskInProgress.Result))
             {
                 await subtasksInProgress.ForEachAsync(subtaskInProgress =>
                 {
@@ -193,8 +194,9 @@ namespace Server.Controllers
 
         private bool IsSubtaskFullyComputed(int subtaskId)
         {
-            var currentTrustLevel = _dbContext.SubtasksInProgress.Where(subtaskInProgress => subtaskInProgress.SubtaskId == subtaskId
-                                                                                             && subtaskInProgress.Status == SubtaskStatus.Done)
+            var currentTrustLevel = _dbContext.SubtasksInProgress.Where(subtaskInProgress =>
+                    subtaskInProgress.SubtaskId == subtaskId
+                    && subtaskInProgress.Status == SubtaskStatus.Done)
                 .Sum(subtaskinProgress => subtaskinProgress.Node.TrustLevel);
 
             return currentTrustLevel >= _dbContext.Subtasks.Include(subtask => subtask.DistributedTask)
@@ -209,7 +211,9 @@ namespace Server.Controllers
 
         private IProblemPluginFacade GetProblemPluginFacade(DistributedTaskDefinition distributedTaskDefinition)
         {
-            var assemblyPath = _pathsProvider.GetCompiledTaskDefinitionMainAssemblyPath(distributedTaskDefinition.DefinitionGuid, distributedTaskDefinition.MainDllName);
+            var assemblyPath =
+                _pathsProvider.GetCompiledTaskDefinitionMainAssemblyPath(distributedTaskDefinition.DefinitionGuid,
+                    distributedTaskDefinition.MainDllName);
             var taskAssembly = _assemblyLoader.LoadAssembly(assemblyPath);
 
             return _problemPluginFacadeFactory.Create(taskAssembly);
