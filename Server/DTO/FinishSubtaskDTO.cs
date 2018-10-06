@@ -17,7 +17,6 @@ namespace Server.DTO
         [JsonProperty("subtask-result")]
         public byte[] SubtaskResult { get; set; }
 
-
         [JsonProperty("errors")]
         public string[] Errors { get; set; }
     }
