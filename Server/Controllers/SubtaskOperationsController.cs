@@ -162,7 +162,7 @@ namespace Server.Controllers
             catch (Exception exception)
             {
                 finishedSubtaskInProgress.Subtask.DistributedTask.Status = DistributedTaskStatus.Error;
-                finishedSubtaskInProgress.Subtask.DistributedTask.Errors.Append(exception.StackTrace);
+                finishedSubtaskInProgress.Subtask.DistributedTask.Errors = finishedSubtaskInProgress.Subtask.DistributedTask.Errors.Append(exception.InnerException.ToString()).ToArray();
             }
 
             await _dbContext.SaveChangesAsync();
