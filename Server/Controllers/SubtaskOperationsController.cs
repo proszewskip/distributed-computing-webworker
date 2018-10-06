@@ -124,6 +124,7 @@ namespace Server.Controllers
             return _dbContext.Subtasks.FirstOrDefaultAsync(subtask =>
                 (subtask.Status == SubtaskStatus.WaitingForExecution || subtask.Status == SubtaskStatus.Executing) &&
                 !subtask.SubtasksInProgress.Any() || subtask.SubtasksInProgress
+                    .Where(subtaskInProgress => subtaskInProgress.Status != SubtaskStatus.Error)
                     .Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel) < subtask.DistributedTask.TrustLevelToComplete);
         }
 
