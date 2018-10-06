@@ -13,5 +13,7 @@ namespace Server.Services
         string GetTaskDefinitionDirectoryPath(Guid guid);
 
         string GetCompiledTaskDefinitionDirectoryPath(Guid guid);
+
+        string GetCompiledTaskDefinitionMainAssemblyPath(Guid guid, string mainDllName);
     }
 }
