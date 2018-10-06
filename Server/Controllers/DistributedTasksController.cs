@@ -49,7 +49,7 @@ namespace Server.Controllers
             var createdDistributedTask = await _distributedTaskResourceService.CreateAsync(distributedTask);
 
             HttpContext.Response.StatusCode = 201;
-            return await _jsonApiResponseFactory.CreateResponse(HttpContext.Response, createdDistributedTask);
+            return await _jsonApiResponseFactory.CreateResponseAsync(HttpContext.Response, createdDistributedTask);
         }
 
         [HttpGet("{id}/input-data")]

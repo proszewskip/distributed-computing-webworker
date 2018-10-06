@@ -21,31 +21,35 @@ namespace Server.Controllers
         private readonly IAssemblyLoader _assemblyLoader;
         private readonly IFileStorage _fileStorage;
         private readonly IPackager _packager;
+        private readonly IJsonApiResponseFactory _jsonApiResponseFactory;
+        private readonly IResourceService<DistributedTaskDefinition> _taskDefinitionResourceService;
         private readonly IPathsProvider _pathsProvider;
         private readonly ILogger<DistributedTaskDefinitionsController> _logger;
 
 
         public DistributedTaskDefinitionsController(
             IJsonApiContext jsonApiContext,
-            IResourceService<DistributedTaskDefinition> resourceService,
+            IResourceService<DistributedTaskDefinition> taskDefinitionResourceService,
             ILoggerFactory loggerFactory,
             IPathsProvider pathsProvider,
             IProblemPluginFacadeFactory problemPluginFacadeFactory,
             IAssemblyLoader assemblyLoader,
             IFileStorage fileStorage,
-            IPackager packager
-        ) : base(jsonApiContext, resourceService, loggerFactory)
+            IPackager packager,
+            IJsonApiResponseFactory jsonApiResponseFactory
+        ) : base(jsonApiContext, taskDefinitionResourceService, loggerFactory)
         {
+            _taskDefinitionResourceService = taskDefinitionResourceService;
             _pathsProvider = pathsProvider;
             _problemPluginFacadeFactory = problemPluginFacadeFactory;
             _assemblyLoader = assemblyLoader;
             _fileStorage = fileStorage;
             _packager = packager;
+            _jsonApiResponseFactory = jsonApiResponseFactory;
 
             _logger = loggerFactory.CreateLogger<DistributedTaskDefinitionsController>();
         }
 
-        // TODO: come up with a better name for the endpoint
         [HttpPost("add")]
         [ValidateModel]
         public async Task<IActionResult> PostAsync([FromForm] CreateDistributedTaskDefinitionDTO body)
@@ -87,7 +91,10 @@ namespace Server.Controllers
 
             try
             {
-                return await base.PostAsync(distributedTaskDefinition);
+                var createdTaskDefinition = await _taskDefinitionResourceService.CreateAsync(distributedTaskDefinition);
+                HttpContext.Response.StatusCode = 201;
+
+                return await _jsonApiResponseFactory.CreateResponseAsync(HttpContext.Response, createdTaskDefinition);
             }
             catch
             {
