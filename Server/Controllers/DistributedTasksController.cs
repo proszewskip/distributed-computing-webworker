@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Server.DTO;
 using Server.Models;
+using Server.Services;
 using Server.Validation;
 
 namespace Server.Controllers
@@ -15,22 +16,22 @@ namespace Server.Controllers
     public class DistributedTasksController : JsonApiController<DistributedTask>
     {
         private readonly IResourceService<DistributedTask> _distributedTaskResourceService;
-        private readonly IJsonApiSerializer _jsonApiSerializer;
+        private readonly IJsonApiResponseFactory _jsonApiResponseFactory;
 
         public DistributedTasksController(
             IJsonApiContext jsonApiContext,
             IResourceService<DistributedTask> distributedTaskResourceService,
             ILoggerFactory loggerFactory,
-            IJsonApiSerializer jsonApiSerializer
+            IJsonApiResponseFactory jsonApiResponseFactory
         ) : base(jsonApiContext, distributedTaskResourceService, loggerFactory)
         {
             _distributedTaskResourceService = distributedTaskResourceService;
-            _jsonApiSerializer = jsonApiSerializer;
+            _jsonApiResponseFactory = jsonApiResponseFactory;
         }
 
         [HttpPost("add")]
         [ValidateModel]
-        public async Task PostAsync([FromForm] CreateDistributedTaskDTO body)
+        public async Task<IActionResult> PostAsync([FromForm] CreateDistributedTaskDTO body)
         {
             var distributedTask = new DistributedTask
             {
@@ -47,11 +48,8 @@ namespace Server.Controllers
 
             var createdDistributedTask = await _distributedTaskResourceService.CreateAsync(distributedTask);
 
-            var serializedResult = _jsonApiSerializer.Serialize(createdDistributedTask);
-
-            HttpContext.Response.ContentType = Constants.ContentType;
             HttpContext.Response.StatusCode = 201;
-            await HttpContext.Response.Body.WriteAsync(Encoding.UTF8.GetBytes(serializedResult));
+            return await _jsonApiResponseFactory.CreateResponse(HttpContext.Response, createdDistributedTask);
         }
 
         [HttpGet("{id}/input-data")]
