@@ -1,8 +1,10 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
 using Microsoft.EntityFrameworkCore;
 using Server.DTO;
 using Server.Models;
@@ -69,7 +71,7 @@ namespace Server.Controllers
             var createdSubtaskInProgress = await _subtaskInProgressResourceService.CreateAsync(subtaskInProgress);
 
             await _subtaskResourceService.UpdateAsync(subtaskInProgress.SubtaskId,
-                new Subtask {Status = SubtaskStatus.Executing});
+                new Subtask { Status = SubtaskStatus.Executing });
 
             return Ok(createdSubtaskInProgress);
         }
@@ -87,16 +89,12 @@ namespace Server.Controllers
                 .Include(subtaskInProgress => subtaskInProgress.Subtask)
                 .ThenInclude(subtask => subtask.DistributedTask)
                 .ThenInclude(distributedTask => distributedTask.DistributedTaskDefinition)
-                .FirstOrDefaultAsync(subtaskInProgress => subtaskInProgress.Id == id);
+                .FirstOrDefaultAsync(subtaskInProgress =>
+                    subtaskInProgress.Id == id && subtaskInProgress.Status == SubtaskStatus.Executing &&
+                    subtaskInProgress.NodeId == distributedNodeId);
 
             if (finishedSubtaskInProgress == null)
                 return NotFound();
-
-            if (finishedSubtaskInProgress.Status != SubtaskStatus.Executing)
-                return BadRequest(); // TODO: specify the reason
-
-            if (finishedSubtaskInProgress.NodeId != distributedNodeId)
-                return BadRequest(); // TODO: specify the reason
 
             using (var transaction = await _dbContext.Database.BeginTransactionAsync())
             {
@@ -121,8 +119,8 @@ namespace Server.Controllers
             // TODO: add sorting by DistributedTask priority
             return _dbContext.Subtasks.FirstOrDefaultAsync(subtask =>
                 (subtask.Status == SubtaskStatus.WaitingForExecution || subtask.Status == SubtaskStatus.Executing) &&
-                !subtask.SubtasksInProgress.Any() || subtask.SubtasksInProgress
-                    .Where(subtaskInProgress => subtaskInProgress.Status != SubtaskStatus.Error)
+                !subtask.SubtasksInProgress.Any() ||
+                subtask.SubtasksInProgress.Where(subtaskInProgress => subtaskInProgress.Status != SubtaskStatus.Error)
                     .Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel) <
                 subtask.DistributedTask.TrustLevelToComplete);
         }
@@ -139,7 +137,8 @@ namespace Server.Controllers
             else
             {
                 subtaskInProgress.Status = SubtaskStatus.Done;
-                subtaskInProgress.Result = body.SubtaskResult;
+                var memoryStream = new MemoryStream(subtaskInProgress.Result);
+                await body.SubtaskResult.CopyToAsync(memoryStream);
             }
 
             await _dbContext.SaveChangesAsync();
@@ -199,8 +198,10 @@ namespace Server.Controllers
                     && subtaskInProgress.Status == SubtaskStatus.Done)
                 .Sum(subtaskinProgress => subtaskinProgress.Node.TrustLevel);
 
-            return currentTrustLevel >= _dbContext.Subtasks.Include(subtask => subtask.DistributedTask)
-                       .First(subtask => subtask.Id == subtaskId).DistributedTask.TrustLevelToComplete;
+            var trustLevelToComplete = _dbContext.Subtasks.Where(subtask => subtask.Id == subtaskId)
+                .Select(subtask => subtask.DistributedTask.TrustLevelToComplete).First();
+
+            return currentTrustLevel >= trustLevelToComplete;
         }
 
         private bool IsTaskFullyComputed(int distributedTaskId)
