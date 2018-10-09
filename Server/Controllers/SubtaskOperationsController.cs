@@ -72,7 +72,7 @@ namespace Server.Controllers
         private Task<Subtask> GetNextSubtaskAsync()
         {
             // TODO: add sorting by DistributedTask priority
-            return _dbContext.Subtasks.Include(subtask => subtask.DistributedTask).FirstOrDefaultAsync(subtask =>
+            return _dbContext.Subtasks.FirstOrDefaultAsync(subtask =>
                    (subtask.Status == SubtaskStatus.WaitingForExecution || subtask.Status == SubtaskStatus.Executing) &&
                    subtask.DistributedTask.Status == DistributedTaskStatus.InProgress &&
                    (!subtask.SubtasksInProgress.Any() ||
