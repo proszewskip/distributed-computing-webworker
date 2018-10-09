@@ -2,9 +2,8 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using JsonApiDotNetCore.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Server.Models;
 
 namespace Server.Services.Api
@@ -20,20 +19,28 @@ namespace Server.Services.Api
     {
         private readonly IAssemblyLoader _assemblyLoader;
         private readonly DistributedComputingDbContext _dbContext;
+        private readonly IResourceService<DistributedTaskDefinition> _distributedTaskDefinitionResourceService;
         private readonly IPathsProvider _pathsProvider;
         private readonly IProblemPluginFacadeFactory _problemPluginFacadeFactory;
+        private readonly IResourceService<SubtaskInProgress> _subtaskInProgressResourceService;
+        private readonly IResourceService<Subtask> _subtaskResourceService;
 
         public FinishComputationService(
-            ILoggerFactory loggerFactory,
             DistributedComputingDbContext dbContext,
             IPathsProvider pathsProvider,
             IAssemblyLoader assemblyLoader,
+            IResourceService<SubtaskInProgress> subtaskInProgressResourceService,
+            IResourceService<Subtask> subtaskResourceService,
+            IResourceService<DistributedTaskDefinition> distributedTaskDefinitionResourceService,
             IProblemPluginFacadeFactory problemPluginFacadeFactory)
         {
             _dbContext = dbContext;
             _pathsProvider = pathsProvider;
             _assemblyLoader = assemblyLoader;
             _problemPluginFacadeFactory = problemPluginFacadeFactory;
+            _subtaskInProgressResourceService = subtaskInProgressResourceService;
+            _subtaskResourceService = subtaskResourceService;
+            _distributedTaskDefinitionResourceService = distributedTaskDefinitionResourceService;
         }
 
         public async Task CompleteSubtaskInProgressAsync(int subtaskInProgressId, Stream subtaskInProgressResult)
@@ -48,34 +55,43 @@ namespace Server.Services.Api
 
         public async Task FailSubtaskInProgressAsync(int subtaskInProgressId, string[] computationErrors)
         {
-            var failedSubtaskInProgress =
-                _dbContext.SubtasksInProgress.Include(subtaskInProgress => subtaskInProgress.Subtask)
-                .ThenInclude(subtask => subtask.DistributedTask)
-                    .First(subtaskInProgress => subtaskInProgress.Id == subtaskInProgressId);
+            var failedSubtaskInProgress = await _subtaskInProgressResourceService.GetAsync(subtaskInProgressId);
 
+            failedSubtaskInProgress.Status = SubtaskStatus.Error;
             failedSubtaskInProgress.Errors = computationErrors;
-            failedSubtaskInProgress.Subtask.Status = SubtaskStatus.Error;
-            failedSubtaskInProgress.Subtask.DistributedTask.Status = DistributedTaskStatus.Error;
-            //TODO: The task should not be marked as failed until single subtask fails at least 3 times.
+
+            await _subtaskInProgressResourceService.UpdateAsync(subtaskInProgressId, failedSubtaskInProgress);
+
+            var subtask = await _subtaskResourceService.GetAsync(failedSubtaskInProgress.SubtaskId);
+            subtask.Status = SubtaskStatus.Error;
+
+            await _subtaskResourceService.UpdateAsync(failedSubtaskInProgress.SubtaskId, subtask);
+
+            var finishedDistributedTask =
+                await _dbContext.DistributedTasks.FirstAsync(distributedTask =>
+                    distributedTask.Id == subtask.DistributedTaskId);
+
+            finishedDistributedTask.Status = DistributedTaskStatus.Error;
 
             await _dbContext.SaveChangesAsync();
+            //TODO: The task should not be marked as failed until single subtask fails at least 3 times.
         }
 
-        private async Task FinishSubtaskInProgressAsync(int id, Stream subtaskInProgressResult)
+        private async Task FinishSubtaskInProgressAsync(int subtaskInProgressId, Stream subtaskInProgressResultStream)
         {
-            var finishedSubtaskInProgress =
-                _dbContext.SubtasksInProgress.First(subtaskInProgress => subtaskInProgress.Id == id);
+            var subtaskInProgressResult = new byte[subtaskInProgressResultStream.Length];
 
-            finishedSubtaskInProgress.Status = SubtaskStatus.Done;
-            finishedSubtaskInProgress.Result = new byte[subtaskInProgressResult.Length];
-
-            using (subtaskInProgressResult)
+            using (subtaskInProgressResultStream)
             {
-                var memoryStream = new MemoryStream(finishedSubtaskInProgress.Result);
-                await subtaskInProgressResult.CopyToAsync(memoryStream);
+                var memoryStream = new MemoryStream(subtaskInProgressResult);
+                await subtaskInProgressResultStream.CopyToAsync(memoryStream);
             }
 
-            await _dbContext.SaveChangesAsync();
+            var finishedSubtaskInProgress = await _subtaskInProgressResourceService.GetAsync(subtaskInProgressId);
+            finishedSubtaskInProgress.Status = SubtaskStatus.Done;
+            finishedSubtaskInProgress.Result = subtaskInProgressResult;
+
+            await _subtaskInProgressResourceService.UpdateAsync(subtaskInProgressId, finishedSubtaskInProgress);
 
             var isSubtaskFullyComputed = IsSubtaskFullyComputed(finishedSubtaskInProgress.SubtaskId);
 
@@ -83,18 +99,61 @@ namespace Server.Services.Api
                 await FinishSubtaskAsync(finishedSubtaskInProgress.SubtaskId);
         }
 
-
-        private async Task FinishTaskAsync(int id)
+        private async Task FinishSubtaskAsync(int subtaskId)
         {
-            var finishedDistributedTask = _dbContext.DistributedTasks
-                .Include(distributedTask => distributedTask.DistributedTaskDefinition)
-                .First(distributedTask => distributedTask.Id == id);
+            var subtasksInProgress = _dbContext.SubtasksInProgress.Where(subtaskInProgress =>
+                subtaskInProgress.SubtaskId == subtaskId);
+
+            var sampleResult = subtasksInProgress.First().Result;
+            if (subtasksInProgress.Any(subtaskInProgress => subtaskInProgress.Result != sampleResult))
+            {
+                await subtasksInProgress.ForEachAsync(subtaskInProgress =>
+                {
+                    subtaskInProgress.Errors = subtaskInProgress.Errors
+                        .Append("Divergent results detected. Subtask must be computed again.").ToArray();
+                    subtaskInProgress.Status = SubtaskStatus.Error;
+                });
+
+                await _dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                var finishedSubtask = await _subtaskResourceService.GetAsync(subtaskId);
+
+                finishedSubtask.Result = sampleResult;
+                finishedSubtask.Status = SubtaskStatus.Done;
+
+                await _subtaskResourceService.UpdateAsync(subtaskId, finishedSubtask);
+
+                if (IsDistributedTaskFullyComputed(finishedSubtask.DistributedTaskId))
+                    await FinishDistributedTaskAsync(finishedSubtask.DistributedTaskId);
+            }
+        }
+
+        private bool IsSubtaskFullyComputed(int subtaskId)
+        {
+            var currentTrustLevel = _dbContext.SubtasksInProgress.Where(subtaskInProgress =>
+                    subtaskInProgress.SubtaskId == subtaskId
+                    && subtaskInProgress.Status == SubtaskStatus.Done)
+                .Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel);
+
+            var trustLevelToComplete = _dbContext.Subtasks.Where(subtask => subtask.Id == subtaskId)
+                .Select(subtask => subtask.DistributedTask.TrustLevelToComplete).First();
+
+            return currentTrustLevel >= trustLevelToComplete;
+        }
+
+        private async Task FinishDistributedTaskAsync(int distributedTaskId)
+        {
+            var finishedDistributedTask =
+                await _dbContext.DistributedTasks.Include(distributedTask => distributedTask.DistributedTaskDefinition).FirstAsync(distributedTask =>
+                    distributedTask.Id == distributedTaskId);
 
             var problemPluginFacade =
                 GetProblemPluginFacade(finishedDistributedTask.DistributedTaskDefinition);
 
             var subtaskResults = _dbContext.Subtasks
-                .Where(subtask => subtask.DistributedTaskId == id)
+                .Where(subtask => subtask.DistributedTaskId == distributedTaskId)
                 .OrderBy(subtask => subtask.SequenceNumber)
                 .Select(subtask => subtask.Result);
 
@@ -112,50 +171,7 @@ namespace Server.Services.Api
             await _dbContext.SaveChangesAsync();
         }
 
-        private async Task FinishSubtaskAsync(int id)
-        {
-            var subtasksInProgress = _dbContext.SubtasksInProgress.Where(subtaskInProgress =>
-                subtaskInProgress.SubtaskId == id);
-
-            var sampleResult = subtasksInProgress.First().Result;
-            if (subtasksInProgress.Any(subtaskInProgress => subtaskInProgress.Result != sampleResult))
-            {
-                await subtasksInProgress.ForEachAsync(subtaskInProgress =>
-                {
-                    subtaskInProgress.Errors.Append(
-                        "Divergent results detected. Subtask must be computed again.");
-                    subtaskInProgress.Status = SubtaskStatus.Error;
-                });
-
-                await _dbContext.SaveChangesAsync();
-            }
-            else
-            {
-                var finishedSubtask = _dbContext.Subtasks.First(subtask => subtask.Id == id);
-                finishedSubtask.Result = sampleResult;
-                finishedSubtask.Status = SubtaskStatus.Done;
-
-                await _dbContext.SaveChangesAsync();
-
-                if (IsTaskFullyComputed(id))
-                    await FinishTaskAsync(finishedSubtask.DistributedTaskId);
-            }
-        }
-
-        private bool IsSubtaskFullyComputed(int subtaskId)
-        {
-            var currentTrustLevel = _dbContext.SubtasksInProgress.Where(subtaskInProgress =>
-                    subtaskInProgress.SubtaskId == subtaskId
-                    && subtaskInProgress.Status == SubtaskStatus.Done)
-                .Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel);
-
-            var trustLevelToComplete = _dbContext.Subtasks.Where(subtask => subtask.Id == subtaskId)
-                .Select(subtask => subtask.DistributedTask.TrustLevelToComplete).First();
-
-            return currentTrustLevel >= trustLevelToComplete;
-        }
-
-        private bool IsTaskFullyComputed(int distributedTaskId)
+        private bool IsDistributedTaskFullyComputed(int distributedTaskId)
         {
             return _dbContext.Subtasks.Where(subtask => subtask.DistributedTaskId == distributedTaskId)
                 .All(subtask => subtask.Status == SubtaskStatus.Done);
