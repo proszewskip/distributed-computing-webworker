@@ -38,11 +38,9 @@ namespace Server.Services
             return Path.Combine(CompiledTasksDefinitionsDirectoryPath, guid.ToString());
         }
 
-        public string GetCompiledTaskDefinitionMainAssemblyPath(Guid guid, string mainDllName)
+        public string GetTaskDefinitionMainAssemblyPath(Guid guid, string mainDllName)
         {
-            var compiledTaskDefinitionDirectoryPath = GetCompiledTaskDefinitionDirectoryPath(guid);
-
-            return Path.Combine(compiledTaskDefinitionDirectoryPath, "managed/", mainDllName);
+            return Path.Combine(GetTaskDefinitionDirectoryPath(guid), mainDllName);
         }
 
         private void InitializePaths()

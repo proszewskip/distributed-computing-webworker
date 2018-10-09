@@ -167,7 +167,7 @@ namespace Server.Services.Api
         private IProblemPluginFacade GetProblemPluginFacade(Guid definitionGuid, string mainDllName)
         {
             var assemblyPath =
-                _pathsProvider.GetCompiledTaskDefinitionMainAssemblyPath(definitionGuid,
+                _pathsProvider.GetTaskDefinitionMainAssemblyPath(definitionGuid,
                     mainDllName);
             var taskAssembly = _assemblyLoader.LoadAssembly(assemblyPath);
 
