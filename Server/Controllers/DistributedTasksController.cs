@@ -1,4 +1,5 @@
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using JsonApiDotNetCore.Controllers;
 using JsonApiDotNetCore.Internal;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Server.DTO;
 using Server.Models;
+using Server.Services;
 using Server.Validation;
 
 namespace Server.Controllers
@@ -14,14 +16,17 @@ namespace Server.Controllers
     public class DistributedTasksController : JsonApiController<DistributedTask>
     {
         private readonly IResourceService<DistributedTask> _distributedTaskResourceService;
+        private readonly IJsonApiResponseFactory _jsonApiResponseFactory;
 
         public DistributedTasksController(
             IJsonApiContext jsonApiContext,
             IResourceService<DistributedTask> distributedTaskResourceService,
-            ILoggerFactory loggerFactory
+            ILoggerFactory loggerFactory,
+            IJsonApiResponseFactory jsonApiResponseFactory
         ) : base(jsonApiContext, distributedTaskResourceService, loggerFactory)
         {
             _distributedTaskResourceService = distributedTaskResourceService;
+            _jsonApiResponseFactory = jsonApiResponseFactory;
         }
 
         [HttpPost("add")]
@@ -41,7 +46,10 @@ namespace Server.Controllers
             var memoryStream = new MemoryStream(distributedTask.InputData);
             await body.InputData.CopyToAsync(memoryStream);
 
-            return await base.PostAsync(distributedTask);
+            var createdDistributedTask = await _distributedTaskResourceService.CreateAsync(distributedTask);
+
+            HttpContext.Response.StatusCode = 201;
+            return await _jsonApiResponseFactory.CreateResponseAsync(HttpContext.Response, createdDistributedTask);
         }
 
         [HttpGet("{id}/input-data")]
