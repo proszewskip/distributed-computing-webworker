@@ -77,7 +77,8 @@ namespace Server
                 .AddScoped<IProblemPluginFacadeFactory, ProblemPluginFacadeFactory>()
                 .AddScoped<IFileStorage, FileStorage>()
                 .AddScoped<IResourceService<DistributedTaskDefinition>, DistributedTaskDefinitionService>()
-                .AddScoped<IResourceService<DistributedTask>, DistributedTaskService>();
+                .AddScoped<IResourceService<DistributedTask>, DistributedTaskService>()
+                .AddScoped<IComputationFinishService, ComputationFinishService>();
 
             services.AddSingleton<IPathsProvider, PathsProvider>();
         }
