@@ -8,8 +8,12 @@ using Newtonsoft.Json;
 
 namespace Server.DTO
 {
-    public class SuccesfulSubtaskDTO
+    public class ComputationSuccessDTO
     {
+        [Required]
+        public int SubtaskInProgressId { get; set; }
+
+
         [Required]
         public string DistributedNodeId { get; set; }
 
