@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Server.DTO;
 using Server.Models;
 using Server.Services.Api;
@@ -39,8 +38,11 @@ namespace Server.Controllers
                 finishedSubtaskInProgress.NodeId != distributedNodeId)
                 return NotFound();
 
-            await _finishComputationService.CompleteSubtaskInProgressAsync(computationSuccessDto.SubtaskInProgressId,
-                computationSuccessDto.SubtaskResult.OpenReadStream());
+            using (var subtaskInProgressResultStream = computationSuccessDto.SubtaskResult.OpenReadStream())
+            {
+                await _finishComputationService.CompleteSubtaskInProgressAsync(
+                    computationSuccessDto.SubtaskInProgressId, subtaskInProgressResultStream);
+            }
 
             return Ok();
         }
