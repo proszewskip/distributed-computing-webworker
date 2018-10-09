@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Server.DTO;
@@ -10,18 +11,18 @@ using Server.Validation;
 namespace Server.Controllers
 {
     [Route("subtasks-in-progress")]
-    public class SubtaskInProgressController : Controller
+    public class SubtaskInProgressOperationsController : Controller
     {
-        private readonly DistributedComputingDbContext _dbContext;
         private readonly IFinishComputationService _finishComputationService;
+        private readonly IResourceService<SubtaskInProgress> _subtaskInProgressResourceService;
 
-        public SubtaskInProgressController(
+        public SubtaskInProgressOperationsController(
             IFinishComputationService finishComputationService,
-            DistributedComputingDbContext dbContext
+            IResourceService<SubtaskInProgress> subtaskInProgressResourceService
         )
         {
             _finishComputationService = finishComputationService;
-            _dbContext = dbContext;
+            _subtaskInProgressResourceService = subtaskInProgressResourceService;
         }
 
         [HttpPost("finish-computation")]
@@ -31,18 +32,15 @@ namespace Server.Controllers
             if (!Guid.TryParse(computationSuccessDto.DistributedNodeId, out var distributedNodeId))
                 return BadRequest(); // TODO: specify the reason
 
-            var finishedSubtaskInProgress = await _dbContext.SubtasksInProgress
-                .Include(subtaskInProgress => subtaskInProgress.Subtask)
-                .FirstOrDefaultAsync(subtaskInProgress =>
-                    subtaskInProgress.Id == computationSuccessDto.SubtaskInProgressId &&
-                    subtaskInProgress.Status == SubtaskStatus.Executing &&
-                    subtaskInProgress.NodeId == distributedNodeId);
+            var finishedSubtaskInProgress =
+                await _subtaskInProgressResourceService.GetAsync(computationSuccessDto.SubtaskInProgressId);
 
-            if (finishedSubtaskInProgress == null)
+            if (finishedSubtaskInProgress == null || finishedSubtaskInProgress.Status != SubtaskStatus.Executing ||
+                finishedSubtaskInProgress.NodeId != distributedNodeId)
                 return NotFound();
 
             await _finishComputationService.CompleteSubtaskInProgressAsync(computationSuccessDto.SubtaskInProgressId,
-                computationSuccessDto.SubtaskResult);
+                computationSuccessDto.SubtaskResult.OpenReadStream());
 
             return Ok();
         }
@@ -54,13 +52,11 @@ namespace Server.Controllers
             if (!Guid.TryParse(computationErrorDto.DistributedNodeId, out var distributedNodeId))
                 return BadRequest(); // TODO: specify the reason
 
-            var faultySubtaskInProgress = await _dbContext.SubtasksInProgress
-                .FirstOrDefaultAsync(subtaskInProgress =>
-                    subtaskInProgress.Id == computationErrorDto.SubtaskInProgressId &&
-                    subtaskInProgress.Status == SubtaskStatus.Executing &&
-                    subtaskInProgress.NodeId == distributedNodeId);
+            var faulty =
+                await _subtaskInProgressResourceService.GetAsync(computationErrorDto.SubtaskInProgressId);
 
-            if (faultySubtaskInProgress == null)
+            if (faulty == null || faulty.Status != SubtaskStatus.Executing ||
+                faulty.NodeId != distributedNodeId)
                 return NotFound();
 
             await _finishComputationService.FailSubtaskInProgressAsync(computationErrorDto.SubtaskInProgressId,
