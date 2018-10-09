@@ -78,7 +78,7 @@ namespace Server
                 .AddScoped<IFileStorage, FileStorage>()
                 .AddScoped<IResourceService<DistributedTaskDefinition>, DistributedTaskDefinitionService>()
                 .AddScoped<IResourceService<DistributedTask>, DistributedTaskService>()
-                .AddScoped<IComputationFinishService, ComputationFinishService>();
+                .AddScoped<IFinishComputationService, FinishComputationService>();
 
             services.AddSingleton<IPathsProvider, PathsProvider>();
         }

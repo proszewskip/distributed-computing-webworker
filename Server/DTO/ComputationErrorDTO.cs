@@ -7,8 +7,11 @@ using Newtonsoft.Json;
 
 namespace Server.DTO
 {
-    public class FailedSubtaskDTO
+    public class ComputationErrorDTO
     {
+        [Required]
+        public int SubtaskInProgressId { get; set; }
+
         [Required]
         public string DistributedNodeId { get; set; }
 
