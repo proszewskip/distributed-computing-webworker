@@ -19,7 +19,6 @@ namespace Server.Services.Api
     {
         private readonly IAssemblyLoader _assemblyLoader;
         private readonly DistributedComputingDbContext _dbContext;
-        private readonly IResourceService<DistributedTaskDefinition> _distributedTaskDefinitionResourceService;
         private readonly IPathsProvider _pathsProvider;
         private readonly IProblemPluginFacadeFactory _problemPluginFacadeFactory;
         private readonly IResourceService<SubtaskInProgress> _subtaskInProgressResourceService;
@@ -31,7 +30,6 @@ namespace Server.Services.Api
             IAssemblyLoader assemblyLoader,
             IResourceService<SubtaskInProgress> subtaskInProgressResourceService,
             IResourceService<Subtask> subtaskResourceService,
-            IResourceService<DistributedTaskDefinition> distributedTaskDefinitionResourceService,
             IProblemPluginFacadeFactory problemPluginFacadeFactory)
         {
             _dbContext = dbContext;
@@ -40,7 +38,6 @@ namespace Server.Services.Api
             _problemPluginFacadeFactory = problemPluginFacadeFactory;
             _subtaskInProgressResourceService = subtaskInProgressResourceService;
             _subtaskResourceService = subtaskResourceService;
-            _distributedTaskDefinitionResourceService = distributedTaskDefinitionResourceService;
         }
 
         public async Task CompleteSubtaskInProgressAsync(int subtaskInProgressId, Stream subtaskInProgressResult)
@@ -81,11 +78,9 @@ namespace Server.Services.Api
         {
             var subtaskInProgressResult = new byte[subtaskInProgressResultStream.Length];
 
-            using (subtaskInProgressResultStream)
-            {
-                var memoryStream = new MemoryStream(subtaskInProgressResult);
-                await subtaskInProgressResultStream.CopyToAsync(memoryStream);
-            }
+
+            var memoryStream = new MemoryStream(subtaskInProgressResult);
+            await subtaskInProgressResultStream.CopyToAsync(memoryStream);
 
             var finishedSubtaskInProgress = await _subtaskInProgressResourceService.GetAsync(subtaskInProgressId);
             finishedSubtaskInProgress.Status = SubtaskStatus.Done;
@@ -146,8 +141,9 @@ namespace Server.Services.Api
         private async Task FinishDistributedTaskAsync(int distributedTaskId)
         {
             var finishedDistributedTask =
-                await _dbContext.DistributedTasks.Include(distributedTask => distributedTask.DistributedTaskDefinition).FirstAsync(distributedTask =>
-                    distributedTask.Id == distributedTaskId);
+                await _dbContext.DistributedTasks.Include(distributedTask => distributedTask.DistributedTaskDefinition)
+                    .FirstAsync(distributedTask =>
+                        distributedTask.Id == distributedTaskId);
 
             var problemPluginFacade =
                 GetProblemPluginFacade(finishedDistributedTask.DistributedTaskDefinition);
