@@ -11,7 +11,7 @@ namespace Server.Services.Api
 {
     public interface IFinishComputationService
     {
-        Task CompleteSubtaskInProgressAsync(int subtaskInProgressId, IFormFile subtaskInProgressResult);
+        Task CompleteSubtaskInProgressAsync(int subtaskInProgressId, Stream subtaskInProgressResult);
 
         Task FailSubtaskInProgressAsync(int subtaskInProgressId, string[] computationErrors);
     }
@@ -36,19 +36,11 @@ namespace Server.Services.Api
             _problemPluginFacadeFactory = problemPluginFacadeFactory;
         }
 
-        public async Task CompleteSubtaskInProgressAsync(int subtaskInProgressId, IFormFile subtaskInProgressResult)
+        public async Task CompleteSubtaskInProgressAsync(int subtaskInProgressId, Stream subtaskInProgressResult)
         {
             using (var transaction = await _dbContext.Database.BeginTransactionAsync())
             {
-                var completedSubtaskInProgress = _dbContext.SubtasksInProgress.Include(subtaskInProgress => subtaskInProgress.Subtask).First(subtaskInProgress =>
-                    subtaskInProgress.Id == subtaskInProgressId);
-
                 await FinishSubtaskInProgressAsync(subtaskInProgressId, subtaskInProgressResult);
-
-                var isSubtaskFinished = await FinishSubtaskAsync(completedSubtaskInProgress.SubtaskId);
-
-                if (isSubtaskFinished)
-                    await FinishTaskAsync(completedSubtaskInProgress.Subtask.DistributedTaskId);
 
                 transaction.Commit();
             }
@@ -64,11 +56,12 @@ namespace Server.Services.Api
             failedSubtaskInProgress.Errors = computationErrors;
             failedSubtaskInProgress.Subtask.Status = SubtaskStatus.Error;
             failedSubtaskInProgress.Subtask.DistributedTask.Status = DistributedTaskStatus.Error;
+            //TODO: The task should not be marked as failed until single subtask fails at least 3 times.
 
             await _dbContext.SaveChangesAsync();
         }
 
-        private async Task FinishSubtaskInProgressAsync(int id, IFormFile subtaskInProgressResult)
+        private async Task FinishSubtaskInProgressAsync(int id, Stream subtaskInProgressResult)
         {
             var finishedSubtaskInProgress =
                 _dbContext.SubtasksInProgress.First(subtaskInProgress => subtaskInProgress.Id == id);
@@ -76,25 +69,29 @@ namespace Server.Services.Api
             finishedSubtaskInProgress.Status = SubtaskStatus.Done;
             finishedSubtaskInProgress.Result = new byte[subtaskInProgressResult.Length];
 
-            var memoryStream = new MemoryStream(finishedSubtaskInProgress.Result);
-            await subtaskInProgressResult.CopyToAsync(memoryStream);
+            using (subtaskInProgressResult)
+            {
+                var memoryStream = new MemoryStream(finishedSubtaskInProgress.Result);
+                await subtaskInProgressResult.CopyToAsync(memoryStream);
+            }
 
             await _dbContext.SaveChangesAsync();
+
+            var isSubtaskFullyComputed = IsSubtaskFullyComputed(finishedSubtaskInProgress.SubtaskId);
+
+            if (isSubtaskFullyComputed)
+                await FinishSubtaskAsync(finishedSubtaskInProgress.SubtaskId);
         }
 
 
         private async Task FinishTaskAsync(int id)
         {
-            if (!IsTaskFullyComputed(id))
-                return;
-
             var finishedDistributedTask = _dbContext.DistributedTasks
                 .Include(distributedTask => distributedTask.DistributedTaskDefinition)
                 .First(distributedTask => distributedTask.Id == id);
 
             var problemPluginFacade =
-                GetProblemPluginFacade(finishedDistributedTask.DistributedTaskDefinition.DefinitionGuid,
-                    finishedDistributedTask.DistributedTaskDefinition.MainDllName);
+                GetProblemPluginFacade(finishedDistributedTask.DistributedTaskDefinition);
 
             var subtaskResults = _dbContext.Subtasks
                 .Where(subtask => subtask.DistributedTaskId == id)
@@ -115,11 +112,8 @@ namespace Server.Services.Api
             await _dbContext.SaveChangesAsync();
         }
 
-        private async Task<bool> FinishSubtaskAsync(int id)
+        private async Task FinishSubtaskAsync(int id)
         {
-            if (!IsSubtaskFullyComputed(id))
-                return false;
-
             var subtasksInProgress = _dbContext.SubtasksInProgress.Where(subtaskInProgress =>
                 subtaskInProgress.SubtaskId == id);
 
@@ -132,17 +126,20 @@ namespace Server.Services.Api
                         "Divergent results detected. Subtask must be computed again.");
                     subtaskInProgress.Status = SubtaskStatus.Error;
                 });
+
+                await _dbContext.SaveChangesAsync();
             }
             else
             {
                 var finishedSubtask = _dbContext.Subtasks.First(subtask => subtask.Id == id);
                 finishedSubtask.Result = sampleResult;
                 finishedSubtask.Status = SubtaskStatus.Done;
+
+                await _dbContext.SaveChangesAsync();
+
+                if (IsTaskFullyComputed(id))
+                    await FinishTaskAsync(finishedSubtask.DistributedTaskId);
             }
-
-            await _dbContext.SaveChangesAsync();
-
-            return true;
         }
 
         private bool IsSubtaskFullyComputed(int subtaskId)
@@ -164,11 +161,11 @@ namespace Server.Services.Api
                 .All(subtask => subtask.Status == SubtaskStatus.Done);
         }
 
-        private IProblemPluginFacade GetProblemPluginFacade(Guid definitionGuid, string mainDllName)
+        private IProblemPluginFacade GetProblemPluginFacade(DistributedTaskDefinition distributedTaskDefinition)
         {
             var assemblyPath =
-                _pathsProvider.GetTaskDefinitionMainAssemblyPath(definitionGuid,
-                    mainDllName);
+                _pathsProvider.GetTaskDefinitionMainAssemblyPath(distributedTaskDefinition.DefinitionGuid,
+                    distributedTaskDefinition.MainDllName);
             var taskAssembly = _assemblyLoader.LoadAssembly(assemblyPath);
 
             return _problemPluginFacadeFactory.Create(taskAssembly);
