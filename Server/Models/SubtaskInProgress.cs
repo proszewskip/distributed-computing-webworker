@@ -28,6 +28,6 @@ namespace Server.Models
         public byte[] Result { get; set; }
 
         // TODO: verify that string[] is the correct type here
-        public string[] Errors { get; set; }
+        public string[] Errors { get; set; } = { };
     }
 }
