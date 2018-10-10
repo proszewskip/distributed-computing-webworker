@@ -26,7 +26,7 @@ namespace Server.Controllers
 
         [HttpPost("computation-success")]
         [ValidateModel]
-        public async Task<IActionResult> FinishComputationAsync([FromForm] ComputationSuccessDTO computationSuccessDto)
+        public async Task<IActionResult> ReportComputationSuccessAsync([FromForm] ComputationSuccessDTO computationSuccessDto)
         {
             if (!Guid.TryParse(computationSuccessDto.DistributedNodeId, out var distributedNodeId))
                 return BadRequest(); // TODO: specify the reason
