@@ -78,6 +78,7 @@ namespace Server.Services.Api
         {
             if (resource.Name != null)
             {
+                //TODO: Move logic from this function to the controller.
                 await EnsureUniqueName(resource.Name);
             }
 

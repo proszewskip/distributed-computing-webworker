@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JsonApiDotNetCore.Services;
@@ -15,10 +14,10 @@ namespace Server.Controllers
     [Route("subtasks")]
     public class SubtaskOperationsController : Controller
     {
+        private readonly DistributedComputingDbContext _dbContext;
         private readonly IResourceService<DistributedNode, Guid> _distributedNodeResourceService;
         private readonly IResourceService<SubtaskInProgress> _subtaskInProgressResourceService;
         private readonly IResourceService<Subtask> _subtaskResourceService;
-        private readonly DistributedComputingDbContext _dbContext;
         private readonly IJsonApiResponseFactory _jsonApiResponseFactory;
 
         public SubtaskOperationsController(
@@ -58,7 +57,7 @@ namespace Server.Controllers
             {
                 Node = distributedNode,
                 Status = SubtaskStatus.Executing,
-                Subtask = nextSubtask,
+                Subtask = nextSubtask
             };
 
             var createdSubtaskInProgress = await _subtaskInProgressResourceService.CreateAsync(subtaskInProgress);
@@ -74,8 +73,14 @@ namespace Server.Controllers
         {
             // TODO: add sorting by DistributedTask priority
             return _dbContext.Subtasks.FirstOrDefaultAsync(subtask =>
-                (subtask.Status == SubtaskStatus.WaitingForExecution || subtask.Status == SubtaskStatus.Executing) &&
-                !subtask.SubtasksInProgress.Any() || subtask.SubtasksInProgress.Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel) < subtask.DistributedTask.TrustLevelToComplete);
+                   (subtask.Status == SubtaskStatus.WaitingForExecution || subtask.Status == SubtaskStatus.Executing) &&
+                   subtask.DistributedTask.Status == DistributedTaskStatus.InProgress &&
+                   (!subtask.SubtasksInProgress.Any() ||
+                   subtask.SubtasksInProgress
+                      .Where(subtaskInProgress => subtaskInProgress.Status != SubtaskStatus.Error)
+                      .Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel)
+                   < subtask.DistributedTask.TrustLevelToComplete)
+            );
         }
     }
 }

@@ -38,6 +38,11 @@ namespace Server.Services
             return Path.Combine(CompiledTasksDefinitionsDirectoryPath, guid.ToString());
         }
 
+        public string GetTaskDefinitionMainAssemblyPath(Guid guid, string mainDllName)
+        {
+            return Path.Combine(GetTaskDefinitionDirectoryPath(guid), mainDllName);
+        }
+
         private void InitializePaths()
         {
             bool invalidEnvironmentConfiguration = false;
