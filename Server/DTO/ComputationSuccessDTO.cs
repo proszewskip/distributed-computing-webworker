@@ -13,7 +13,6 @@ namespace Server.DTO
         [Required]
         public int SubtaskInProgressId { get; set; }
 
-
         [Required]
         public string DistributedNodeId { get; set; }
 
