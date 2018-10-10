@@ -59,11 +59,13 @@ namespace Server.Services.Api
 
             await _subtaskInProgressResourceService.UpdateAsync(subtaskInProgressId, failedSubtaskInProgress);
 
+            //TODO: The task should not be marked as failed until single subtask fails at least 3 times.
             var subtask = await _subtaskResourceService.GetAsync(failedSubtaskInProgress.SubtaskId);
             subtask.Status = SubtaskStatus.Error;
 
             await _subtaskResourceService.UpdateAsync(failedSubtaskInProgress.SubtaskId, subtask);
 
+            //TODO: Use IResourceService for updating DistributedTasks.
             var finishedDistributedTask =
                 await _dbContext.DistributedTasks.FirstAsync(distributedTask =>
                     distributedTask.Id == subtask.DistributedTaskId);
@@ -71,7 +73,6 @@ namespace Server.Services.Api
             finishedDistributedTask.Status = DistributedTaskStatus.Error;
 
             await _dbContext.SaveChangesAsync();
-            //TODO: The task should not be marked as failed until single subtask fails at least 3 times.
         }
 
         private async Task FinishSubtaskInProgressAsync(int subtaskInProgressId, Stream subtaskInProgressResultStream)
@@ -102,6 +103,7 @@ namespace Server.Services.Api
             var sampleResult = subtasksInProgress.First().Result;
             if (subtasksInProgress.Any(subtaskInProgress => subtaskInProgress.Result != sampleResult))
             {
+                //TODO: limit number of recomputing
                 await subtasksInProgress.ForEachAsync(subtaskInProgress =>
                 {
                     subtaskInProgress.Errors = subtaskInProgress.Errors
@@ -140,6 +142,7 @@ namespace Server.Services.Api
 
         private async Task FinishDistributedTaskAsync(int distributedTaskId)
         {
+            //TODO: Use IResourceService for updating DistributedTasks.
             var finishedDistributedTask =
                 await _dbContext.DistributedTasks.Include(distributedTask => distributedTask.DistributedTaskDefinition)
                     .FirstAsync(distributedTask =>
