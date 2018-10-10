@@ -35,6 +35,9 @@ namespace Server.Models
 
         public byte[] Result { get; set; }
 
+        [Attr("errors")]
+        public string[] Errors { get; set; } = { };
+
         [HasMany("subtasks")]
         public virtual List<Subtask> Subtasks { get; set; }
     }
