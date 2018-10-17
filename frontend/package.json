@@ -1,0 +1,41 @@
+{
+  "name": "distributed-computing-webworker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "pages/index.tsx",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/proszewskip/distributed-computing-webworker.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/proszewskip/distributed-computing-webworker/issues"
+  },
+  "homepage": "https://github.com/proszewskip/distributed-computing-webworker#readme",
+  "dependencies": {
+    "next": "^7.0.2",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2"
+  },
+  "devDependencies": {
+    "@types/next": "^7.0.3",
+    "@types/react": "^16.4.18",
+    "@zeit/next-typescript": "^1.1.1",
+    "fork-ts-checker-webpack-plugin": "^0.4.10",
+    "husky": "^1.1.2",
+    "prettier": "^1.14.3",
+    "pretty-quick": "^1.8.0",
+    "typescript": "^3.1.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  }
+}
