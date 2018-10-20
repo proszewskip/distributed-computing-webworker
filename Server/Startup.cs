@@ -34,6 +34,7 @@ namespace Server
             ConfigureDatabaseProvider(services);
             services.AddJsonApi<DistributedComputingDbContext>();
             services.Configure<ServerConfig>(Configuration.GetSection("ServerConfig"));
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,7 +52,13 @@ namespace Server
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
+            app.UseCors(builder =>
+                builder
+                    .AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+            );
             app.UseJsonApi();
         }
 
