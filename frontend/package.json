@@ -21,6 +21,8 @@
   },
   "homepage": "https://github.com/proszewskip/distributed-computing-webworker#readme",
   "dependencies": {
+    "evergreen-ui": "^4.0.2",
+    "kitsu": "^6.4.0",
     "next": "^7.0.2",
     "react": "^16.5.2",
     "react-dom": "^16.5.2"
