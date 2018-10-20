@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/proszewskip/distributed-computing-webworker#readme",
   "dependencies": {
+    "@zeit/next-css": "^1.0.1",
     "evergreen-ui": "^4.0.2",
     "kitsu": "^6.4.0",
     "next": "^7.0.2",
@@ -31,6 +32,7 @@
     "@types/jest": "^23.3.5",
     "@types/next": "^7.0.3",
     "@types/react": "^16.4.18",
+    "@types/react-table": "^6.7.13",
     "@types/react-test-renderer": "^16.0.3",
     "@zeit/next-typescript": "^1.1.1",
     "fork-ts-checker-webpack-plugin": "^0.4.10",
