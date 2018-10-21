@@ -1,0 +1,6 @@
+{
+  "tslint.jsEnable": true,
+  "files.exclude": {
+    "**/node_modules": true
+  }
+}
