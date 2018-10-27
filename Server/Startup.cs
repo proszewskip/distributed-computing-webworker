@@ -32,7 +32,10 @@ namespace Server
             AddMvc(services);
             ConfigureDependencyInjection(services);
             ConfigureDatabaseProvider(services);
-            services.AddJsonApi<DistributedComputingDbContext>();
+            services.AddJsonApi<DistributedComputingDbContext>(options => {
+                options.IncludeTotalRecordCount = true;
+                options.DefaultPageSize = 25;
+            });
             services.Configure<ServerConfig>(Configuration.GetSection("ServerConfig"));
             services.AddCors();
         }
