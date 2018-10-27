@@ -79,6 +79,20 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       filtered: [],
     };
 
+    columns.push({
+      id: 'action',
+      Header: 'Action',
+      Cell: (cellProps: any) => (
+        <Button
+          appearance="primary"
+          intent="danger"
+          onClick={this.onRowClick(cellProps.original)}
+        >
+          Remove
+        </Button>
+      ),
+    });
+
     this.debouncedFetchData = debounce(this.fetchData, 250);
   }
 
@@ -216,6 +230,10 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       },
       this.debouncedFetchData,
     );
+  };
+
+  private onRowClick = (value: any) => () => {
+    console.log('Clicked', value);
   };
 }
 
