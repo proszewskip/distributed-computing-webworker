@@ -1,6 +1,7 @@
 import { ProblemPluginInfo } from './problem-plugin-info';
 
 export interface DistributedTaskDefinition {
+  id: string;
   name: string;
   description: string;
   'definition-guid': string;

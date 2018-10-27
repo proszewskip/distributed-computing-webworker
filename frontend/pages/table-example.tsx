@@ -1,6 +1,8 @@
 import fetch from 'isomorphic-unfetch';
-import React, { Component, GetDerivedStateFromProps } from 'react';
+import debounce from 'lodash.debounce';
+import React, { Component } from 'react';
 import ReactTable, { Column, TableProps } from 'react-table';
+import { Button } from 'evergreen-ui';
 
 // @ts-ignore (TODO: remove after https://github.com/DefinitelyTyped/DefinitelyTyped/pull/30074 is merged)
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
@@ -31,9 +33,10 @@ interface TableExampleProps {
 interface TableExampleState extends TableExampleProps {
   page: number;
   loading: boolean;
+  selectedRowIds: string[];
 }
 
-async function getEntities<T>(
+async function getEntities<T extends { id: string }>(
   baseUrl: string,
   urlSearchParams = new URLSearchParams(),
   page = 1,
@@ -42,7 +45,10 @@ async function getEntities<T>(
   const paginatedUrl = `${baseUrl}?page[size]=${pageSize}&page[number]=${page}&${urlSearchParams}`;
 
   const body = await fetch(paginatedUrl).then((res) => res.json());
-  const data = (body.data || []).map((entity: any) => entity.attributes) as T[];
+  const data = (body.data || []).map((entity: any) => ({
+    ...entity.attributes,
+    id: entity.id,
+  })) as T[];
   const totalRecords = body.meta['total-records'] as number;
 
   return {
@@ -59,23 +65,39 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       ...props,
       loading: false,
       page: 1,
+      selectedRowIds: [],
     };
+
+    this.onFetchData = debounce(this.onFetchData, 250);
   }
 
   public render() {
-    const { data, totalRecords, loading } = this.state;
+    const { data, totalRecords, loading, selectedRowIds } = this.state;
     const pagesCount = Math.ceil(totalRecords / 25);
 
     return (
-      <ReactTable
-        data={data}
-        columns={columns}
-        pages={pagesCount}
-        loading={loading}
-        manual={true}
-        pageSize={25}
-        onFetchData={this.onFetchData}
-      />
+      <div>
+        <Button appearance="primary" onClick={this.onClickExample}>
+          Bulk action for selected elements
+        </Button>
+        <SelectTable
+          data={data}
+          columns={columns}
+          pages={pagesCount}
+          loading={loading}
+          manual={true}
+          pageSize={25}
+          onFetchData={this.onFetchData}
+          // SelectTable props
+          keyField="id"
+          isSelected={this.isSelected}
+          toggleSelection={this.toggleSelection}
+          selectType="checkbox"
+          toggleAll={this.toggleAll}
+          selectAll={this.areAllSelected()}
+        />
+        Selected {selectedRowIds.length} out of {totalRecords} elements.
+      </div>
     );
   }
 
@@ -101,6 +123,49 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       totalRecords,
       loading: false,
     });
+  };
+
+  private isSelected = (id: string) => this.state.selectedRowIds.includes(id);
+
+  private toggleSelection = (id: string) => {
+    const { selectedRowIds } = this.state;
+    const index = selectedRowIds.indexOf(id);
+
+    if (index === -1) {
+      this.setState({
+        selectedRowIds: [...selectedRowIds, id],
+      });
+    } else {
+      const previousSlice = selectedRowIds.slice(0, index);
+      const nextSlice = selectedRowIds.slice(index + 1);
+
+      this.setState({
+        selectedRowIds: [...previousSlice, ...nextSlice],
+      });
+    }
+  };
+
+  private toggleAll = () => {
+    if (this.areAllSelected()) {
+      this.setState({
+        selectedRowIds: [],
+      });
+    } else {
+      const notSelectedIds = this.state.data
+        .map((definition) => definition.id)
+        .filter((id) => !this.isSelected(id));
+
+      this.setState({
+        selectedRowIds: [...this.state.selectedRowIds, ...notSelectedIds],
+      });
+    }
+  };
+
+  private areAllSelected = () =>
+    this.state.data.every((entity) => this.isSelected(entity.id));
+
+  private onClickExample = () => {
+    console.log('Selected ids', this.state.selectedRowIds);
   };
 }
 
