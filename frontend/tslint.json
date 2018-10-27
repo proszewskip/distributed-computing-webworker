@@ -2,7 +2,8 @@
   "extends": [
     "tslint:recommended",
     "tslint-consistent-codestyle",
-    "tslint-react"
+    "tslint-react",
+    "tslint-config-prettier"
   ],
   "jsRules": {
     "quotemark": [
