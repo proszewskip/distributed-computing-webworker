@@ -1,7 +1,12 @@
 import fetch from 'isomorphic-unfetch';
 import debounce from 'lodash.debounce';
 import React, { Component } from 'react';
-import ReactTable, { Column, TableProps } from 'react-table';
+import ReactTable, {
+  Column,
+  TableProps,
+  Filter,
+  FilteredChangeFunction,
+} from 'react-table';
 import { Button } from 'evergreen-ui';
 
 // @ts-ignore (TODO: remove after https://github.com/DefinitelyTyped/DefinitelyTyped/pull/30074 is merged)
@@ -32,15 +37,17 @@ interface TableExampleProps {
 
 interface TableExampleState extends TableExampleProps {
   page: number;
+  pageSize: number;
   loading: boolean;
   selectedRowIds: string[];
+  filtered: Filter[];
 }
 
 async function getEntities<T extends { id: string }>(
   baseUrl: string,
   urlSearchParams = new URLSearchParams(),
   page = 1,
-  pageSize = 25,
+  pageSize = 20,
 ) {
   const paginatedUrl = `${baseUrl}?page[size]=${pageSize}&page[number]=${page}&${urlSearchParams}`;
 
@@ -58,6 +65,8 @@ async function getEntities<T extends { id: string }>(
 }
 
 class TableExample extends Component<TableExampleProps, TableExampleState> {
+  private debouncedFetchData: () => any;
+
   constructor(props: TableExampleProps) {
     super(props);
 
@@ -65,15 +74,24 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       ...props,
       loading: false,
       page: 1,
+      pageSize: 20,
       selectedRowIds: [],
+      filtered: [],
     };
 
-    this.onFetchData = debounce(this.onFetchData, 250);
+    this.debouncedFetchData = debounce(this.fetchData, 250);
   }
 
   public render() {
-    const { data, totalRecords, loading, selectedRowIds } = this.state;
-    const pagesCount = Math.ceil(totalRecords / 25);
+    const {
+      data,
+      totalRecords,
+      loading,
+      selectedRowIds,
+      pageSize,
+      filtered,
+    } = this.state;
+    const pagesCount = Math.ceil(totalRecords / pageSize);
 
     return (
       <div>
@@ -86,8 +104,11 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
           pages={pagesCount}
           loading={loading}
           manual={true}
-          pageSize={25}
-          onFetchData={this.onFetchData}
+          pageSize={pageSize}
+          onPageSizeChange={this.onPageSizeChange}
+          filtered={filtered}
+          onFilteredChange={this.onFilteredChange}
+          onPageChange={this.onPageChange}
           // SelectTable props
           keyField="id"
           isSelected={this.isSelected}
@@ -101,13 +122,13 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
     );
   }
 
-  private onFetchData: TableProps['onFetchData'] = async (state) => {
-    const page = state.page + 1;
+  private fetchData = async () => {
+    const { page, pageSize, filtered } = this.state;
     this.setState({ loading: true, page });
 
     const searchParams = new URLSearchParams();
-    if (state.filtered) {
-      state.filtered.forEach(({ id, value }: any) => {
+    if (filtered) {
+      filtered.forEach(({ id, value }: any) => {
         searchParams.set(`filter[${id}]`, `like:${value}`);
       });
     }
@@ -116,6 +137,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       distributedTaskDefinitionsUrl,
       searchParams,
       page,
+      pageSize,
     );
 
     this.setState({
@@ -162,10 +184,38 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
   };
 
   private areAllSelected = () =>
+    this.state.data.length > 0 &&
     this.state.data.every((entity) => this.isSelected(entity.id));
 
   private onClickExample = () => {
     console.log('Selected ids', this.state.selectedRowIds);
+  };
+
+  private onPageSizeChange: TableProps['onPageSizeChange'] = (pageSize) => {
+    this.setState(
+      {
+        pageSize,
+      },
+      this.fetchData,
+    );
+  };
+
+  private onPageChange: TableProps['onPageChange'] = (page) => {
+    this.setState(
+      {
+        page: page + 1,
+      },
+      this.fetchData,
+    );
+  };
+
+  private onFilteredChange: FilteredChangeFunction = (filtered) => {
+    this.setState(
+      {
+        filtered,
+      },
+      this.debouncedFetchData,
+    );
   };
 }
 
