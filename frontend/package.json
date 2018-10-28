@@ -35,7 +35,8 @@
     "ramda": "^0.25.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
-    "react-table": "^6.8.6"
+    "react-table": "^6.8.6",
+    "yup": "^0.26.6"
   },
   "devDependencies": {
     "@types/jest": "^23.3.5",
