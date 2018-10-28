@@ -23,10 +23,12 @@
   "dependencies": {
     "@zeit/next-css": "^1.0.1",
     "evergreen-ui": "^4.0.2",
+    "immutable": "^4.0.0-rc.11",
     "isomorphic-unfetch": "^3.0.0",
     "kitsu": "^6.4.0",
     "lodash.debounce": "^4.0.8",
     "next": "^7.0.2",
+    "ramda": "^0.25.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-table": "^6.8.6"
