@@ -3,6 +3,6 @@ import {} from 'react-table/lib/hoc/selectTable';
 
 declare module 'react-table' {
   interface TableProps {
-    resolveData(data: any): any[];
+    resolveData?(data: any): any[];
   }
 }
