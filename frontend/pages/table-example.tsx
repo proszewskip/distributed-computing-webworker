@@ -28,6 +28,7 @@ import {
   ToggleFiltersActionButton,
 } from 'components/data-table/data-table-view/action-buttons';
 import {
+  SelectCheckbox,
   StyledDataTable,
   TextFilter,
 } from 'components/data-table/styled-data-table';
@@ -132,6 +133,8 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
             toggleAll={this.toggleAll}
             selectAll={this.areAllSelected()}
             renderSummary={this.renderSummary}
+            SelectInputComponent={SelectCheckbox}
+            SelectAllInputComponent={SelectCheckbox}
           />
         </DataTableView>
       </div>
