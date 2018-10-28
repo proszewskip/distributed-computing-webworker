@@ -1,28 +1,43 @@
+import { Button, minorScale, Pane, Strong, Text } from 'evergreen-ui';
 import fetch from 'isomorphic-unfetch';
 import debounce from 'lodash.debounce';
 import React, { Component } from 'react';
-import ReactTable, {
+import {
   Column,
-  TableProps,
   Filter,
   FilteredChangeFunction,
+  TableProps,
 } from 'react-table';
-import { Button } from 'evergreen-ui';
+
+import { List } from 'immutable';
 
 // @ts-ignore (TODO: remove after https://github.com/DefinitelyTyped/DefinitelyTyped/pull/30074 is merged)
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
 
-const SelectTable = selectTableHOC(ReactTable);
-
 import 'react-table/react-table.css';
+
+import { Omit } from 'types/omit';
+
+import { StyledDataTable } from 'components/data-table/styled-data-table/styled-data-table';
+import { TableWithSummaryProps } from 'components/data-table/styled-data-table/table-with-summary';
 
 import { DistributedTaskDefinition } from 'models';
 
+const SelectTable = selectTableHOC(StyledDataTable);
+
+const TextCell = (row: { value: any }) => <Text>{row.value}</Text>;
+
 const columns: Column[] = [
-  { accessor: 'name', Header: 'Name', filterable: true },
+  {
+    accessor: 'name',
+    Header: <Text>Name</Text>,
+    Cell: TextCell,
+    filterable: true,
+  },
   {
     accessor: 'main-dll-name',
-    Header: 'Main DLL name',
+    Header: <Text>Main DLL name</Text>,
+    Cell: TextCell,
   },
 ];
 
@@ -35,7 +50,8 @@ interface TableExampleProps {
   totalRecords: number;
 }
 
-interface TableExampleState extends TableExampleProps {
+interface TableExampleState extends Omit<TableExampleProps, 'data'> {
+  data: List<DistributedTaskDefinition>;
   page: number;
   pageSize: number;
   loading: boolean;
@@ -70,8 +86,11 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
   constructor(props: TableExampleProps) {
     super(props);
 
+    const { data } = props;
+
     this.state = {
       ...props,
+      data: List(data),
       loading: false,
       page: 1,
       pageSize: 20,
@@ -81,7 +100,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
 
     columns.push({
       id: 'action',
-      Header: 'Action',
+      Header: <Text>Action</Text>,
       Cell: (cellProps: any) => (
         <Button
           appearance="primary"
@@ -114,6 +133,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
         </Button>
         <SelectTable
           data={data}
+          resolveData={this.resolveData}
           columns={columns}
           pages={pagesCount}
           loading={loading}
@@ -123,6 +143,8 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
           filtered={filtered}
           onFilteredChange={this.onFilteredChange}
           onPageChange={this.onPageChange}
+          sortable={false}
+          getTableProps={this.getTableProps}
           // SelectTable props
           keyField="id"
           isSelected={this.isSelected}
@@ -135,6 +157,8 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       </div>
     );
   }
+
+  private resolveData = (data: List<DistributedTaskDefinition>) => data.toJS();
 
   private fetchData = async () => {
     const { page, pageSize, filtered } = this.state;
@@ -155,7 +179,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
     );
 
     this.setState({
-      data,
+      data: List(data),
       totalRecords,
       loading: false,
     });
@@ -188,8 +212,8 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       });
     } else {
       const notSelectedIds = this.state.data
-        .map((definition) => definition.id)
-        .filter((id) => !this.isSelected(id));
+        .filter((definition) => !this.isSelected(definition.id))
+        .map((definition) => definition.id);
 
       this.setState({
         selectedRowIds: [...this.state.selectedRowIds, ...notSelectedIds],
@@ -198,7 +222,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
   };
 
   private areAllSelected = () =>
-    this.state.data.length > 0 &&
+    this.state.data.size > 0 &&
     this.state.data.every((entity) => this.isSelected(entity.id));
 
   private onClickExample = () => {
@@ -235,11 +259,28 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
   private onRowClick = (value: any) => () => {
     console.log('Clicked', value);
   };
+
+  private getTableProps = (): TableWithSummaryProps => ({
+    renderSummary: this.renderSummary,
+  });
+
+  private renderSummary = () => (
+    <Pane borderTop="default" paddingY={minorScale(3)} paddingX={minorScale(2)}>
+      <Strong size={600}>{this.state.totalRecords}</Strong>{' '}
+      <Text size={600}>items in total</Text>
+    </Pane>
+  );
+}
+
+interface TableExamplePageProps extends Omit<TableExampleProps, 'data'> {
+  data: DistributedTaskDefinition[];
 }
 
 // tslint:disable-next-line:max-classes-per-file
-class TableExamplePage extends Component<TableExampleProps> {
-  public static async getInitialProps(): Promise<Partial<TableExampleProps>> {
+class TableExamplePage extends Component<TableExamplePageProps> {
+  public static async getInitialProps(): Promise<
+    Partial<TableExamplePageProps>
+  > {
     return getEntities<DistributedTaskDefinition>(
       distributedTaskDefinitionsUrl,
     );
