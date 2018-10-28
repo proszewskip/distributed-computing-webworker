@@ -32,6 +32,7 @@ import {
   TextFilter,
 } from 'components/data-table/styled-data-table';
 import { TableWithSummaryProps } from 'components/data-table/styled-data-table/table-with-summary';
+import { withFiltering } from 'components/data-table/with-filtering';
 import {
   withSelectableRows,
   WithSelectableRowsAdditionalProps,
@@ -39,8 +40,8 @@ import {
 
 import { DistributedTaskDefinition } from 'models';
 
-const Table = withSelectableRows(
-  selectTableHOC(StyledDataTable),
+const Table = withFiltering(
+  withSelectableRows(selectTableHOC(StyledDataTable)),
 ) as ComponentType<any>;
 
 const TextCell = (row: { value: any }) => <Text>{row.value}</Text>;
@@ -61,7 +62,7 @@ interface TableExampleState extends Omit<TableExampleProps, 'data'> {
   loading: boolean;
   selectedRowIds: WithSelectableRowsAdditionalProps['selectedRowIds'];
   filtered: Filter[];
-  filtersEnabled: boolean;
+  filteringEnabled: boolean;
 }
 
 async function getEntities<T extends { id: string }>(
@@ -87,71 +88,13 @@ async function getEntities<T extends { id: string }>(
 
 class TableExample extends Component<TableExampleProps, TableExampleState> {
   private debouncedFetchData: () => any;
-
-  constructor(props: TableExampleProps) {
-    super(props);
-
-    const { data } = props;
-
-    this.state = {
-      ...props,
-      data: List(data),
-      loading: false,
-      page: 1,
-      pageSize: 20,
-      selectedRowIds: Set(),
-      filtered: [],
-      filtersEnabled: false,
-    };
-
-    this.debouncedFetchData = debounce(this.fetchData, 250);
-  }
-
-  public render() {
-    const {
-      data,
-      totalRecords,
-      loading,
-      pageSize,
-      filtered,
-      selectedRowIds,
-    } = this.state;
-    const pagesCount = Math.ceil(totalRecords / pageSize);
-
-    return (
-      <div>
-        <DataTableView
-          header={<Heading size={600}>Distributed Task definitions</Heading>}
-          renderActionButtons={this.renderActionButtons}
-        >
-          <Table
-            data={data}
-            resolveData={this.resolveData}
-            columns={this.getColumns()}
-            pages={pagesCount}
-            loading={loading}
-            manual={true}
-            pageSize={pageSize}
-            onPageSizeChange={this.onPageSizeChange}
-            filtered={filtered}
-            onFilteredChange={this.onFilteredChange}
-            onPageChange={this.onPageChange}
-            sortable={false}
-            selectedRowIds={selectedRowIds}
-            onSelectionChange={this.onSelectionChange}
-            renderSummary={this.renderSummary}
-          />
-        </DataTableView>
-      </div>
-    );
-  }
-
-  private getColumns = (): Column[] => [
+  private filterableColumnIds = ['name'];
+  private columns: Column[] = [
     {
+      id: 'name',
       accessor: 'name',
       Header: <Text>Name</Text>,
       Cell: TextCell,
-      filterable: this.state.filtersEnabled,
       Filter: TextFilter,
     },
     {
@@ -174,6 +117,67 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
     },
   ];
 
+  constructor(props: TableExampleProps) {
+    super(props);
+
+    const { data } = props;
+
+    this.state = {
+      ...props,
+      data: List(data),
+      loading: false,
+      page: 1,
+      pageSize: 20,
+      selectedRowIds: Set(),
+      filtered: [],
+      filteringEnabled: false,
+    };
+
+    this.debouncedFetchData = debounce(this.fetchData, 250);
+  }
+
+  public render() {
+    const {
+      data,
+      totalRecords,
+      loading,
+      pageSize,
+      filtered,
+      selectedRowIds,
+      filteringEnabled,
+    } = this.state;
+    const pagesCount = Math.ceil(totalRecords / pageSize);
+
+    return (
+      <div>
+        <DataTableView
+          header={<Heading size={600}>Distributed Task definitions</Heading>}
+          renderActionButtons={this.renderActionButtons}
+        >
+          <Table
+            data={data}
+            resolveData={this.resolveData}
+            columns={this.columns}
+            filterableColumnIds={this.filterableColumnIds}
+            filteringEnabled={filteringEnabled}
+            pages={pagesCount}
+            loading={loading}
+            manual={true}
+            pageSize={pageSize}
+            onPageSizeChange={this.onPageSizeChange}
+            filtered={filtered}
+            onFilteredChange={this.onFilteredChange}
+            onPageChange={this.onPageChange}
+            sortable={false}
+            selectedRowIds={selectedRowIds}
+            onSelectionChange={this.onSelectionChange}
+            renderSummary={this.renderSummary}
+          />
+        </DataTableView>
+      </div>
+    );
+  }
+
   private renderSummary: TableWithSummaryProps['renderSummary'] = () => (
     <Text size={600} marginY={minorScale(2)}>
       Selected {this.state.selectedRowIds.size} out of {this.state.totalRecords}{' '}
@@ -184,11 +188,11 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
   private resolveData = (data: List<DistributedTaskDefinition>) => data.toJS();
 
   private fetchData = async () => {
-    const { page, pageSize, filtered, filtersEnabled } = this.state;
+    const { page, pageSize, filtered, filteringEnabled } = this.state;
     this.setState({ loading: true, page });
 
     const searchParams = new URLSearchParams();
-    if (filtered && filtersEnabled) {
+    if (filtered && filteringEnabled) {
       filtered.forEach(({ id, value }: any) => {
         searchParams.set(`filter[${id}]`, `like:${value}`);
       });
@@ -250,7 +254,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
         disabled={this.state.selectedRowIds.size === 0}
       />
       <ToggleFiltersActionButton
-        filtersEnabled={this.state.filtersEnabled}
+        filtersEnabled={this.state.filteringEnabled}
         onClick={this.toggleFilters}
       />
     </>
@@ -262,8 +266,8 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
 
   private toggleFilters = () => {
     this.setState(
-      ({ filtersEnabled }) => ({
-        filtersEnabled: !filtersEnabled,
+      ({ filteringEnabled }) => ({
+        filteringEnabled: !filteringEnabled,
       }),
       this.fetchData,
     );
