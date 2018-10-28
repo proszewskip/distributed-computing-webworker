@@ -10,6 +10,9 @@ const Index = () => (
     <Link href="/table-example">
       <a>Table example</a>
     </Link>
+    <Link href="/form-example">
+      <a>Form example</a>
+    </Link>
     Hello Next.js
   </div>
 );
