@@ -1,7 +1,7 @@
 import { Button, Heading, minorScale, Text } from 'evergreen-ui';
 import fetch from 'isomorphic-unfetch';
 import debounce from 'lodash.debounce';
-import React, { Component } from 'react';
+import React, { Component, ComponentType } from 'react';
 import {
   Column,
   Filter,
@@ -9,7 +9,7 @@ import {
   TableProps,
 } from 'react-table';
 
-import { List } from 'immutable';
+import { List, Set } from 'immutable';
 
 // @ts-ignore (TODO: remove after https://github.com/DefinitelyTyped/DefinitelyTyped/pull/30074 is merged)
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
@@ -28,15 +28,20 @@ import {
   ToggleFiltersActionButton,
 } from 'components/data-table/data-table-view/action-buttons';
 import {
-  SelectCheckbox,
   StyledDataTable,
   TextFilter,
 } from 'components/data-table/styled-data-table';
 import { TableWithSummaryProps } from 'components/data-table/styled-data-table/table-with-summary';
+import {
+  withSelectableRows,
+  WithSelectableRowsAdditionalProps,
+} from 'components/data-table/with-selectable-rows';
 
 import { DistributedTaskDefinition } from 'models';
 
-const SelectTable = selectTableHOC(StyledDataTable);
+const Table = withSelectableRows(
+  selectTableHOC(StyledDataTable),
+) as ComponentType<any>;
 
 const TextCell = (row: { value: any }) => <Text>{row.value}</Text>;
 
@@ -54,7 +59,7 @@ interface TableExampleState extends Omit<TableExampleProps, 'data'> {
   page: number;
   pageSize: number;
   loading: boolean;
-  selectedRowIds: string[];
+  selectedRowIds: WithSelectableRowsAdditionalProps['selectedRowIds'];
   filtered: Filter[];
   filtersEnabled: boolean;
 }
@@ -94,7 +99,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       loading: false,
       page: 1,
       pageSize: 20,
-      selectedRowIds: [],
+      selectedRowIds: Set(),
       filtered: [],
       filtersEnabled: false,
     };
@@ -103,7 +108,14 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
   }
 
   public render() {
-    const { data, totalRecords, loading, pageSize, filtered } = this.state;
+    const {
+      data,
+      totalRecords,
+      loading,
+      pageSize,
+      filtered,
+      selectedRowIds,
+    } = this.state;
     const pagesCount = Math.ceil(totalRecords / pageSize);
 
     return (
@@ -112,7 +124,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
           header={<Heading size={600}>Distributed Task definitions</Heading>}
           renderActionButtons={this.renderActionButtons}
         >
-          <SelectTable
+          <Table
             data={data}
             resolveData={this.resolveData}
             columns={this.getColumns()}
@@ -125,16 +137,9 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
             onFilteredChange={this.onFilteredChange}
             onPageChange={this.onPageChange}
             sortable={false}
-            // SelectTable props
-            keyField="id"
-            isSelected={this.isSelected}
-            toggleSelection={this.toggleSelection}
-            selectType="checkbox"
-            toggleAll={this.toggleAll}
-            selectAll={this.areAllSelected()}
+            selectedRowIds={selectedRowIds}
+            onSelectionChange={this.onSelectionChange}
             renderSummary={this.renderSummary}
-            SelectInputComponent={SelectCheckbox}
-            SelectAllInputComponent={SelectCheckbox}
           />
         </DataTableView>
       </div>
@@ -171,8 +176,8 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
 
   private renderSummary: TableWithSummaryProps['renderSummary'] = () => (
     <Text size={600} marginY={minorScale(2)}>
-      Selected {this.state.selectedRowIds.length} out of{' '}
-      {this.state.totalRecords} elements.
+      Selected {this.state.selectedRowIds.size} out of {this.state.totalRecords}{' '}
+      elements.
     </Text>
   );
 
@@ -201,50 +206,6 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       totalRecords,
       loading: false,
     });
-  };
-
-  private isSelected = (id: string) => this.state.selectedRowIds.includes(id);
-
-  private toggleSelection = (id: string) => {
-    const { selectedRowIds } = this.state;
-    const index = selectedRowIds.indexOf(id);
-
-    if (index === -1) {
-      this.setState({
-        selectedRowIds: [...selectedRowIds, id],
-      });
-    } else {
-      const previousSlice = selectedRowIds.slice(0, index);
-      const nextSlice = selectedRowIds.slice(index + 1);
-
-      this.setState({
-        selectedRowIds: [...previousSlice, ...nextSlice],
-      });
-    }
-  };
-
-  private toggleAll = () => {
-    if (this.areAllSelected()) {
-      this.setState({
-        selectedRowIds: [],
-      });
-    } else {
-      const notSelectedIds = this.state.data
-        .filter((definition) => !this.isSelected(definition.id))
-        .map((definition) => definition.id);
-
-      this.setState({
-        selectedRowIds: [...this.state.selectedRowIds, ...notSelectedIds],
-      });
-    }
-  };
-
-  private areAllSelected = () =>
-    this.state.data.size > 0 &&
-    this.state.data.every((entity) => this.isSelected(entity.id));
-
-  private onBulkActionExampleClick = () => {
-    console.log('Selected ids', this.state.selectedRowIds);
   };
 
   private onPageSizeChange: TableProps['onPageSizeChange'] = (pageSize) => {
@@ -286,7 +247,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       />
       <DeleteActionButton
         onClick={this.onBulkActionExampleClick}
-        disabled={this.state.selectedRowIds.length === 0}
+        disabled={this.state.selectedRowIds.size === 0}
       />
       <ToggleFiltersActionButton
         filtersEnabled={this.state.filtersEnabled}
@@ -294,6 +255,10 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       />
     </>
   );
+
+  private onBulkActionExampleClick = () => {
+    console.log('Selected ids', this.state.selectedRowIds);
+  };
 
   private toggleFilters = () => {
     this.setState(
@@ -303,6 +268,10 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       this.fetchData,
     );
   };
+
+  private onSelectionChange: WithSelectableRowsAdditionalProps['onSelectionChange'] = (
+    selectedRowIds,
+  ) => this.setState({ selectedRowIds });
 }
 
 interface TableExamplePageProps extends Omit<TableExampleProps, 'data'> {
