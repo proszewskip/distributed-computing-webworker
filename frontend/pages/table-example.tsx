@@ -1,4 +1,4 @@
-import { Button, minorScale, Pane, Strong, Text } from 'evergreen-ui';
+import { Button, Heading, minorScale, Text } from 'evergreen-ui';
 import fetch from 'isomorphic-unfetch';
 import debounce from 'lodash.debounce';
 import React, { Component } from 'react';
@@ -18,7 +18,19 @@ import 'react-table/react-table.css';
 
 import { Omit } from 'types/omit';
 
-import { StyledDataTable } from 'components/data-table/styled-data-table/styled-data-table';
+import {
+  DataTableView,
+  DataTableViewProps,
+} from 'components/data-table/data-table-view';
+import {
+  DeleteActionButton,
+  RefreshActionButton,
+  ToggleFiltersActionButton,
+} from 'components/data-table/data-table-view/action-buttons';
+import {
+  StyledDataTable,
+  TextFilter,
+} from 'components/data-table/styled-data-table';
 import { TableWithSummaryProps } from 'components/data-table/styled-data-table/table-with-summary';
 
 import { DistributedTaskDefinition } from 'models';
@@ -26,20 +38,6 @@ import { DistributedTaskDefinition } from 'models';
 const SelectTable = selectTableHOC(StyledDataTable);
 
 const TextCell = (row: { value: any }) => <Text>{row.value}</Text>;
-
-const columns: Column[] = [
-  {
-    accessor: 'name',
-    Header: <Text>Name</Text>,
-    Cell: TextCell,
-    filterable: true,
-  },
-  {
-    accessor: 'main-dll-name',
-    Header: <Text>Main DLL name</Text>,
-    Cell: TextCell,
-  },
-];
 
 const serverIp = 'http://localhost:5000';
 const entityPath = '/distributed-task-definitions';
@@ -57,6 +55,7 @@ interface TableExampleState extends Omit<TableExampleProps, 'data'> {
   loading: boolean;
   selectedRowIds: string[];
   filtered: Filter[];
+  filtersEnabled: boolean;
 }
 
 async function getEntities<T extends { id: string }>(
@@ -96,9 +95,63 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       pageSize: 20,
       selectedRowIds: [],
       filtered: [],
+      filtersEnabled: false,
     };
 
-    columns.push({
+    this.debouncedFetchData = debounce(this.fetchData, 250);
+  }
+
+  public render() {
+    const { data, totalRecords, loading, pageSize, filtered } = this.state;
+    const pagesCount = Math.ceil(totalRecords / pageSize);
+
+    return (
+      <div>
+        <DataTableView
+          header={<Heading size={600}>Distributed Task definitions</Heading>}
+          renderActionButtons={this.renderActionButtons}
+        >
+          <SelectTable
+            data={data}
+            resolveData={this.resolveData}
+            columns={this.getColumns()}
+            pages={pagesCount}
+            loading={loading}
+            manual={true}
+            pageSize={pageSize}
+            onPageSizeChange={this.onPageSizeChange}
+            filtered={filtered}
+            onFilteredChange={this.onFilteredChange}
+            onPageChange={this.onPageChange}
+            sortable={false}
+            // SelectTable props
+            keyField="id"
+            isSelected={this.isSelected}
+            toggleSelection={this.toggleSelection}
+            selectType="checkbox"
+            toggleAll={this.toggleAll}
+            selectAll={this.areAllSelected()}
+            renderSummary={this.renderSummary}
+          />
+        </DataTableView>
+      </div>
+    );
+  }
+
+  private getColumns = (): Column[] => [
+    {
+      accessor: 'name',
+      Header: <Text>Name</Text>,
+      Cell: TextCell,
+      filterable: this.state.filtersEnabled,
+      Filter: TextFilter,
+    },
+    {
+      accessor: 'main-dll-name',
+      Header: <Text>Main DLL name</Text>,
+      Cell: TextCell,
+    },
+    {
       id: 'action',
       Header: <Text>Action</Text>,
       Cell: (cellProps: any) => (
@@ -110,62 +163,24 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
           Remove
         </Button>
       ),
-    });
+    },
+  ];
 
-    this.debouncedFetchData = debounce(this.fetchData, 250);
-  }
-
-  public render() {
-    const {
-      data,
-      totalRecords,
-      loading,
-      selectedRowIds,
-      pageSize,
-      filtered,
-    } = this.state;
-    const pagesCount = Math.ceil(totalRecords / pageSize);
-
-    return (
-      <div>
-        <Button appearance="primary" onClick={this.onClickExample}>
-          Bulk action for selected elements
-        </Button>
-        <SelectTable
-          data={data}
-          resolveData={this.resolveData}
-          columns={columns}
-          pages={pagesCount}
-          loading={loading}
-          manual={true}
-          pageSize={pageSize}
-          onPageSizeChange={this.onPageSizeChange}
-          filtered={filtered}
-          onFilteredChange={this.onFilteredChange}
-          onPageChange={this.onPageChange}
-          sortable={false}
-          getTableProps={this.getTableProps}
-          // SelectTable props
-          keyField="id"
-          isSelected={this.isSelected}
-          toggleSelection={this.toggleSelection}
-          selectType="checkbox"
-          toggleAll={this.toggleAll}
-          selectAll={this.areAllSelected()}
-        />
-        Selected {selectedRowIds.length} out of {totalRecords} elements.
-      </div>
-    );
-  }
+  private renderSummary: TableWithSummaryProps['renderSummary'] = () => (
+    <Text size={600} marginY={minorScale(2)}>
+      Selected {this.state.selectedRowIds.length} out of{' '}
+      {this.state.totalRecords} elements.
+    </Text>
+  );
 
   private resolveData = (data: List<DistributedTaskDefinition>) => data.toJS();
 
   private fetchData = async () => {
-    const { page, pageSize, filtered } = this.state;
+    const { page, pageSize, filtered, filtersEnabled } = this.state;
     this.setState({ loading: true, page });
 
     const searchParams = new URLSearchParams();
-    if (filtered) {
+    if (filtered && filtersEnabled) {
       filtered.forEach(({ id, value }: any) => {
         searchParams.set(`filter[${id}]`, `like:${value}`);
       });
@@ -225,7 +240,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
     this.state.data.size > 0 &&
     this.state.data.every((entity) => this.isSelected(entity.id));
 
-  private onClickExample = () => {
+  private onBulkActionExampleClick = () => {
     console.log('Selected ids', this.state.selectedRowIds);
   };
 
@@ -260,16 +275,31 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
     console.log('Clicked', value);
   };
 
-  private getTableProps = (): TableWithSummaryProps => ({
-    renderSummary: this.renderSummary,
-  });
-
-  private renderSummary = () => (
-    <Pane borderTop="default" paddingY={minorScale(3)} paddingX={minorScale(2)}>
-      <Strong size={600}>{this.state.totalRecords}</Strong>{' '}
-      <Text size={600}>items in total</Text>
-    </Pane>
+  private renderActionButtons: DataTableViewProps['renderActionButtons'] = () => (
+    <>
+      <RefreshActionButton
+        onClick={this.fetchData}
+        disabled={this.state.loading}
+      />
+      <DeleteActionButton
+        onClick={this.onBulkActionExampleClick}
+        disabled={this.state.selectedRowIds.length === 0}
+      />
+      <ToggleFiltersActionButton
+        filtersEnabled={this.state.filtersEnabled}
+        onClick={this.toggleFilters}
+      />
+    </>
   );
+
+  private toggleFilters = () => {
+    this.setState(
+      ({ filtersEnabled }) => ({
+        filtersEnabled: !filtersEnabled,
+      }),
+      this.fetchData,
+    );
+  };
 }
 
 interface TableExamplePageProps extends Omit<TableExampleProps, 'data'> {
