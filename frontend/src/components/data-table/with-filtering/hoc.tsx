@@ -14,8 +14,6 @@ export interface WithFilteringAdditionalProps {
   filteringEnabled: boolean;
 }
 
-// TODO: try setting `showFiltering` to false instead of changing `columns`
-
 export function withFiltering<Props extends WithFilteringRequiredProps>(
   WrappedComponent: ComponentType<Props>,
 ) {
