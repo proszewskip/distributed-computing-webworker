@@ -7,9 +7,12 @@ import { Omit } from 'types/omit';
 import { PaginationButton } from './pagination-button';
 import { TableWithSummary, TableWithSummaryProps } from './table-with-summary';
 
-export interface StyledDataTableProps extends Omit<TableProps, 'data'> {
+export interface StyledDataTableProps
+  extends Omit<Partial<TableProps>, 'data'> {
+  children?: TableProps['children'];
+
   data: List<any>;
-  resolveData(data: List<any>): any[];
+  resolveData?(data: List<any>): any[];
 
   renderSummary?(): ReactNode;
 }
@@ -21,6 +24,7 @@ export class StyledDataTable extends PureComponent<StyledDataTableProps> {
     TableComponent: TableWithSummary,
     getTableProps: () => ({}),
     renderSummary: () => null,
+    resolveData: (data) => data.toJS(),
   };
 
   public render() {

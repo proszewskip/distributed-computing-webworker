@@ -1,13 +1,7 @@
 import { Button, Heading, minorScale, Text } from 'evergreen-ui';
 import fetch from 'isomorphic-unfetch';
-import debounce from 'lodash.debounce';
 import React, { Component, ComponentType } from 'react';
-import {
-  Column,
-  Filter,
-  FilteredChangeFunction,
-  TableProps,
-} from 'react-table';
+import { Column } from 'react-table';
 
 import { List, Set } from 'immutable';
 
@@ -16,8 +10,14 @@ import selectTableHOC from 'react-table/lib/hoc/selectTable';
 
 import 'react-table/react-table.css';
 
+import { ComponentProps } from 'types/component-props';
 import { Omit } from 'types/omit';
 
+import {
+  DataTable,
+  DataTableProps,
+  ForceFetchData,
+} from 'components/data-table/data-table';
 import {
   DataTableView,
   DataTableViewProps,
@@ -27,22 +27,20 @@ import {
   RefreshActionButton,
   ToggleFiltersActionButton,
 } from 'components/data-table/data-table-view/action-buttons';
-import {
-  StyledDataTable,
-  TextFilter,
-} from 'components/data-table/styled-data-table';
+import { TextFilter } from 'components/data-table/styled-data-table';
 import { TableWithSummaryProps } from 'components/data-table/styled-data-table/table-with-summary';
-import { withFiltering } from 'components/data-table/with-filtering';
 import {
   withSelectableRows,
   WithSelectableRowsAdditionalProps,
+  WithSelectableRowsRequiredProps,
 } from 'components/data-table/with-selectable-rows';
 
 import { DistributedTaskDefinition } from 'models';
 
-const Table = withFiltering(
-  withSelectableRows(selectTableHOC(StyledDataTable)),
-) as ComponentType<any>;
+const SelectDataTable = selectTableHOC(DataTable) as ComponentType<
+  ComponentProps<typeof DataTable> & WithSelectableRowsRequiredProps
+>;
+const Table = withSelectableRows(SelectDataTable);
 
 const TextCell = (row: { value: any }) => <Text>{row.value}</Text>;
 
@@ -52,16 +50,13 @@ const distributedTaskDefinitionsUrl = `${serverIp}${entityPath}`;
 
 interface TableExampleProps {
   data: DistributedTaskDefinition[];
-  totalRecords: number;
+  totalRecordsCount: number;
 }
 
 interface TableExampleState extends Omit<TableExampleProps, 'data'> {
   data: List<DistributedTaskDefinition>;
-  page: number;
-  pageSize: number;
   loading: boolean;
   selectedRowIds: WithSelectableRowsAdditionalProps['selectedRowIds'];
-  filtered: Filter[];
   filteringEnabled: boolean;
 }
 
@@ -78,16 +73,15 @@ async function getEntities<T extends { id: string }>(
     ...entity.attributes,
     id: entity.id,
   })) as T[];
-  const totalRecords = body.meta['total-records'] as number;
+  const totalRecordsCount = body.meta['total-records'] as number;
 
   return {
     data,
-    totalRecords,
+    totalRecordsCount,
   };
 }
 
 class TableExample extends Component<TableExampleProps, TableExampleState> {
-  private debouncedFetchData: () => any;
   private filterableColumnIds = ['name'];
   private columns: Column[] = [
     {
@@ -126,27 +120,19 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       ...props,
       data: List(data),
       loading: false,
-      page: 1,
-      pageSize: 20,
       selectedRowIds: Set(),
-      filtered: [],
       filteringEnabled: false,
     };
-
-    this.debouncedFetchData = debounce(this.fetchData, 250);
   }
 
   public render() {
     const {
       data,
-      totalRecords,
+      totalRecordsCount,
       loading,
-      pageSize,
-      filtered,
       selectedRowIds,
       filteringEnabled,
     } = this.state;
-    const pagesCount = Math.ceil(totalRecords / pageSize);
 
     return (
       <div>
@@ -156,22 +142,18 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
         >
           <Table
             data={data}
-            resolveData={this.resolveData}
             columns={this.columns}
             filterableColumnIds={this.filterableColumnIds}
             filteringEnabled={filteringEnabled}
-            pages={pagesCount}
             loading={loading}
-            manual={true}
-            pageSize={pageSize}
-            onPageSizeChange={this.onPageSizeChange}
-            filtered={filtered}
-            onFilteredChange={this.onFilteredChange}
-            onPageChange={this.onPageChange}
-            sortable={false}
             selectedRowIds={selectedRowIds}
             onSelectionChange={this.onSelectionChange}
             renderSummary={this.renderSummary}
+            totalRecordsCount={totalRecordsCount}
+            onFetchData={this.fetchData}
+            initialPage={1}
+            initialPageSize={20}
+            getForceFetchData={this.getFetchDataCallback}
           />
         </DataTableView>
       </div>
@@ -180,16 +162,18 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
 
   private renderSummary: TableWithSummaryProps['renderSummary'] = () => (
     <Text size={600} marginY={minorScale(2)}>
-      Selected {this.state.selectedRowIds.size} out of {this.state.totalRecords}{' '}
-      elements.
+      Selected {this.state.selectedRowIds.size} out of{' '}
+      {this.state.totalRecordsCount} elements.
     </Text>
   );
 
-  private resolveData = (data: List<DistributedTaskDefinition>) => data.toJS();
-
-  private fetchData = async () => {
-    const { page, pageSize, filtered, filteringEnabled } = this.state;
-    this.setState({ loading: true, page });
+  private fetchData: DataTableProps['onFetchData'] = async ({
+    filtered,
+    pageSize,
+    page,
+  }) => {
+    const { filteringEnabled } = this.state;
+    this.setState({ loading: true });
 
     const searchParams = new URLSearchParams();
     if (filtered && filteringEnabled) {
@@ -198,45 +182,15 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       });
     }
 
-    const { data, totalRecords } = await getEntities<DistributedTaskDefinition>(
-      distributedTaskDefinitionsUrl,
-      searchParams,
-      page,
-      pageSize,
-    );
+    const { data, totalRecordsCount } = await getEntities<
+      DistributedTaskDefinition
+    >(distributedTaskDefinitionsUrl, searchParams, page, pageSize);
 
     this.setState({
       data: List(data),
-      totalRecords,
+      totalRecordsCount,
       loading: false,
     });
-  };
-
-  private onPageSizeChange: TableProps['onPageSizeChange'] = (pageSize) => {
-    this.setState(
-      {
-        pageSize,
-      },
-      this.fetchData,
-    );
-  };
-
-  private onPageChange: TableProps['onPageChange'] = (page) => {
-    this.setState(
-      {
-        page: page + 1,
-      },
-      this.fetchData,
-    );
-  };
-
-  private onFilteredChange: FilteredChangeFunction = (filtered) => {
-    this.setState(
-      {
-        filtered,
-      },
-      this.debouncedFetchData,
-    );
   };
 
   private onRowClick = (value: any) => () => {
@@ -246,7 +200,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
   private renderActionButtons: DataTableViewProps['renderActionButtons'] = () => (
     <>
       <RefreshActionButton
-        onClick={this.fetchData}
+        onClick={this.forceFetchData}
         disabled={this.state.loading}
       />
       <DeleteActionButton
@@ -269,13 +223,21 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       ({ filteringEnabled }) => ({
         filteringEnabled: !filteringEnabled,
       }),
-      this.fetchData,
+      this.forceFetchData,
     );
   };
 
   private onSelectionChange: WithSelectableRowsAdditionalProps['onSelectionChange'] = (
     selectedRowIds,
   ) => this.setState({ selectedRowIds });
+
+  private forceFetchData: ForceFetchData = () => null;
+
+  private getFetchDataCallback: DataTableProps['getForceFetchData'] = (
+    fetchData,
+  ) => {
+    this.forceFetchData = fetchData;
+  };
 }
 
 interface TableExamplePageProps extends Omit<TableExampleProps, 'data'> {
