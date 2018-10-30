@@ -1,15 +1,22 @@
 import { memoize } from 'ramda';
 import { ComponentType, PureComponent } from 'react';
-import { Column, TableProps } from 'react-table';
+import { Column } from 'react-table';
 
 import { getDisplayName } from 'utils/get-display-name';
+import { StyledDataTableProps } from '../styled-data-table';
+
+export interface WithFilteringRequiredProps {
+  columns?: StyledDataTableProps['columns'];
+}
 
 export interface WithFilteringAdditionalProps {
   filterableColumnIds: string[];
   filteringEnabled: boolean;
 }
 
-export function withFiltering<Props extends TableProps>(
+// TODO: try setting `showFiltering` to false instead of changing `columns`
+
+export function withFiltering<Props extends WithFilteringRequiredProps>(
   WrappedComponent: ComponentType<Props>,
 ) {
   type WithFilteringProps = Props & WithFilteringAdditionalProps;

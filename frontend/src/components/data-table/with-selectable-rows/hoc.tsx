@@ -1,23 +1,43 @@
-import { Set } from 'immutable';
+import { List, Set } from 'immutable';
 import memoizeOne from 'memoize-one';
 import { ComponentType, PureComponent } from 'react';
 
+import { Subtract } from 'types/subtract';
 import { getDisplayName } from 'utils/get-display-name';
 
-import { SelectCheckbox } from 'components/data-table/styled-data-table';
+import {
+  SelectCheckbox,
+  StyledDataTableProps,
+} from 'components/data-table/styled-data-table';
 import { Entity } from 'models';
 
 export interface WithSelectableRowsAdditionalProps {
   selectedRowIds: Set<string>;
-  onSelectionChange?: (selectedRowIds: Set<string>) => any;
+  data: StyledDataTableProps['data'];
+  onSelectionChange?(selectedRowIds: Set<string>): any;
+}
+
+export interface WithSelectableRowsRequiredProps {
+  keyField?: string;
+  selectType?: 'checkbox' | 'radio';
+  isSelected?: (id: string) => boolean;
+  toggleSelection?: (id: string) => any;
+  toggleAll?: () => any;
+  selectAll?: boolean;
+  SelectInputComponent?: ComponentType<any>;
+  SelectAllInputComponent?: ComponentType<any>;
 }
 
 // TODO: enforce that Props extends SelectTableHOC props
 // After https://github.com/DefinitelyTyped/DefinitelyTyped/pull/30074 is merged
-export function withSelectableRows<Props extends any>(
-  WrappedComponent: ComponentType<any>,
-) {
-  type WithSelectableRowsProps = Props & WithSelectableRowsAdditionalProps;
+export function withSelectableRows<
+  Props extends WithSelectableRowsRequiredProps
+>(WrappedComponent: ComponentType<Props>) {
+  type WithSelectableRowsProps = Subtract<
+    Props,
+    WithSelectableRowsRequiredProps
+  > &
+    WithSelectableRowsAdditionalProps;
 
   class WithSelectableRows extends PureComponent<WithSelectableRowsProps> {
     public static displayName = `withSelectableRows(${getDisplayName(
@@ -57,6 +77,9 @@ export function withSelectableRows<Props extends any>(
 
     private toggleSelection = (id: string) => {
       const { selectedRowIds, onSelectionChange } = this.props;
+      if (!onSelectionChange) {
+        return;
+      }
 
       if (this.isSelected(id)) {
         onSelectionChange(selectedRowIds.delete(id));
@@ -67,14 +90,19 @@ export function withSelectableRows<Props extends any>(
 
     private toggleAll = () => {
       const { onSelectionChange } = this.props;
+
+      if (!onSelectionChange) {
+        return;
+      }
+
       if (this.areAllSelected()) {
         return onSelectionChange(Set());
       }
 
       const { data, selectedRowIds } = this.props;
       const updatedSelectedRowIds = selectedRowIds.merge(
-        data.map((entity: Entity) => entity.id),
-      );
+        (data as any).map((entity: Entity) => entity.id),
+      ) as Set<string>;
 
       onSelectionChange(updatedSelectedRowIds);
     };
@@ -85,6 +113,6 @@ export function withSelectableRows<Props extends any>(
 
 const areAllSelectedFactory = () =>
   memoizeOne(
-    (data: Set<Entity>, selectedRowIds: Set<string>) =>
+    (data: List<Entity>, selectedRowIds: Set<string>) =>
       data.size > 0 && data.every((entity) => selectedRowIds.has(entity.id)),
   );
