@@ -72,6 +72,7 @@ class DataTable extends PureComponent<DataTableProps, DataTableState> {
     return (
       <StyledDataTable
         {...this.props}
+        onFetchData={this.noop}
         pages={pagesCount}
         page={page - 1}
         onPageChange={this.onPageChange}
@@ -84,6 +85,8 @@ class DataTable extends PureComponent<DataTableProps, DataTableState> {
       />
     );
   }
+
+  private noop = () => null;
 
   private fetchData = () => {
     const { onFetchData } = this.props;
