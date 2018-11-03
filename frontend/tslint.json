@@ -2,7 +2,8 @@
   "extends": [
     "tslint:recommended",
     "tslint-consistent-codestyle",
-    "tslint-react"
+    "tslint-react",
+    "tslint-config-prettier"
   ],
   "jsRules": {
     "quotemark": [
@@ -25,6 +26,9 @@
     // tslint-consistent-codestyle
     "no-static-this": true,
     "early-exit": true,
-    "prefer-while": true
+    "prefer-while": true,
+
+    "interface-name": [true, "never-prefix"],
+    "object-literal-sort-keys": false
   }
 }

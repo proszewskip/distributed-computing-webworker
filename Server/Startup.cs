@@ -32,8 +32,12 @@ namespace Server
             AddMvc(services);
             ConfigureDependencyInjection(services);
             ConfigureDatabaseProvider(services);
-            services.AddJsonApi<DistributedComputingDbContext>();
+            services.AddJsonApi<DistributedComputingDbContext>(options => {
+                options.IncludeTotalRecordCount = true;
+                options.DefaultPageSize = 25;
+            });
             services.Configure<ServerConfig>(Configuration.GetSection("ServerConfig"));
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,7 +55,13 @@ namespace Server
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
+            app.UseCors(builder =>
+                builder
+                    .AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+            );
             app.UseJsonApi();
         }
 
