@@ -31,7 +31,6 @@ export default class FilePicker extends PureComponent<
       capture,
       height,
       onChange,
-      // tslint:disable-next-line:trailing-comma
       ...props
     } = this.props;
     const { files } = this.state;
