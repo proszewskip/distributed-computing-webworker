@@ -2,12 +2,12 @@ import { TextInput } from 'evergreen-ui';
 import { FieldProps } from 'formik';
 import React from 'react';
 
-export const FormikTextInput = (props: FieldProps) => {
-  const { field } = props;
+export const FormikTextInput = (fieldProps: FieldProps) => {
+  const { field, form, ...props } = fieldProps;
 
   return (
     <div>
-      <TextInput {...field} />
+      <TextInput {...field} {...props} />
     </div>
   );
 };
