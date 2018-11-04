@@ -1,13 +1,13 @@
-import { Button, TextInput } from 'evergreen-ui';
-import { FormikActions, FormikProps, withFormik } from 'formik';
+import { Button } from 'evergreen-ui';
+import { FormikActions, FormikProps, withFormik, Field } from 'formik';
 import fetch from 'isomorphic-unfetch';
 import React from 'react';
 import * as Yup from 'yup';
 
 import { CreateDistributedTaskDefinition } from '../src/models/index';
 
-import FilePicker from '../src/components/form/file-picker';
-import ValidatedFormField from '../src/components/form/validated-form-field';
+import ValidatedTextInput from 'components/form/validated-text-input';
+import ValidatedFilePicker from 'components/form/validated-file-picker';
 
 const serverIp = 'http://localhost:5000';
 const entityPath = '/distributed-task-definitions/add';
@@ -24,88 +24,29 @@ const ValidationSchema = Yup.object().shape({
 });
 
 const ExampleForm = ({
-  values,
-  errors,
-  touched,
-  handleChange,
-  handleBlur,
   handleSubmit,
   isSubmitting,
-  setFieldValue,
-  setTouched,
 }: FormikProps<CreateDistributedTaskDefinition>) => (
   <form onSubmit={handleSubmit}>
-    <ValidatedFormField
-      label="Name"
-      labelFor="name"
-      isRequired={true}
-      isErrorVisible={touched.name === true}
-      validationResult={errors.name}
-    />
-    <TextInput
-      id="name"
-      name="name"
-      onChange={handleChange}
-      onBlur={handleBlur}
-      value={values.name}
-      width="30rem"
-    />
-
-    <ValidatedFormField
-      label="Description"
-      labelFor="description"
-      isRequired={true}
-    />
-    <TextInput
-      id="description"
+    <Field name="name" label="Name" component={ValidatedTextInput} />
+    <Field
       name="description"
-      onChange={handleChange}
-      onBlur={handleBlur}
-      value={values.description}
-      height="6rem"
-      width="30rem"
+      label="Description"
+      component={ValidatedTextInput}
     />
-
-    <ValidatedFormField
-      label="MainDll"
-      labelFor="MainDll"
-      isRequired={true}
-      isErrorVisible={touched.MainDll === true}
-      validationResult={errors.MainDll}
-    />
-    <FilePicker
+    <Field
       name="MainDll"
-      // tslint:disable-next-line:jsx-no-multiline-js jsx-no-lambda
-      onChange={(fileList: FileList) => {
-        setFieldValue('MainDll', fileList[0], true);
-        setTouched({
-          MainDll: true,
-          ...touched,
-        });
-      }}
+      label="MainDll"
+      component={ValidatedFilePicker}
       accept=".dll"
-      required={true}
     />
 
-    <ValidatedFormField
-      label="AdditionalDlls"
-      labelFor="AdditionalDlls"
-      isRequired={true}
-      isErrorVisible={touched.AdditionalDlls === true}
-      validationResult={errors.AdditionalDlls}
-    />
-    <FilePicker
+    <Field
       name="AdditionalDlls"
-      // tslint:disable-next-line:jsx-no-multiline-js jsx-no-lambda
-      onChange={(fileList: FileList) => {
-        setFieldValue('AdditionalDlls', fileList, true);
-        setTouched({
-          AdditionalDlls: true,
-          ...touched,
-        });
-      }}
-      multiple={true}
+      label="AdditionalDlls"
+      component={ValidatedFilePicker}
       accept=".dll"
+      multiple={true}
     />
 
     <Button type="submit" disabled={isSubmitting}>
