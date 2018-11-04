@@ -1,15 +1,13 @@
 import { TextInput } from 'evergreen-ui';
 import { FieldProps } from 'formik';
-import React, { PureComponent } from 'react';
+import React from 'react';
 
-export default class FormikTextInput extends PureComponent<FieldProps> {
-  public render() {
-    const { field } = this.props;
+export const FormikTextInput = (props: FieldProps) => {
+  const { field } = props;
 
-    return (
-      <div>
-        <TextInput {...field} />
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      <TextInput {...field} />
+    </div>
+  );
+};
