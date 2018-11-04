@@ -2,7 +2,7 @@ import { Textarea } from 'evergreen-ui';
 import { FieldProps } from 'formik';
 import React from 'react';
 
-export const FormikTextArea = (fieldProps: FieldProps) => {
+export const FormikTextarea = (fieldProps: FieldProps) => {
   const { field, form, ...props } = fieldProps;
 
   return (

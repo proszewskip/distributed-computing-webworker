@@ -10,7 +10,7 @@ import { CreateDistributedTaskDefinition } from '../src/models/index';
 import { ErrorAlert } from 'components/form/errors/error-alert';
 import { FormikFilePicker } from 'components/form/file-picker/';
 import { FormikTextInput } from 'components/form/text-input/';
-import { FormikTextArea } from 'components/form/textarea';
+import { FormikTextarea } from 'components/form/textarea';
 import { withLabel } from 'components/form/with-label/hoc';
 import { withValidation } from 'components/form/with-validation/hoc';
 
@@ -18,10 +18,10 @@ const serverIp = 'http://localhost:5000';
 const entityPath = '/distributed-task-definitions/add';
 const urlToFetch = `${serverIp}${entityPath}`;
 
-const ValidatedFormTextInput = withValidation(FormikTextInput);
-const ValidatedFormTextInputWithLabel = withLabel(ValidatedFormTextInput);
+const ValidatedTextInput = withValidation(FormikTextInput);
+const ValidatedTextInputWithLabel = withLabel(ValidatedTextInput);
 
-const FormTextInputWithLabel = withLabel(FormikTextArea);
+const TextareaWithLabel = withLabel(FormikTextarea);
 
 const ValidatedFilePicker = withValidation(FormikFilePicker);
 const ValidatedFilePickerWithLabel = withLabel(ValidatedFilePicker);
@@ -40,14 +40,14 @@ const ExampleForm = ({
       <Field
         name="name"
         label="Name"
-        component={ValidatedFormTextInputWithLabel}
+        component={ValidatedTextInputWithLabel}
         width="100%"
       />
 
       <Field
         name="description"
         label="Description"
-        component={FormTextInputWithLabel}
+        component={TextareaWithLabel}
         width="100%"
         height="6rem"
       />
