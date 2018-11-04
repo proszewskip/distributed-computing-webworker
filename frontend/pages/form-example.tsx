@@ -2,6 +2,7 @@ import { Button } from 'evergreen-ui';
 import { Field, FormikActions, FormikProps, withFormik } from 'formik';
 import fetch from 'isomorphic-unfetch';
 import React from 'react';
+import { ClipLoader } from 'react-spinners';
 import * as Yup from 'yup';
 
 import { CreateDistributedTaskDefinition } from '../src/models/index';
@@ -28,9 +29,10 @@ const ExampleForm = ({
   isSubmitting,
   touched,
   errors,
+  values,
 }: FormikProps<CreateDistributedTaskDefinition>) => (
   <form onSubmit={handleSubmit}>
-    <ErrorAlert touched={touched} errors={errors} />
+    <ErrorAlert touched={touched} errors={errors} values={values} />
 
     <Field
       name="name"
@@ -59,9 +61,15 @@ const ExampleForm = ({
       multiple={true}
     />
 
+    <Button type="button" onClick={() => alert('Cancel')}>
+      Cancel
+    </Button>
+
     <Button type="submit" disabled={isSubmitting}>
       Submit
     </Button>
+
+    <ClipLoader loading={isSubmitting} />
   </form>
 );
 
@@ -113,7 +121,7 @@ async function handleSubmitHandler(
       const errorObject: any = {};
 
       for (const error of result.Errors) {
-        errorObject[error.Title] = error.detail;
+        errorObject[error.title] = error.detail;
       }
 
       setErrors(errorObject);

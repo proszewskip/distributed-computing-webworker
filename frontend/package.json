@@ -35,6 +35,7 @@
     "ramda": "^0.25.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
+    "react-spinners": "^0.4.7",
     "react-table": "^6.8.6",
     "tslint-config-prettier": "^1.15.0",
     "ui-box": "^1.4.0",
