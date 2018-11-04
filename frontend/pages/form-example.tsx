@@ -6,36 +6,50 @@ import * as Yup from 'yup';
 
 import { CreateDistributedTaskDefinition } from '../src/models/index';
 
-import ValidatedFilePicker from 'components/form/validated-file-picker';
-import ValidatedTextInput from 'components/form/validated-text-input';
+import { FormikFilePicker } from 'components/form/file-picker/';
+import { FormikTextInput } from 'components/form/text-input/';
+import { withLabel } from 'components/form/with-label/hoc';
+import { withValidation } from 'components/form/with-validation/hoc';
 
 const serverIp = 'http://localhost:5000';
 const entityPath = '/distributed-task-definitions/add';
 const urlToFetch = `${serverIp}${entityPath}`;
+
+const ValidatedFormTextInput = withValidation(FormikTextInput);
+const ValidatedFormTextInputWithLabel = withLabel(ValidatedFormTextInput);
+const FormTextInputWithLabel = withLabel(FormikTextInput);
+
+const ValidatedFilePicker = withValidation(FormikFilePicker);
+const ValidatedFilePickerWithLabel = withLabel(ValidatedFilePicker);
 
 const ExampleForm = ({
   handleSubmit,
   isSubmitting,
 }: FormikProps<CreateDistributedTaskDefinition>) => (
   <form onSubmit={handleSubmit}>
-    <Field name="name" label="Name" component={ValidatedTextInput} />
+    <Field
+      name="name"
+      label="Name"
+      component={ValidatedFormTextInputWithLabel}
+    />
 
     <Field
       name="description"
       label="Description"
-      component={ValidatedTextInput}
+      component={FormTextInputWithLabel}
     />
+
     <Field
       name="MainDll"
       label="MainDll"
-      component={ValidatedFilePicker}
+      component={ValidatedFilePickerWithLabel}
       accept=".dll"
     />
 
     <Field
       name="AdditionalDlls"
       label="AdditionalDlls"
-      component={ValidatedFilePicker}
+      component={ValidatedFilePickerWithLabel}
       accept=".dll"
       multiple={true}
     />
