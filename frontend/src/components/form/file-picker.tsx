@@ -1,19 +1,9 @@
 import { Button, TextInput } from 'evergreen-ui';
 import React, { PureComponent } from 'react';
+import { FilePickerProps } from 'types/file-picker-props';
 import Box from 'ui-box';
 
 export const CLASS_PREFIX = 'evergreen-file-picker';
-
-interface FilePickerProps {
-  name?: string;
-  accept?: string | [string];
-  required?: boolean;
-  multiple?: boolean;
-  disabled?: boolean;
-  capture?: boolean;
-  height?: number;
-  onChange?: (arg: any) => any;
-}
 
 interface FilePickerState {
   files: any[];
