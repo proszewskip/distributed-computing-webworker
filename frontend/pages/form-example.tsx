@@ -1,4 +1,4 @@
-import { Button } from 'evergreen-ui';
+import { Button, Pane } from 'evergreen-ui';
 import { Field, FormikActions, FormikProps, withFormik } from 'formik';
 import fetch from 'isomorphic-unfetch';
 import React from 'react';
@@ -10,6 +10,7 @@ import { CreateDistributedTaskDefinition } from '../src/models/index';
 import { ErrorAlert } from 'components/form/errors/error-alert';
 import { FormikFilePicker } from 'components/form/file-picker/';
 import { FormikTextInput } from 'components/form/text-input/';
+import { FormikTextArea } from 'components/form/textarea';
 import { withLabel } from 'components/form/with-label/hoc';
 import { withValidation } from 'components/form/with-validation/hoc';
 
@@ -19,7 +20,8 @@ const urlToFetch = `${serverIp}${entityPath}`;
 
 const ValidatedFormTextInput = withValidation(FormikTextInput);
 const ValidatedFormTextInputWithLabel = withLabel(ValidatedFormTextInput);
-const FormTextInputWithLabel = withLabel(FormikTextInput);
+
+const FormTextInputWithLabel = withLabel(FormikTextArea);
 
 const ValidatedFilePicker = withValidation(FormikFilePicker);
 const ValidatedFilePickerWithLabel = withLabel(ValidatedFilePicker);
@@ -31,46 +33,51 @@ const ExampleForm = ({
   errors,
   values,
 }: FormikProps<CreateDistributedTaskDefinition>) => (
-  <form onSubmit={handleSubmit}>
-    <ErrorAlert touched={touched} errors={errors} values={values} />
+  <Pane width="30%">
+    <form onSubmit={handleSubmit}>
+      <ErrorAlert touched={touched} errors={errors} values={values} />
 
-    <Field
-      name="name"
-      label="Name"
-      component={ValidatedFormTextInputWithLabel}
-    />
+      <Field
+        name="name"
+        label="Name"
+        component={ValidatedFormTextInputWithLabel}
+        width="100%"
+      />
 
-    <Field
-      name="description"
-      label="Description"
-      component={FormTextInputWithLabel}
-    />
+      <Field
+        name="description"
+        label="Description"
+        component={FormTextInputWithLabel}
+        width="100%"
+        height="6rem"
+      />
 
-    <Field
-      name="MainDll"
-      label="MainDll"
-      component={ValidatedFilePickerWithLabel}
-      accept=".dll"
-    />
+      <Field
+        name="MainDll"
+        label="MainDll"
+        component={ValidatedFilePickerWithLabel}
+        accept=".dll"
+      />
 
-    <Field
-      name="AdditionalDlls"
-      label="AdditionalDlls"
-      component={ValidatedFilePickerWithLabel}
-      accept=".dll"
-      multiple={true}
-    />
+      <Field
+        name="AdditionalDlls"
+        label="AdditionalDlls"
+        component={ValidatedFilePickerWithLabel}
+        accept=".dll"
+        multiple={true}
+      />
 
-    <Button type="button" onClick={() => alert('Cancel')}>
-      Cancel
-    </Button>
+      <Button type="button" onClick={() => alert('Cancel')}>
+        Cancel
+      </Button>
 
-    <Button type="submit" disabled={isSubmitting}>
-      Submit
-    </Button>
+      <Button type="submit" disabled={isSubmitting}>
+        Submit
+      </Button>
 
-    <ClipLoader loading={isSubmitting} />
-  </form>
+      <ClipLoader loading={isSubmitting} />
+    </form>
+  </Pane>
 );
 
 const validationSchema = Yup.object().shape({
@@ -110,6 +117,7 @@ async function handleSubmitHandler(
   }
 
   formData.append('name', values.name);
+  formData.append('description', values.description);
 
   await fetch(urlToFetch, {
     method: 'post',
@@ -125,6 +133,8 @@ async function handleSubmitHandler(
       }
 
       setErrors(errorObject);
+    } else {
+      alert('Distributed Task Definition added');
     }
     setSubmitting(false);
   });
