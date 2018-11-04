@@ -21,13 +21,17 @@ export class FormikFilePicker extends PureComponent<FormikFilePickerProps> {
   }
 
   private onChange(fileList: FileList) {
-    const { form, field } = this.props;
+    const { form, field, multiple } = this.props;
 
     const { name } = field;
 
     this.onChange = this.onChange.bind(this);
 
-    form.setFieldValue(name, fileList[0], true);
+    if (!multiple) {
+      form.setFieldValue(name, fileList[0], true);
+    } else {
+      form.setFieldValue(name, fileList, true);
+    }
 
     const touched = form.touched;
     touched[name] = true;
