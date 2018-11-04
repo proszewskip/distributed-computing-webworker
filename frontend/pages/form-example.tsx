@@ -6,6 +6,7 @@ import * as Yup from 'yup';
 
 import { CreateDistributedTaskDefinition } from '../src/models/index';
 
+import { ErrorAlert } from 'components/form/errors/error-alert';
 import { FormikFilePicker } from 'components/form/file-picker/';
 import { FormikTextInput } from 'components/form/text-input/';
 import { withLabel } from 'components/form/with-label/hoc';
@@ -25,8 +26,12 @@ const ValidatedFilePickerWithLabel = withLabel(ValidatedFilePicker);
 const ExampleForm = ({
   handleSubmit,
   isSubmitting,
+  touched,
+  errors,
 }: FormikProps<CreateDistributedTaskDefinition>) => (
   <form onSubmit={handleSubmit}>
+    <ErrorAlert touched={touched} errors={errors} />
+
     <Field
       name="name"
       label="Name"
