@@ -1,6 +1,5 @@
 import { Button, TextInput } from 'evergreen-ui';
 import React, { PureComponent } from 'react';
-import { FilePickerProps } from 'types/file-picker-props';
 import Box from 'ui-box';
 
 export const CLASS_PREFIX = 'evergreen-file-picker';
@@ -9,17 +8,25 @@ interface FilePickerState {
   files: any[];
 }
 
-export default class FilePicker extends PureComponent<
+export interface FilePickerProps {
+  name?: string;
+  accept?: string | [string];
+  required?: boolean;
+  multiple?: boolean;
+  disabled?: boolean;
+  capture?: boolean;
+  height?: number;
+  onChange?: (arg: any) => any;
+}
+
+export default class FormFilePicker extends PureComponent<
   FilePickerProps,
   FilePickerState
 > {
   public fileInput: any;
-  constructor(props: FilePickerProps) {
-    super(props);
-    this.state = {
-      files: [],
-    };
-  }
+  public state: FilePickerState = {
+    files: [],
+  };
 
   public render() {
     const {
