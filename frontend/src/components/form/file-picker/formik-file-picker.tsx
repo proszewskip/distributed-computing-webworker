@@ -1,31 +1,24 @@
 import React, { PureComponent } from 'react';
-import { FilePickerProps } from 'types/file-picker-props';
-
 import { FieldProps } from 'formik';
-import FilePicker from './file-picker';
 
-type FormikFilePickerProps = FilePickerProps & FieldProps;
+import { withLabel } from '../with-label';
+import { withValidation } from '../with-validation';
+import FormFilePicker, { FilePickerProps } from './form-file-picker';
 
-export class FormikFilePicker extends PureComponent<FormikFilePickerProps> {
-  constructor(props: FormikFilePickerProps) {
-    super(props);
+export type FormikFilePickerProps = FilePickerProps & FieldProps;
 
-    this.onChange = this.onChange.bind(this);
-  }
-
+export class BaseFilePicker extends PureComponent<FormikFilePickerProps> {
   public render() {
     const { field, form, ...props } = this.props;
     const { name } = field;
 
-    return <FilePicker name={name} {...props} onChange={this.onChange} />;
+    return <FormFilePicker name={name} {...props} onChange={this.onChange} />;
   }
 
-  private onChange(fileList: FileList) {
+  private onChange: FilePickerProps['onChange'] = (fileList: FileList) => {
     const { form, field, multiple } = this.props;
 
     const { name } = field;
-
-    this.onChange = this.onChange.bind(this);
 
     if (!multiple) {
       form.setFieldValue(name, fileList[0], true);
@@ -33,9 +26,14 @@ export class FormikFilePicker extends PureComponent<FormikFilePickerProps> {
       form.setFieldValue(name, fileList, true);
     }
 
-    const touched = form.touched;
-    touched[name] = true;
+    const touched = {
+      ...form.touched,
+      [name]: true,
+    };
 
     form.setTouched(touched);
-  }
+  };
 }
+
+export const FilePicker = withValidation(BaseFilePicker);
+export const FilePickerWithLabel = withLabel(FilePicker);

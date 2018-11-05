@@ -1,13 +1,15 @@
 import { TextInput } from 'evergreen-ui';
 import { FieldProps } from 'formik';
-import React from 'react';
+import React, { StatelessComponent } from 'react';
 
-export const FormikTextInput = (fieldProps: FieldProps) => {
+import { withLabel } from '../with-label';
+import { withValidation } from '../with-validation';
+
+export const BaseTextinput: StatelessComponent<FieldProps> = (fieldProps) => {
   const { field, form, ...props } = fieldProps;
 
-  return (
-    <div>
-      <TextInput {...field} {...props} />
-    </div>
-  );
+  return <TextInput {...field} {...props} />;
 };
+
+export const ValidatedTextInput = withValidation(BaseTextinput);
+export const ValidatedTextInputWithLabel = withLabel(ValidatedTextInput);
