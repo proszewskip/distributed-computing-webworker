@@ -31,19 +31,21 @@ export const ErrorAlert: StatelessComponent<ErrorAlertProps> = (
   );
 };
 
-const checkValidationResult = (errorAlertProps: ErrorAlertProps) => {
-  const { touched, errors } = errorAlertProps;
-
-  const fieldNames = Object.keys(errorAlertProps.values);
+const checkValidationResult = ({
+  touched,
+  errors,
+  values,
+}: ErrorAlertProps) => {
+  const fieldNames = Object.keys(values);
 
   return fieldNames.some(
     (key: string) => touched[key] !== undefined && errors[key] !== undefined,
   );
 };
 
-const getErrorsFromServer = (errorAlertProps: ErrorAlertProps) => {
-  const fieldNames = Object.keys(errorAlertProps.values);
-  const errorKeys = Object.keys(errorAlertProps.errors);
+const getErrorsFromServer = ({ errors, values }: ErrorAlertProps) => {
+  const fieldNames = Object.keys(values);
+  const errorKeys = Object.keys(errors);
 
   const serverErrors = errorKeys.filter((key) => !fieldNames.includes(key));
   // TODO: use values after custom server errors are sent as `Detail`.

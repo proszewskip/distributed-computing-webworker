@@ -1,5 +1,5 @@
-import React, { PureComponent } from 'react';
 import { FieldProps } from 'formik';
+import React, { PureComponent } from 'react';
 
 import { withLabel } from '../with-label';
 import { withValidation } from '../with-validation';
