@@ -1,30 +1,30 @@
 import { Button, Pane } from 'evergreen-ui';
-import { Field, FormikActions, FormikProps, withFormik } from 'formik';
+import {
+  Field,
+  FormikActions,
+  FormikProps,
+  withFormik,
+  WithFormikConfig,
+} from 'formik';
 import fetch from 'isomorphic-unfetch';
+import { Dictionary } from 'lodash';
 import React from 'react';
 import { ClipLoader } from 'react-spinners';
 import * as Yup from 'yup';
 
-import { CreateDistributedTaskDefinition } from '../src/models/index';
+import {
+  CreateDistributedTaskDefinition,
+  CreateDistributedTaskDefinitionResponse,
+} from '../src/models/index';
 
 import { ErrorAlert } from 'components/form/errors/error-alert';
-import { FormikFilePicker } from 'components/form/file-picker/';
-import { FormikTextInput } from 'components/form/text-input/';
-import { FormikTextarea } from 'components/form/textarea';
-import { withLabel } from 'components/form/with-label/hoc';
-import { withValidation } from 'components/form/with-validation/hoc';
+import { FilePickerWithLabel } from 'components/form/file-picker';
+import { ValidatedTextInputWithLabel } from 'components/form/text-input';
+import { TextareaWithLabel } from 'components/form/textarea';
 
 const serverIp = 'http://localhost:5000';
 const entityPath = '/distributed-task-definitions/add';
 const urlToFetch = `${serverIp}${entityPath}`;
-
-const ValidatedTextInput = withValidation(FormikTextInput);
-const ValidatedTextInputWithLabel = withLabel(ValidatedTextInput);
-
-const TextareaWithLabel = withLabel(FormikTextarea);
-
-const ValidatedFilePicker = withValidation(FormikFilePicker);
-const ValidatedFilePickerWithLabel = withLabel(ValidatedFilePicker);
 
 const ExampleForm = ({
   handleSubmit,
@@ -55,14 +55,14 @@ const ExampleForm = ({
       <Field
         name="MainDll"
         label="MainDll"
-        component={ValidatedFilePickerWithLabel}
+        component={FilePickerWithLabel}
         accept=".dll"
       />
 
       <Field
         name="AdditionalDlls"
         label="AdditionalDlls"
-        component={ValidatedFilePickerWithLabel}
+        component={FilePickerWithLabel}
         accept=".dll"
         multiple={true}
       />
@@ -90,12 +90,12 @@ const validationSchema = Yup.object().shape({
   AdditionalDlls: Yup.array().required(),
 });
 
-function mapPropsToValues() {
+function mapPropsToValues(props: CreateDistributedTaskDefinition) {
   return {
-    name: '',
-    description: '',
-    MainDll: undefined,
-    AdditionalDlls: undefined,
+    name: props.name,
+    description: props.description,
+    MainDll: props.MainDll,
+    AdditionalDlls: props.AdditionalDlls,
   };
 }
 
@@ -105,11 +105,11 @@ async function handleSubmitHandler(
 ) {
   setSubmitting(true);
   const formData = new FormData();
-  if (values.MainDll !== undefined) {
+  if (values.MainDll) {
     formData.append('MainDll', values.MainDll);
   }
 
-  if (values.AdditionalDlls !== undefined) {
+  if (values.AdditionalDlls) {
     // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < values.AdditionalDlls.length; ++i) {
       formData.append('AdditionalDlls', values.AdditionalDlls[i]);
@@ -119,28 +119,31 @@ async function handleSubmitHandler(
   formData.append('name', values.name);
   formData.append('description', values.description);
 
-  await fetch(urlToFetch, {
+  const response: Response = await fetch(urlToFetch, {
     method: 'post',
     body: formData,
-  }).then(async (response: Response) => {
-    if (!response.ok) {
-      const result = await response.json();
-
-      const errorObject: any = {};
-
-      for (const error of result.Errors) {
-        errorObject[error.title] = error.detail;
-      }
-
-      setErrors(errorObject);
-    } else {
-      alert('Distributed Task Definition added');
-    }
-    setSubmitting(false);
   });
+
+  if (!response.ok) {
+    const result: CreateDistributedTaskDefinitionResponse = await response.json();
+
+    const errorObject: Dictionary<string> = {};
+
+    for (const error of result.Errors) {
+      errorObject[error.title] = error.detail;
+    }
+
+    setErrors(errorObject);
+  } else {
+    alert('Distributed Task Definition added');
+  }
+  setSubmitting(false);
 }
 
-const withFormikProps = {
+const withFormikProps: WithFormikConfig<
+  CreateDistributedTaskDefinition,
+  CreateDistributedTaskDefinition
+> = {
   handleSubmit: handleSubmitHandler,
   mapPropsToValues,
   validationSchema,
@@ -151,7 +154,12 @@ const ExampleFormWithFormik = withFormik(withFormikProps)(ExampleForm);
 const Basic = () => (
   <div>
     <h1>Example form</h1>
-    <ExampleFormWithFormik />
+    <ExampleFormWithFormik
+      name=""
+      description=""
+      MainDll={undefined}
+      AdditionalDlls={undefined}
+    />
   </div>
 );
 
