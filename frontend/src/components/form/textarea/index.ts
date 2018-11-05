@@ -1,1 +1,1 @@
-export * from './formik-text-area';
+export * from './formik-textarea';
