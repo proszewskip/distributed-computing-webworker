@@ -84,6 +84,7 @@ const validationSchema = Yup.object().shape({
   name: Yup.string()
     .min(3, 'Must be longer than 3 characters')
     .required('Required'),
+  description: Yup.string(),
   MainDll: Yup.object()
     .nullable(true)
     .test('Defined', 'MainDll is required', (file: any) => file !== undefined),
