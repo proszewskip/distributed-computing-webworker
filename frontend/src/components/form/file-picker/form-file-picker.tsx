@@ -8,7 +8,7 @@ interface FilePickerState {
   files: any[];
 }
 
-export interface FilePickerProps {
+export interface FormFilePickerProps {
   name?: string;
   accept?: string | [string];
   required?: boolean;
@@ -16,11 +16,11 @@ export interface FilePickerProps {
   disabled?: boolean;
   capture?: boolean;
   height?: number;
-  onChange?: (arg: any) => any;
+  onChange?: (arg: File[]) => any;
 }
 
 export default class FormFilePicker extends PureComponent<
-  FilePickerProps,
+  FormFilePickerProps,
   FilePickerState
 > {
   public fileInput: any;
