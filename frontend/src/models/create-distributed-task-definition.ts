@@ -1,10 +1,12 @@
 import { Dictionary } from 'lodash';
 
+export type FileList = File[];
+
 export interface CreateDistributedTaskDefinition {
   name: string;
   description: string;
-  MainDll: File | undefined;
-  AdditionalDlls: FileList | undefined;
+  MainDll: File | null;
+  AdditionalDlls?: FileList;
 }
 
 export interface CreateDistributedTaskDefinitionResponse {

@@ -3,11 +3,13 @@ import React, { PureComponent } from 'react';
 
 import { withLabel } from '../with-label';
 import { withValidation } from '../with-validation';
-import FormFilePicker, { FilePickerProps } from './form-file-picker';
+import FormFilePicker, { FormFilePickerProps } from './form-file-picker';
 
-export type FormikFilePickerProps = FilePickerProps & FieldProps;
+import { FileList } from './../../../models/create-distributed-task-definition';
 
-export class BaseFilePicker extends PureComponent<FormikFilePickerProps> {
+export type BaseFilePickerProps = FormFilePickerProps & FieldProps;
+
+export class BaseFilePicker extends PureComponent<BaseFilePickerProps> {
   public render() {
     const { field, form, ...props } = this.props;
     const { name } = field;
@@ -15,15 +17,15 @@ export class BaseFilePicker extends PureComponent<FormikFilePickerProps> {
     return <FormFilePicker name={name} {...props} onChange={this.onChange} />;
   }
 
-  private onChange: FilePickerProps['onChange'] = (fileList: FileList) => {
+  private onChange: FormFilePickerProps['onChange'] = (fileArray: FileList) => {
     const { form, field, multiple } = this.props;
 
     const { name } = field;
 
     if (!multiple) {
-      form.setFieldValue(name, fileList[0], true);
+      form.setFieldValue(name, fileArray[0] || null, true);
     } else {
-      form.setFieldValue(name, fileList, true);
+      form.setFieldValue(name, fileArray, true);
     }
 
     const touched = {

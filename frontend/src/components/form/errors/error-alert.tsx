@@ -11,7 +11,7 @@ interface ErrorAlertProps<V = any> {
 export const ErrorAlert: StatelessComponent<ErrorAlertProps> = (
   errorAlertProps,
 ) => {
-  const errorsAlertVisible = checkValidationResult(errorAlertProps);
+  const errorsAlertVisible = hasFormErrors(errorAlertProps);
 
   const errorsFromServer = getErrorsFromServer(errorAlertProps).map(
     (errorMessage) => (
@@ -31,11 +31,7 @@ export const ErrorAlert: StatelessComponent<ErrorAlertProps> = (
   );
 };
 
-const checkValidationResult = ({
-  touched,
-  errors,
-  values,
-}: ErrorAlertProps) => {
+const hasFormErrors = ({ touched, errors, values }: ErrorAlertProps) => {
   const fieldNames = Object.keys(values);
 
   return fieldNames.some(

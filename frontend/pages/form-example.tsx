@@ -19,8 +19,8 @@ import {
 
 import { ErrorAlert } from 'components/form/errors/error-alert';
 import { FilePickerWithLabel } from 'components/form/file-picker';
-import { ValidatedTextInputWithLabel } from 'components/form/text-input';
-import { TextareaWithLabel } from 'components/form/textarea';
+import { TextInputWithLabel } from 'components/form/text-input';
+import { Textarea } from 'components/form/textarea';
 
 const serverIp = 'http://localhost:5000';
 const entityPath = '/distributed-task-definitions/add';
@@ -40,14 +40,14 @@ const ExampleForm = ({
       <Field
         name="name"
         label="Name"
-        component={ValidatedTextInputWithLabel}
+        component={TextInputWithLabel}
         width="100%"
       />
 
       <Field
         name="description"
         label="Description"
-        component={TextareaWithLabel}
+        component={Textarea}
         width="100%"
         height="6rem"
       />
@@ -80,15 +80,17 @@ const ExampleForm = ({
   </Pane>
 );
 
-const validationSchema = Yup.object().shape({
+const validationSchema = Yup.object<CreateDistributedTaskDefinition>().shape({
   name: Yup.string()
     .min(3, 'Must be longer than 3 characters')
     .required('Required'),
   description: Yup.string(),
-  MainDll: Yup.object()
-    .nullable(true)
-    .test('Defined', 'MainDll is required', (file: any) => file !== undefined),
-  AdditionalDlls: Yup.array().required(),
+  MainDll: Yup.mixed().test('Required', 'Required', (value) => {
+    return value;
+  }),
+  AdditionalDlls: Yup.array<File>()
+    .min(1, 'Required')
+    .required('Required'),
 });
 
 function mapPropsToValues(props: CreateDistributedTaskDefinition) {
@@ -155,12 +157,7 @@ const ExampleFormWithFormik = withFormik(withFormikProps)(ExampleForm);
 const Basic = () => (
   <div>
     <h1>Example form</h1>
-    <ExampleFormWithFormik
-      name=""
-      description=""
-      MainDll={undefined}
-      AdditionalDlls={undefined}
-    />
+    <ExampleFormWithFormik name="" description="" MainDll={null} />
   </div>
 );
 
