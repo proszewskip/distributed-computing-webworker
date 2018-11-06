@@ -31,6 +31,7 @@ export class BaseFilePicker extends PureComponent<FormikFilePickerProps> {
       [name]: true,
     };
 
+    form.validateForm();
     form.setTouched(touched);
   };
 }
