@@ -2,6 +2,8 @@ import { Button, TextInput } from 'evergreen-ui';
 import React, { PureComponent } from 'react';
 import Box from 'ui-box';
 
+import { FileList } from '../../../models/create-distributed-task-definition';
+
 export const CLASS_PREFIX = 'evergreen-file-picker';
 
 interface FilePickerState {
@@ -16,7 +18,7 @@ export interface FormFilePickerProps {
   disabled?: boolean;
   capture?: boolean;
   height?: number;
-  onChange?: (arg: File[]) => any;
+  onChange?: (arg: FileList) => any;
 }
 
 export default class FormFilePicker extends PureComponent<
