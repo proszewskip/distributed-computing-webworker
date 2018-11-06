@@ -2,7 +2,7 @@ import { Button, TextInput } from 'evergreen-ui';
 import React, { PureComponent } from 'react';
 import Box from 'ui-box';
 
-import { FileList } from '../../../models/create-distributed-task-definition';
+import { FileList } from 'models/create-distributed-task-definition';
 
 export const CLASS_PREFIX = 'evergreen-file-picker';
 
