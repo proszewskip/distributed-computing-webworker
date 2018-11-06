@@ -10,6 +10,8 @@ Frontend readme is available under `./frontend`.
 
 #### Linux
 
+- Install [docker](https://www.docker.com/get-started)
+- Install [docker-compose](https://docs.docker.com/compose/install/)
 - Install [.NET Core 2.1](https://www.microsoft.com/net/download/dotnet-core/2.1)
 - Install latest [mono](https://www.mono-project.com/docs/getting-started/install/).
 - Set enviroment variable with path to `mono` compiler
@@ -17,6 +19,8 @@ Frontend readme is available under `./frontend`.
 
 #### Windows
 
+- Install [docker](https://www.docker.com/get-started)
+- Install [docker-compose](https://docs.docker.com/compose/install/)
 - Install [.NET Core 2.1](https://www.microsoft.com/net/download/dotnet-core/2.1)
 
 ### Building and running
@@ -30,5 +34,6 @@ In order to build whole project run:
 In order to start `Server` module run:
 
 ```bash
+docker-compose up -d
 dotnet run --project Server
 ```
