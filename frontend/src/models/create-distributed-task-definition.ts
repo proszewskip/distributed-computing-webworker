@@ -1,5 +1,7 @@
 import { Dictionary } from 'lodash';
 
+import { ServerError } from './server-error';
+
 export type FileList = File[];
 
 export interface CreateDistributedTaskDefinition {
@@ -10,5 +12,5 @@ export interface CreateDistributedTaskDefinition {
 }
 
 export interface CreateDistributedTaskDefinitionResponse {
-  Errors: Dictionary<string>;
+  Errors: Dictionary<ServerError>;
 }

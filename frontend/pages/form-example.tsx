@@ -132,8 +132,8 @@ async function handleSubmitHandler(
 
     const errorObject: Dictionary<string> = {};
 
-    for (const error of result.Errors) {
-      errorObject[error.title] = error.detail;
+    for (const [, value] of Object.entries(result.Errors)) {
+      errorObject[value.title] = value.detail;
     }
 
     setErrors(errorObject);
