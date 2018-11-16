@@ -339,8 +339,11 @@ ASALocalRun/
 # Include files from the mono-wasm-sdk
 !mono-wasm-sdk/*
 
-/compiled-task-definitions
-/task-definitions
+compiled-task-definitions/*
+task-definitions/*
+
+!compiled-task-definitions/.keep
+!task-definitions/.keep
 
 # Logs
 logs
