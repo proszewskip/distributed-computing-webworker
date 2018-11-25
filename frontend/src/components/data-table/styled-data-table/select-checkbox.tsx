@@ -1,5 +1,5 @@
 import { Checkbox } from 'evergreen-ui';
-import React, { PureComponent } from 'react';
+import React, { PureComponent, SyntheticEvent } from 'react';
 
 interface SelectCheckboxProps {
   checked: boolean;
@@ -12,14 +12,29 @@ export class SelectCheckbox extends PureComponent<SelectCheckboxProps> {
   public render() {
     const { checked } = this.props;
 
-    return <Checkbox marginY={0} checked={checked} onChange={this.onChange} />;
+    return (
+      <Checkbox
+        marginY={0}
+        checked={checked}
+        onChange={this.onChange}
+        onClick={this.onClick}
+      />
+    );
   }
 
-  private onChange = (e: any) => {
+  private onChange = (event: MouseEvent) => {
     const { id, row, onClick } = this.props;
 
-    const { shiftKey } = e;
-    e.stopPropagation();
+    const { shiftKey } = event;
+    event.stopPropagation();
     onClick(id, shiftKey, row);
+  };
+
+  /**
+   * Propagation has to be stopped to prevent catching the click event on the row
+   * when a checkbox has been clicked.
+   */
+  private onClick = (event: SyntheticEvent) => {
+    event.stopPropagation();
   };
 }
