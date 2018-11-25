@@ -1,14 +1,12 @@
 import { Button, Heading, minorScale, Text } from 'evergreen-ui';
 import fetch from 'isomorphic-unfetch';
-import React, { Component, ComponentType } from 'react';
+import React, { Component, ComponentType, MouseEventHandler } from 'react';
 import { Column } from 'react-table';
 
 import { List, Set } from 'immutable';
 
 // @ts-ignore (TODO: remove after https://github.com/DefinitelyTyped/DefinitelyTyped/pull/30074 is merged)
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
-
-import 'react-table/react-table.css';
 
 import { ComponentProps } from 'types/component-props';
 import { Omit } from 'types/omit';
@@ -81,6 +79,9 @@ async function getEntities<T extends { id: string }>(
   };
 }
 
+const preventPropagationHandler: MouseEventHandler = (event) =>
+  event.stopPropagation();
+
 class TableExample extends Component<TableExampleProps, TableExampleState> {
   private filterableColumnIds = ['name'];
   private columns: Column[] = [
@@ -100,13 +101,21 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       id: 'action',
       Header: <Text>Action</Text>,
       Cell: (cellProps: any) => (
-        <Button
-          appearance="primary"
-          intent="danger"
-          onClick={this.onRowClick(cellProps.original)}
-        >
-          Remove
-        </Button>
+        <div onClick={preventPropagationHandler}>
+          <Button
+            appearance="primary"
+            intent="danger"
+            onClick={this.onRowClick(cellProps.original)}
+          >
+            Remove
+          </Button>
+          <Button
+            appearance="primary"
+            onClick={this.onRowClick(cellProps.original)}
+          >
+            See details
+          </Button>
+        </div>
       ),
     },
   ];

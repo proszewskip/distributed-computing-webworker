@@ -1,6 +1,7 @@
 import { List, Set } from 'immutable';
 import memoizeOne from 'memoize-one';
 import { ComponentType, PureComponent } from 'react';
+import { RowInfo, TableProps } from 'react-table';
 
 import { Subtract } from 'types/subtract';
 import { getDisplayName } from 'utils/get-display-name';
@@ -17,6 +18,10 @@ export interface WithSelectableRowsAdditionalProps {
   onSelectionChange?(selectedRowIds: Set<string>): any;
 }
 
+export interface WithSelectableRowsOptionalProps {
+  getTrProps?: TableProps['getTrProps'];
+}
+
 export interface WithSelectableRowsRequiredProps {
   keyField?: string;
   selectType?: 'checkbox' | 'radio';
@@ -31,7 +36,8 @@ export interface WithSelectableRowsRequiredProps {
 // TODO: enforce that Props extends SelectTableHOC props
 // After https://github.com/DefinitelyTyped/DefinitelyTyped/pull/30074 is merged
 export function withSelectableRows<
-  Props extends WithSelectableRowsRequiredProps
+  Props extends WithSelectableRowsRequiredProps &
+    WithSelectableRowsOptionalProps
 >(WrappedComponent: ComponentType<Props>) {
   type WithSelectableRowsProps = Subtract<
     Props,
@@ -69,6 +75,7 @@ export function withSelectableRows<
           selectAll={this.areAllSelected()}
           SelectInputComponent={SelectCheckbox}
           SelectAllInputComponent={SelectCheckbox}
+          getTrProps={this.getTrProps}
         />
       );
     }
@@ -106,6 +113,22 @@ export function withSelectableRows<
 
       onSelectionChange(updatedSelectedRowIds);
     };
+
+    private getTrProps: TableProps['getTrProps'] = (
+      _: any,
+      rowInfo?: RowInfo,
+    ) => {
+      if (!rowInfo) {
+        return;
+      }
+
+      return {
+        onClick: this.onRowClickFactory(rowInfo.original.id),
+      };
+    };
+
+    private onRowClickFactory = (rowId: string) => () =>
+      this.toggleSelection(rowId);
   }
 
   return WithSelectableRows;
