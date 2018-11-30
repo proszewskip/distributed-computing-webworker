@@ -5,6 +5,7 @@ module.exports = {
       tsConfig: 'jest.tsconfig.json',
     },
   },
+  moduleDirectories: ['node_modules', 'src'],
   preset: 'ts-jest',
   testEnvironment: 'node',
   transform: {
