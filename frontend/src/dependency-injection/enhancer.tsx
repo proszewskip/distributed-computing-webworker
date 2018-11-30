@@ -2,12 +2,13 @@ import React, { Component, ReactNode } from 'react';
 
 import DIContext, { DependenciesMap } from './context';
 
-export type DependenciesEnhancer = (
-  existingDependencies: DependenciesMap,
-) => DependenciesMap;
+export type DependenciesEnhancer<
+  InitialDependencies extends DependenciesMap,
+  EnhancedDependencies extends DependenciesMap
+> = (initialDependencies: InitialDependencies) => EnhancedDependencies;
 
 export interface DependencyInjectionEnhancerProps {
-  enhanceDependencies: DependenciesEnhancer;
+  enhanceDependencies: DependenciesEnhancer<any, any>;
 }
 
 export class DependencyInjectionEnhancer extends Component<
@@ -18,9 +19,9 @@ export class DependencyInjectionEnhancer extends Component<
   }
 
   private renderEnhancedDependencies = (
-    existingDependencies: DependenciesMap | null,
+    initialDependencies: DependenciesMap | null,
   ): ReactNode => {
-    if (!existingDependencies) {
+    if (!initialDependencies) {
       // tslint:disable-next-line:no-console
       console.error(
         'DependencyInjectionEnhancer cannot be used when there are no provided dependencies',
@@ -30,7 +31,7 @@ export class DependencyInjectionEnhancer extends Component<
     }
 
     const enhancedDependencies = this.props.enhanceDependencies(
-      existingDependencies,
+      initialDependencies,
     );
 
     return (
