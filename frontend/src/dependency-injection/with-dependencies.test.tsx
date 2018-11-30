@@ -3,6 +3,7 @@ import renderer from 'react-test-renderer';
 
 import { DependenciesProvider, DependencyInjectionProvider } from './provider';
 import { DependenciesExtractor, withDependencies } from './with-dependencies';
+import { mockConsole } from 'utils/mock-console';
 
 describe('withDependencies', () => {
   interface AllDependencies {
@@ -83,6 +84,8 @@ describe('withDependencies', () => {
   });
 
   describe('when there are no dependencies provided', () => {
+    mockConsole();
+
     it('should not render the component when there are no dependencies provided', () => {
       const TestComponentWithDependencies = withDependencies(
         extractDependencies,
