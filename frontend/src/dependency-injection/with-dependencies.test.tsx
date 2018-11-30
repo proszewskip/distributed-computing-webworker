@@ -1,9 +1,10 @@
 import React, { StatelessComponent } from 'react';
 import renderer from 'react-test-renderer';
 
+import { mockConsole } from 'utils/mock-console';
+
 import { DependenciesProvider, DependencyInjectionProvider } from './provider';
 import { DependenciesExtractor, withDependencies } from './with-dependencies';
-import { mockConsole } from 'utils/mock-console';
 
 describe('withDependencies', () => {
   interface AllDependencies {
