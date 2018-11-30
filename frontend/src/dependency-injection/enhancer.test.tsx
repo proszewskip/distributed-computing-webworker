@@ -1,6 +1,8 @@
 import React, { StatelessComponent } from 'react';
 import renderer from 'react-test-renderer';
 
+import { mockConsole } from 'utils/mock-console';
+
 import DIContext, { DependenciesMap } from './context';
 import { DependenciesEnhancer, DependencyInjectionEnhancer } from './enhancer';
 import { DependenciesProvider } from './provider';
@@ -20,6 +22,8 @@ describe('DependencyInjectionEnhancer', () => {
     InitialDependencies,
     EnhancedDependencies
   >;
+
+  mockConsole();
 
   beforeEach(() => {
     provideDependencies = () => ({
