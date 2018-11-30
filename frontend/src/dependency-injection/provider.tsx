@@ -2,22 +2,18 @@ import React, { Component } from 'react';
 
 import DIContext, { DependenciesMap } from './context';
 
-export type DependenciesProvider = () => DependenciesMap;
+export type DependenciesProvider<
+  Dependencies extends DependenciesMap
+> = () => Dependencies;
 
 export interface DependencyInjectionProviderProps {
-  provideDependencies: DependenciesProvider;
+  provideDependencies: DependenciesProvider<any>;
 }
 
 export class DependencyInjectionProvider extends Component<
   DependencyInjectionProviderProps
 > {
-  private readonly dependenciesMap: DependenciesMap;
-
-  constructor(props: DependencyInjectionProviderProps) {
-    super(props);
-
-    this.dependenciesMap = props.provideDependencies();
-  }
+  private readonly dependenciesMap = this.props.provideDependencies();
 
   public render() {
     return (
