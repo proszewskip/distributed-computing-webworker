@@ -1,0 +1,7 @@
+.ReactTable .rt-thead .rt-resizable-header-content {
+  text-align: left;
+}
+
+.ReactTable .rt-tr {
+  align-items: center;
+}
