@@ -8,7 +8,7 @@ import {
 } from 'formik';
 import fetch from 'isomorphic-unfetch';
 import { Dictionary } from 'lodash';
-import React from 'react';
+import React, { StatelessComponent } from 'react';
 import { ClipLoader } from 'react-spinners';
 import * as Yup from 'yup';
 
@@ -21,18 +21,22 @@ import { ErrorAlert } from 'components/form/errors/error-alert';
 import { FilePickerWithLabel } from 'components/form/file-picker';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
+import { withWarnUnsavedData } from 'components/form/with-warn-unsaved-form';
 
 const serverIp = 'http://localhost:5000';
 const entityPath = '/distributed-task-definitions/add';
 const urlToFetch = `${serverIp}${entityPath}`;
 
-const ExampleForm = ({
+type ExampleFormProps = FormikProps<CreateDistributedTaskDefinition> &
+  CreateDistributedTaskDefinition;
+
+const ExampleForm: StatelessComponent<ExampleFormProps> = ({
   handleSubmit,
   isSubmitting,
   touched,
   errors,
   values,
-}: FormikProps<CreateDistributedTaskDefinition>) => (
+}) => (
   <Pane width="30%">
     <form onSubmit={handleSubmit}>
       <ErrorAlert touched={touched} errors={errors} values={values} />
@@ -93,7 +97,9 @@ const validationSchema = Yup.object<CreateDistributedTaskDefinition>().shape({
     .required('Required'),
 });
 
-function mapPropsToValues(props: CreateDistributedTaskDefinition) {
+function mapPropsToValues(
+  props: CreateDistributedTaskDefinition,
+): CreateDistributedTaskDefinition {
   return {
     name: props.name,
     description: props.description,
@@ -107,22 +113,23 @@ async function handleSubmitHandler(
   { setSubmitting, setErrors }: FormikActions<CreateDistributedTaskDefinition>,
 ) {
   setSubmitting(true);
+
+  // TODO: extract construction of formData to another function
   const formData = new FormData();
   if (values.MainDll) {
     formData.append('MainDll', values.MainDll);
   }
 
   if (values.AdditionalDlls) {
-    // tslint:disable-next-line:prefer-for-of
-    for (let i = 0; i < values.AdditionalDlls.length; ++i) {
-      formData.append('AdditionalDlls', values.AdditionalDlls[i]);
+    for (const file of values.AdditionalDlls) {
+      formData.append('AdditionalDlls', file);
     }
   }
 
   formData.append('name', values.name);
   formData.append('description', values.description);
 
-  const response: Response = await fetch(urlToFetch, {
+  const response = await fetch(urlToFetch, {
     method: 'post',
     body: formData,
   });
@@ -130,6 +137,7 @@ async function handleSubmitHandler(
   if (!response.ok) {
     const result: CreateDistributedTaskDefinitionResponse = await response.json();
 
+    // TODO: extract construction of errorObject to another function
     const errorObject: Dictionary<string> = {};
 
     for (const [, value] of Object.entries(result.Errors)) {
@@ -152,7 +160,8 @@ const withFormikProps: WithFormikConfig<
   validationSchema,
 };
 
-const ExampleFormWithFormik = withFormik(withFormikProps)(ExampleForm);
+const exampleFormWithWarn = withWarnUnsavedData(ExampleForm);
+const ExampleFormWithFormik = withFormik(withFormikProps)(exampleFormWithWarn);
 
 const Basic = () => (
   <div>
