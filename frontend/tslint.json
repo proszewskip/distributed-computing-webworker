@@ -12,7 +12,9 @@
       "jsx-double",
       "avoid-template",
       "avoid-escape"
-    ]
+    ],
+
+    "object-literal-sort-keys": false
   },
   "rules": {
     "quotemark": [
