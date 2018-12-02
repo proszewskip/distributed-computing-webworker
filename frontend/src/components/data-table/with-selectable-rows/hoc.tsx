@@ -1,6 +1,6 @@
 import { List, Set } from 'immutable';
 import memoizeOne from 'memoize-one';
-import { ComponentType, PureComponent } from 'react';
+import React, { ComponentType, PureComponent } from 'react';
 import { RowInfo, TableProps } from 'react-table';
 
 import { Subtract } from 'types/subtract';

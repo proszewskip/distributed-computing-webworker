@@ -1,4 +1,4 @@
-import { ComponentClass, ReactNode, StatelessComponent } from 'react';
+import React, { ComponentClass, ReactNode, StatelessComponent } from 'react';
 import { ReactTableDefaults } from 'react-table';
 
 const OriginalTableComponent = ReactTableDefaults.TableComponent as ComponentClass;
