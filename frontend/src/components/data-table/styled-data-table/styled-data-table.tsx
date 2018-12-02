@@ -2,6 +2,9 @@ import { List } from 'immutable';
 import React, { PureComponent, ReactNode } from 'react';
 import ReactTable, { TableProps } from 'react-table';
 
+import 'react-table/react-table.css';
+import './overrides.css';
+
 import { Omit } from 'types/omit';
 
 import { PaginationButton } from './pagination-button';
