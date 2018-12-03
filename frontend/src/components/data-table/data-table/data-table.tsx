@@ -18,10 +18,10 @@ import {
 
 type StyledDataTableLeftProps = Omit<
   StyledDataTableProps,
-  'page' | 'pages' | 'pageSize'
+  'page' | 'pages' | 'pageSize' | 'onFetchData'
 >;
 
-interface DataTableProps extends StyledDataTableLeftProps {
+interface DataTableOwnProps {
   initialFiltered?: StyledDataTableProps['filtered'];
   initialPage: number;
   initialPageSize: number;
@@ -29,6 +29,8 @@ interface DataTableProps extends StyledDataTableLeftProps {
   onFetchData?: FetchDataCallback;
   getForceFetchData?(forceFetchData: ForceFetchData): any;
 }
+
+type DataTableProps = StyledDataTableLeftProps & DataTableOwnProps;
 
 type DataTableState = DataFetchingParams;
 
