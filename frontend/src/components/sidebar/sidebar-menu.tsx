@@ -1,3 +1,4 @@
+import { Button, Pane } from 'evergreen-ui';
 import Link, { LinkProps } from 'next/link';
 import React, { StatelessComponent } from 'react';
 
@@ -13,16 +14,14 @@ export interface SidebarMenuProps {
 
 export const SidebarMenu: StatelessComponent<SidebarMenuProps> = (props) => {
   return (
-    <ul>
+    <Pane display="flex" flexDirection="column" alignItems="stretch">
       {props.items.map((item) => (
-        <li key={item.title}>
-          <Link href={item.href}>
-            <a>
-              {item.title} {item.isActive() && 'active'}
-            </a>
-          </Link>
-        </li>
+        <Link href={item.href} passHref={true}>
+          <Button is="a" appearance="minimal" isActive={item.isActive()}>
+            {item.title}
+          </Button>
+        </Link>
       ))}
-    </ul>
+    </Pane>
   );
 };
