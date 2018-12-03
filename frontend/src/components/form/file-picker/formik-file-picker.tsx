@@ -5,7 +5,7 @@ import { withLabel } from '../with-label';
 import { withValidation } from '../with-validation';
 import FormFilePicker, { FormFilePickerProps } from './form-file-picker';
 
-import { FileList } from 'models/create-distributed-task-definition';
+import { FileList } from 'models';
 
 export type BaseFilePickerProps = FormFilePickerProps & FieldProps;
 

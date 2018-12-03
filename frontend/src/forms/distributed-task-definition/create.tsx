@@ -12,11 +12,6 @@ import React, { StatelessComponent } from 'react';
 import { ClipLoader } from 'react-spinners';
 import * as Yup from 'yup';
 
-import {
-  CreateDistributedTaskDefinition,
-  CreateDistributedTaskDefinitionResponse,
-} from '../src/models/index';
-
 import { ErrorAlert } from 'components/form/errors/error-alert';
 import { FilePickerWithLabel } from 'components/form/file-picker';
 import { TextInputWithLabel } from 'components/form/text-input';
@@ -26,12 +21,38 @@ import { Layout, LayoutProps } from 'components/layout';
 
 import { AuthenticatedSidebar, Head } from 'product-specific';
 
-const serverIp = 'http://localhost:5000';
-const entityPath = '/distributed-task-definitions/add';
-const urlToFetch = `${serverIp}${entityPath}`;
+import { config } from 'config';
+
+import { FileList, ServerError } from 'models';
+
+const urlToFetch = `${config.serverIp}/distributed-task-definitions/add`;
 
 type ExampleFormProps = FormikProps<CreateDistributedTaskDefinition> &
   CreateDistributedTaskDefinition;
+
+interface CreateDistributedTaskDefinition {
+  name: string;
+  description: string;
+  MainDll: File | null;
+  AdditionalDlls?: FileList;
+}
+
+const validationSchema = Yup.object<CreateDistributedTaskDefinition>().shape({
+  name: Yup.string()
+    .min(3, 'Must be longer than 3 characters')
+    .required('Required'),
+  description: Yup.string(),
+  MainDll: Yup.mixed().test('Required', 'Required', (value) => {
+    return value;
+  }),
+  AdditionalDlls: Yup.array<File>()
+    .min(1, 'Required')
+    .required('Required'),
+});
+
+interface CreateDistributedTaskDefinitionResponse {
+  Errors: Dictionary<ServerError>;
+}
 
 const ExampleForm: StatelessComponent<ExampleFormProps> = ({
   handleSubmit,
@@ -87,19 +108,6 @@ const ExampleForm: StatelessComponent<ExampleFormProps> = ({
   </Pane>
 );
 
-const validationSchema = Yup.object<CreateDistributedTaskDefinition>().shape({
-  name: Yup.string()
-    .min(3, 'Must be longer than 3 characters')
-    .required('Required'),
-  description: Yup.string(),
-  MainDll: Yup.mixed().test('Required', 'Required', (value) => {
-    return value;
-  }),
-  AdditionalDlls: Yup.array<File>()
-    .min(1, 'Required')
-    .required('Required'),
-});
-
 function mapPropsToValues(
   props: CreateDistributedTaskDefinition,
 ): CreateDistributedTaskDefinition {
@@ -111,13 +119,19 @@ function mapPropsToValues(
   };
 }
 
-async function handleSubmitHandler(
-  values: CreateDistributedTaskDefinition,
-  { setSubmitting, setErrors }: FormikActions<CreateDistributedTaskDefinition>,
-) {
-  setSubmitting(true);
+function getErrorObject(
+  response: CreateDistributedTaskDefinitionResponse,
+): Dictionary<string> {
+  const errorObject: Dictionary<string> = {};
 
-  // TODO: extract construction of formData to another function
+  for (const [, value] of Object.entries(response.Errors)) {
+    errorObject[value.title] = value.detail;
+  }
+
+  return errorObject;
+}
+
+function buildFormData(values: CreateDistributedTaskDefinition): FormData {
   const formData = new FormData();
   if (values.MainDll) {
     formData.append('MainDll', values.MainDll);
@@ -132,20 +146,26 @@ async function handleSubmitHandler(
   formData.append('name', values.name);
   formData.append('description', values.description);
 
+  return formData;
+}
+
+async function handleSubmitHandler(
+  values: CreateDistributedTaskDefinition,
+  { setSubmitting, setErrors }: FormikActions<CreateDistributedTaskDefinition>,
+) {
+  setSubmitting(true);
+
+  const formData = buildFormData(values);
+
   const response = await fetch(urlToFetch, {
     method: 'post',
     body: formData,
   });
 
   if (!response.ok) {
-    const result: CreateDistributedTaskDefinitionResponse = await response.json();
+    const responseBody: CreateDistributedTaskDefinitionResponse = await response.json();
 
-    // TODO: extract construction of errorObject to another function
-    const errorObject: Dictionary<string> = {};
-
-    for (const [, value] of Object.entries(result.Errors)) {
-      errorObject[value.title] = value.detail;
-    }
+    const errorObject = getErrorObject(responseBody);
 
     setErrors(errorObject);
   } else {
