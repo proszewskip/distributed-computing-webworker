@@ -1,14 +1,12 @@
 import { Button, Heading, minorScale, Text } from 'evergreen-ui';
 import fetch from 'isomorphic-unfetch';
-import React, { Component, ComponentType, MouseEventHandler } from 'react';
+import React, { Component, MouseEventHandler } from 'react';
 import { Column } from 'react-table';
 
 import { List, Set } from 'immutable';
 
-// @ts-ignore (TODO: remove after https://github.com/DefinitelyTyped/DefinitelyTyped/pull/30074 is merged)
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
 
-import { ComponentProps } from 'types/component-props';
 import { Omit } from 'types/omit';
 
 import {
@@ -30,14 +28,11 @@ import { TableWithSummaryProps } from 'components/data-table/styled-data-table/t
 import {
   withSelectableRows,
   WithSelectableRowsAdditionalProps,
-  WithSelectableRowsRequiredProps,
 } from 'components/data-table/with-selectable-rows';
 
 import { DistributedTaskDefinition } from 'models';
 
-const SelectDataTable = selectTableHOC(DataTable) as ComponentType<
-  ComponentProps<typeof DataTable> & WithSelectableRowsRequiredProps
->;
+const SelectDataTable = selectTableHOC(DataTable);
 const Table = withSelectableRows(SelectDataTable);
 
 const TextCell = (row: { value: any }) => <Text>{row.value}</Text>;
