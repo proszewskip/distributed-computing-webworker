@@ -2,19 +2,18 @@ import centered from '@storybook/addon-centered';
 import { storiesOf } from '@storybook/react';
 import { Pane } from 'evergreen-ui';
 import always from 'ramda/es/always';
-import React, { StatelessComponent } from 'react';
+import React from 'react';
 
 import { SidebarMenu, SidebarMenuProps } from '../src/components/sidebar';
 
 const stories = storiesOf('SidebarMenu', module);
 
-const Wrapper: StatelessComponent = ({ children }) => (
-  <Pane width={200} height={300} backgroundColor="#f3f3f3" borderRadius={10}>
-    {children}
-  </Pane>
-);
-
 stories
+  .addDecorator((story) => (
+    <Pane width={200} height={300} backgroundColor="#f3f3f3" borderRadius={10}>
+      {story()}
+    </Pane>
+  ))
   .addDecorator(centered)
   .add('no active items', () => {
     const isActive = always(false);
@@ -37,11 +36,7 @@ stories
       },
     ];
 
-    return (
-      <Wrapper>
-        <SidebarMenu items={items} />
-      </Wrapper>
-    );
+    return <SidebarMenu items={items} />;
   })
   .add('with an active item', () => {
     const items: SidebarMenuProps['items'] = [
@@ -57,11 +52,7 @@ stories
       },
     ];
 
-    return (
-      <Wrapper>
-        <SidebarMenu items={items} />
-      </Wrapper>
-    );
+    return <SidebarMenu items={items} />;
   })
   .add('using advanced href', () => {
     const isActive = always(false);
@@ -79,9 +70,5 @@ stories
       },
     ];
 
-    return (
-      <Wrapper>
-        <SidebarMenu items={items} />
-      </Wrapper>
-    );
+    return <SidebarMenu items={items} />;
   });

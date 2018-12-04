@@ -1,7 +1,7 @@
 import centered from '@storybook/addon-centered';
 import { storiesOf } from '@storybook/react';
 import { Pane } from 'evergreen-ui';
-import React, { StatelessComponent } from 'react';
+import React from 'react';
 
 import {
   Sidebar,
@@ -11,21 +11,16 @@ import {
 
 const stories = storiesOf('Sidebar', module);
 
-const Wrapper: StatelessComponent = ({ children }) => (
-  <Pane width={200} height={300} backgroundColor="#f3f3f3" borderRadius={10}>
-    {children}
-  </Pane>
-);
-
 stories
+  .addDecorator((story) => (
+    <Pane width={200} height={300} backgroundColor="#f3f3f3" borderRadius={10}>
+      {story()}
+    </Pane>
+  ))
   .addDecorator(centered)
-  .add('simple header and content', () => {
-    return (
-      <Wrapper>
-        <Sidebar title="Title">Content</Sidebar>
-      </Wrapper>
-    );
-  })
+  .add('simple header and content', () => (
+    <Sidebar title="Title">Content</Sidebar>
+  ))
   .add('with SidebarMenu', () => {
     const menuItems: SidebarMenuProps['items'] = [
       {
@@ -41,10 +36,8 @@ stories
     ];
 
     return (
-      <Wrapper>
-        <Sidebar title="Distributed Computing">
-          <SidebarMenu items={menuItems} />
-        </Sidebar>
-      </Wrapper>
+      <Sidebar title="Distributed Computing">
+        <SidebarMenu items={menuItems} />
+      </Sidebar>
     );
   });
