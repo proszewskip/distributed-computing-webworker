@@ -10,10 +10,11 @@ import {
   SidebarMenu,
   SidebarMenuProps,
 } from '../src/components/sidebar';
+import centered from '@storybook/addon-centered';
 
 const stories = storiesOf('Layout', module);
 
-stories.add('default layout', () => {
+const DefaultLayout: StatelessComponent = ({ children: additionalText }) => {
   const menuItems: SidebarMenuProps['items'] = [
     {
       href: 'test',
@@ -54,26 +55,45 @@ stories.add('default layout', () => {
   }
 
   return (
-    <Pane height={600}>
-      <Layout renderSidebar={renderSidebar}>
-        <Pane marginX={16}>
-          <Paragraph>
-            Keep in mind that the height of this demo is hardcoded to 600 px.
-          </Paragraph>
-          <Paragraph>
-            In reality the height would be 100% of the body.
-          </Paragraph>
-        </Pane>
+    <Layout renderSidebar={renderSidebar}>
+      <Pane marginX={16}>{additionalText}</Pane>
 
-        <Pane
-          display="flex"
-          flexWrap="wrap"
-          justifyContent="space-around"
-          marginTop={8}
-        >
-          {cards}
-        </Pane>
-      </Layout>
-    </Pane>
+      <Pane
+        display="flex"
+        flexWrap="wrap"
+        justifyContent="space-around"
+        marginTop={8}
+      >
+        {cards}
+      </Pane>
+    </Layout>
   );
-});
+};
+
+stories.add('desktop layout', () => (
+  <Pane height={600}>
+    <DefaultLayout>
+      <Paragraph>
+        Keep in mind that the height of this demo is hardcoded to 600 px.
+      </Paragraph>
+
+      <Paragraph>In reality the height would be 100% of the body.</Paragraph>
+    </DefaultLayout>
+  </Pane>
+));
+
+stories.addDecorator(centered).add('mobile layout', () => (
+  <Pane height={600} width={375}>
+    <DefaultLayout>
+      <Paragraph>
+        Keep in mind that the height of this demo is hardcoded to 600 px.
+      </Paragraph>
+
+      <Paragraph>In reality the height would be 100% of the body.</Paragraph>
+
+      <Paragraph>
+        The width has been hardcoded to 375 px to simulate a mobile device.
+      </Paragraph>
+    </DefaultLayout>
+  </Pane>
+));
