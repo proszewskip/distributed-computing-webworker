@@ -4,7 +4,7 @@ import { Pane } from 'evergreen-ui';
 import always from 'ramda/es/always';
 import React from 'react';
 
-import { SidebarMenu, SidebarMenuProps } from '../src/components/sidebar';
+import { SidebarMenu, SidebarMenuProps } from 'components/sidebar';
 
 const stories = storiesOf('SidebarMenu', module);
 
