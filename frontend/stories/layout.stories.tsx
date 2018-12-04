@@ -67,28 +67,21 @@ const DefaultLayout: StatelessComponent = ({ children: additionalText }) => {
 };
 
 stories.add('desktop layout', () => (
-  <Pane height={600}>
-    <DefaultLayout>
-      <Paragraph>
-        Keep in mind that the height of this demo is hardcoded to 600 px.
-      </Paragraph>
-
-      <Paragraph>In reality the height would be 100% of the body.</Paragraph>
-    </DefaultLayout>
+  <Pane height="100vh" border="default">
+    <DefaultLayout />
   </Pane>
 ));
 
 stories.addDecorator(centered).add('mobile layout', () => (
-  <Pane height={600} width={375}>
+  <Pane height="100vh" width={375} border="default">
     <DefaultLayout>
       <Paragraph>
-        Keep in mind that the height of this demo is hardcoded to 600 px.
+        The width has been hardcoded to 375 px to simulate a mobile device.
       </Paragraph>
 
-      <Paragraph>In reality the height would be 100% of the body.</Paragraph>
-
       <Paragraph>
-        The width has been hardcoded to 375 px to simulate a mobile device.
+        If you still see the sidebar immediately, please resize the storybook
+        body so that it is smaller.
       </Paragraph>
     </DefaultLayout>
   </Pane>
