@@ -16,7 +16,7 @@ export const SidebarMenu: StatelessComponent<SidebarMenuProps> = (props) => {
   return (
     <Pane display="flex" flexDirection="column" alignItems="stretch">
       {props.items.map((item) => (
-        <Link href={item.href} passHref={true}>
+        <Link href={item.href} passHref={true} key={item.title}>
           <Button is="a" appearance="minimal" isActive={item.isActive()}>
             {item.title}
           </Button>
