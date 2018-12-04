@@ -1,16 +1,12 @@
+import centered from '@storybook/addon-centered';
 import { storiesOf } from '@storybook/react';
 import { Card, Pane, Paragraph } from 'evergreen-ui';
 import React, { ReactNode, StatelessComponent } from 'react';
 
 import 'normalize.css';
 
-import { Layout } from '../src/components/layout';
-import {
-  Sidebar,
-  SidebarMenu,
-  SidebarMenuProps,
-} from '../src/components/sidebar';
-import centered from '@storybook/addon-centered';
+import { Layout } from 'components/layout';
+import { Sidebar, SidebarMenu, SidebarMenuProps } from 'components/sidebar';
 
 const stories = storiesOf('Layout', module);
 

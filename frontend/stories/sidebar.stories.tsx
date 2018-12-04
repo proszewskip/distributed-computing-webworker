@@ -3,11 +3,7 @@ import { storiesOf } from '@storybook/react';
 import { Pane } from 'evergreen-ui';
 import React from 'react';
 
-import {
-  Sidebar,
-  SidebarMenu,
-  SidebarMenuProps,
-} from '../src/components/sidebar';
+import { Sidebar, SidebarMenu, SidebarMenuProps } from 'components/sidebar';
 
 const stories = storiesOf('Sidebar', module);
 
