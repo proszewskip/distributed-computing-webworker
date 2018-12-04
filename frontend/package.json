@@ -31,6 +31,7 @@
     "lodash.debounce": "^4.0.8",
     "memoize-one": "^4.0.2",
     "next": "^7.0.2",
+    "normalize.css": "^8.0.1",
     "ramda": "^0.25.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
