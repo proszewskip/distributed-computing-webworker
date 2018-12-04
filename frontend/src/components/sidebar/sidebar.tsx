@@ -1,5 +1,4 @@
 import { Heading, minorScale, Pane } from 'evergreen-ui';
-import { defaultTheme } from 'evergreen-ui/esm/theme';
 import React, { ReactNode, StatelessComponent } from 'react';
 
 export interface SidebarProps {
@@ -14,7 +13,8 @@ export const Sidebar: StatelessComponent<SidebarProps> = ({
     <Pane
       display="flex"
       flexDirection="column"
-      backgroundColor={defaultTheme.colors.background.tint2}
+      background="tint2"
+      height="100%"
     >
       <Heading
         size={600}
