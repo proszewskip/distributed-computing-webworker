@@ -1,5 +1,5 @@
 import { memoize } from 'ramda';
-import { ComponentType, PureComponent } from 'react';
+import React, { ComponentType, PureComponent } from 'react';
 import { Column } from 'react-table';
 
 import { getDisplayName } from 'utils/get-display-name';
