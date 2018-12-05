@@ -27,9 +27,6 @@ import { FileList, ServerError } from 'models';
 
 const urlToFetch = `${config.serverIp}/distributed-task-definitions/add`;
 
-type ExampleFormProps = FormikProps<CreateDistributedTaskDefinition> &
-  CreateDistributedTaskDefinition;
-
 interface CreateDistributedTaskDefinition {
   name: string;
   description: string;
@@ -50,17 +47,18 @@ const validationSchema = Yup.object<CreateDistributedTaskDefinition>().shape({
     .required('Required'),
 });
 
+type CreateDistributedTaskDefinitionProps = FormikProps<
+  CreateDistributedTaskDefinition
+> &
+  CreateDistributedTaskDefinition;
+
 interface CreateDistributedTaskDefinitionResponse {
   Errors: Dictionary<ServerError>;
 }
 
-const ExampleForm: StatelessComponent<ExampleFormProps> = ({
-  handleSubmit,
-  isSubmitting,
-  touched,
-  errors,
-  values,
-}) => (
+const CreateDistributedTaskDefinitionForm: StatelessComponent<
+  CreateDistributedTaskDefinitionProps
+> = ({ handleSubmit, isSubmitting, touched, errors, values }) => (
   <Pane width="30%">
     <form onSubmit={handleSubmit}>
       <ErrorAlert touched={touched} errors={errors} values={values} />
@@ -183,25 +181,9 @@ const withFormikProps: WithFormikConfig<
   validationSchema,
 };
 
-const ExampleFormWithWarn = withWarnOnUnsavedData(ExampleForm);
-const ExampleFormWithFormik = withFormik(withFormikProps)(ExampleFormWithWarn);
-
-const renderSidebar: LayoutProps['renderSidebar'] = () => (
-  <AuthenticatedSidebar />
+const FormWithWarn = withWarnOnUnsavedData(CreateDistributedTaskDefinitionForm);
+const CreateDistributedTaskDefinitionWithFormik = withFormik(withFormikProps)(
+  FormWithWarn,
 );
 
-export default () => (
-  <>
-    <Head />
-
-    <Layout renderSidebar={renderSidebar}>
-      <Pane marginX={16}>
-        <Heading size={800} marginBottom={16}>
-          Example form
-        </Heading>
-
-        <ExampleFormWithFormik name="" description="" MainDll={null} />
-      </Pane>
-    </Layout>
-  </>
-);
+export default CreateDistributedTaskDefinitionWithFormik;
