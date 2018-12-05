@@ -15,7 +15,7 @@ import * as Yup from 'yup';
 import { ErrorAlert } from 'components/form/errors/error-alert';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
-import { withWarnUnsavedData } from 'components/form/with-warn-unsaved-form';
+import { withWarnOnUnsavedData } from 'components/form/with-warn-unsaved-form';
 
 import { config } from 'config';
 
@@ -36,10 +36,10 @@ const validationSchema = Yup.object<UpdateDistributedTask>().shape({
     .required('Required'),
   description: Yup.string(),
   priority: Yup.number()
-    .min(0)
+    .positive('Priority cannot be less than 0')
     .required(),
   'trust-level-to-complete': Yup.number()
-    .min(0)
+    .moreThan(0, 'Trust level to complete must be greater than 0')
     .required(),
 });
 
@@ -75,6 +75,7 @@ const UpdateDistributedTaskForm: StatelessComponent<
       <Field
         name="priority"
         label="Priority"
+        type="number"
         component={TextInputWithLabel}
         width="100%"
       />
@@ -82,6 +83,7 @@ const UpdateDistributedTaskForm: StatelessComponent<
       <Field
         name="trust-level-to-complete"
         label="Trust level to complete"
+        type="number"
         component={TextInputWithLabel}
         width="100%"
       />
@@ -168,7 +170,7 @@ const withFormikProps: WithFormikConfig<
   validationSchema,
 };
 
-const FormWithWarn = withWarnUnsavedData(UpdateDistributedTaskForm);
+const FormWithWarn = withWarnOnUnsavedData(UpdateDistributedTaskForm);
 const UpdateDistributedTaskWithFormik = withFormik(withFormikProps)(
   FormWithWarn,
 );
