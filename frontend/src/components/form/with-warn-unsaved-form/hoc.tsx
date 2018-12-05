@@ -1,9 +1,8 @@
 import { FormikProps } from 'formik';
+import { withRouter, WithRouterProps } from 'next/router';
 import React, { Component, ComponentType } from 'react';
 
 import { getDisplayName } from 'utils/get-display-name';
-
-import { withRouter, WithRouterProps } from 'next/router';
 
 type WithWarnOnUnsavedDataRequiredProps = Pick<FormikProps<any>, 'dirty'>;
 
@@ -28,24 +27,23 @@ export function withWarnOnUnsavedData<
     };
 
     public handleRedirection = () => {
-      if (this.props.dirty && !confirm(this.leaveMessage)) {
-        // TODO: Update after route cancellation is added to next router.
-        // https://github.com/zeit/next.js/issues/2476
-        this.props.router.events.off(
-          'routeChangeStart',
-          this.handleRedirection,
-        );
+      const { router } = this.props;
 
-        this.props.router.push(
-          this.props.router.pathname,
-          this.props.router.pathname,
-          { shallow: true },
-        );
-
-        this.props.router.events.on('routeChangeStart', this.handleRedirection);
-
-        throw Error;
+      if (!this.props.dirty || confirm(this.leaveMessage)) {
+        return;
       }
+
+      // TODO: Update after route cancellation is added to next router.
+      // https://github.com/zeit/next.js/issues/2476
+      router.events.off('routeChangeStart', this.handleRedirection);
+
+      router.push(this.props.router.pathname, this.props.router.pathname, {
+        shallow: true,
+      });
+
+      router.events.on('routeChangeStart', this.handleRedirection);
+
+      throw Error;
     };
 
     public componentDidMount = () => {
