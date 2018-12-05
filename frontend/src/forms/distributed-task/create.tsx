@@ -16,7 +16,7 @@ import { ErrorAlert } from 'components/form/errors/error-alert';
 import { FilePickerWithLabel } from 'components/form/file-picker';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
-import { withWarnUnsavedData } from 'components/form/with-warn-unsaved-form';
+import { withWarnOnUnsavedData } from 'components/form/with-warn-unsaved-form';
 
 import { config } from 'config';
 
@@ -38,10 +38,10 @@ const validationSchema = Yup.object<CreateDistributedTask>().shape({
     .required('Required'),
   description: Yup.string(),
   priority: Yup.number()
-    .min(0)
+    .positive('Priority cannot be less than 0')
     .required(),
   'trust-level-to-complete': Yup.number()
-    .min(0)
+    .moreThan(0, 'Trust level to complete must be greater than 0')
     .required(),
   InputData: Yup.mixed().test('Required', 'Required', (value) => {
     return value;
@@ -80,6 +80,7 @@ const CreateDistributedTaskForm: StatelessComponent<
       <Field
         name="priority"
         label="Priority"
+        type="number"
         component={TextInputWithLabel}
         width="100%"
       />
@@ -87,6 +88,7 @@ const CreateDistributedTaskForm: StatelessComponent<
       <Field
         name="trust-level-to-complete"
         label="Trust level to complete"
+        type="number"
         component={TextInputWithLabel}
         width="100%"
       />
@@ -95,7 +97,6 @@ const CreateDistributedTaskForm: StatelessComponent<
         name="InputData"
         label="Task input"
         component={FilePickerWithLabel}
-        accept=".dll"
       />
 
       <Button type="button" onClick={() => alert('Cancel')}>
@@ -185,7 +186,7 @@ const withFormikProps: WithFormikConfig<
   validationSchema,
 };
 
-const FormWithWarn = withWarnUnsavedData(CreateDistributedTaskForm);
+const FormWithWarn = withWarnOnUnsavedData(CreateDistributedTaskForm);
 const CreateDistributedTaskWithFormik = withFormik(withFormikProps)(
   FormWithWarn,
 );

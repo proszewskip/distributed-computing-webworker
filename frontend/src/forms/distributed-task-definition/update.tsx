@@ -15,7 +15,7 @@ import * as Yup from 'yup';
 import { ErrorAlert } from 'components/form/errors/error-alert';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
-import { withWarnUnsavedData } from 'components/form/with-warn-unsaved-form';
+import { withWarnOnUnsavedData } from 'components/form/with-warn-unsaved-form';
 
 import { config } from 'config';
 
@@ -143,7 +143,7 @@ const withFormikProps: WithFormikConfig<
   validationSchema,
 };
 
-const FormWithWarn = withWarnUnsavedData(UpdateDistributedTaskDefinitionForm);
+const FormWithWarn = withWarnOnUnsavedData(UpdateDistributedTaskDefinitionForm);
 const UpdateDistributedTaskDefinitionWithFormik = withFormik(withFormikProps)(
   FormWithWarn,
 );
