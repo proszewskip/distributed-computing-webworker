@@ -1,6 +1,6 @@
 import { Checkbox } from 'evergreen-ui';
 import React, { PureComponent, SyntheticEvent } from 'react';
-import { SelectAllInputComponent as SelectAllInputComponentProps } from 'react-table/lib/hoc/selectTable';
+import { SelectAllInputComponentProps } from 'react-table/lib/hoc/selectTable';
 
 export class SelectAllCheckbox extends PureComponent<
   SelectAllInputComponentProps
