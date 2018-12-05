@@ -1,5 +1,5 @@
 import { IconButton, majorScale, Pane } from 'evergreen-ui';
-import React, { PureComponent, ReactNode, MouseEventHandler } from 'react';
+import React, { MouseEventHandler, PureComponent, ReactNode } from 'react';
 
 import { Desktop, Mobile } from 'components/responsive-helpers';
 
