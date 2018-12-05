@@ -4,7 +4,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "baseUrl": ".",
-    "jsx": "preserve",
+    "jsx": "react",
     "lib": ["dom", "es2017"],
     "module": "esnext",
     "moduleResolution": "node",
@@ -20,5 +20,7 @@
     "paths": {
       "*": ["src/*"]
     }
-  }
+  },
+  "include": ["src/**/*", "pages/**/*", "stories/**/*"],
+  "exclude": ["node_modules"]
 }
