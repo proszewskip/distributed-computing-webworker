@@ -21,7 +21,7 @@ import { ErrorAlert } from 'components/form/errors/error-alert';
 import { FilePickerWithLabel } from 'components/form/file-picker';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
-import { withWarnUnsavedData } from 'components/form/with-warn-unsaved-form';
+import { withWarnOnUnsavedData } from 'components/form/with-warn-unsaved-form';
 
 const serverIp = 'http://localhost:5000';
 const entityPath = '/distributed-task-definitions/add';
@@ -160,8 +160,8 @@ const withFormikProps: WithFormikConfig<
   validationSchema,
 };
 
-const exampleFormWithWarn = withWarnUnsavedData(ExampleForm);
-const ExampleFormWithFormik = withFormik(withFormikProps)(exampleFormWithWarn);
+const ExampleFormWithWarn = withWarnOnUnsavedData(ExampleForm);
+const ExampleFormWithFormik = withFormik(withFormikProps)(ExampleFormWithWarn);
 
 const Basic = () => (
   <div>
