@@ -2,11 +2,13 @@ import { List, Set } from 'immutable';
 import memoizeOne from 'memoize-one';
 import React, { ComponentType, PureComponent } from 'react';
 import { RowInfo, TableProps } from 'react-table';
+import { SelectTableAdditionalProps } from 'react-table/lib/hoc/selectTable';
 
 import { Subtract } from 'types/subtract';
 import { getDisplayName } from 'utils/get-display-name';
 
 import {
+  SelectAllCheckbox,
   SelectCheckbox,
   StyledDataTableProps,
 } from 'components/data-table/styled-data-table';
@@ -22,27 +24,10 @@ export interface WithSelectableRowsOptionalProps {
   getTrProps?: TableProps['getTrProps'];
 }
 
-export interface WithSelectableRowsRequiredProps {
-  keyField?: string;
-  selectType?: 'checkbox' | 'radio';
-  isSelected?: (id: string) => boolean;
-  toggleSelection?: (id: string) => any;
-  toggleAll?: () => any;
-  selectAll?: boolean;
-  SelectInputComponent?: ComponentType<any>;
-  SelectAllInputComponent?: ComponentType<any>;
-}
-
-// TODO: enforce that Props extends SelectTableHOC props
-// After https://github.com/DefinitelyTyped/DefinitelyTyped/pull/30074 is merged
 export function withSelectableRows<
-  Props extends WithSelectableRowsRequiredProps &
-    WithSelectableRowsOptionalProps
+  Props extends SelectTableAdditionalProps & WithSelectableRowsOptionalProps
 >(WrappedComponent: ComponentType<Props>) {
-  type WithSelectableRowsProps = Subtract<
-    Props,
-    WithSelectableRowsRequiredProps
-  > &
+  type WithSelectableRowsProps = Subtract<Props, SelectTableAdditionalProps> &
     WithSelectableRowsAdditionalProps;
 
   class WithSelectableRows extends PureComponent<WithSelectableRowsProps> {
@@ -74,7 +59,7 @@ export function withSelectableRows<
           toggleAll={this.toggleAll}
           selectAll={this.areAllSelected()}
           SelectInputComponent={SelectCheckbox}
-          SelectAllInputComponent={SelectCheckbox}
+          SelectAllInputComponent={SelectAllCheckbox}
           getTrProps={this.getTrProps}
         />
       );

@@ -11,7 +11,7 @@ import { PaginationButton } from './pagination-button';
 import { TableWithSummary, TableWithSummaryProps } from './table-with-summary';
 
 export interface StyledDataTableProps
-  extends Omit<Partial<TableProps>, 'data'> {
+  extends Omit<Partial<TableProps>, 'data' | 'resolveData'> {
   children?: TableProps['children'];
 
   data: List<any>;
@@ -31,12 +31,17 @@ export class StyledDataTable extends PureComponent<StyledDataTableProps> {
   };
 
   public render() {
-    const { data, ...rest } = this.props;
+    const { data, resolveData, ...rest } = this.props;
 
+    /**
+     * NOTE: `as any` type assertion are required becuase typings for react-table only allow
+     * arrays as data, not Immutable lists.
+     */
     return (
       <ReactTable
         {...rest}
         data={data as any}
+        resolveData={resolveData as any}
         getTableProps={this.getTableProps}
       />
     );
