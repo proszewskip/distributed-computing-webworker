@@ -119,7 +119,7 @@ export function withSelectableRows<
       rowInfo?: RowInfo,
     ) => {
       if (!rowInfo) {
-        return;
+        return {};
       }
 
       return {
