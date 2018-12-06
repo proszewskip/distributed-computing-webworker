@@ -1,4 +1,4 @@
-import { Button, Heading, minorScale, Text } from 'evergreen-ui';
+import { Button, Heading, minorScale, Pane, Text } from 'evergreen-ui';
 import fetch from 'isomorphic-unfetch';
 import React, { Component, MouseEventHandler } from 'react';
 import { Column } from 'react-table';
@@ -259,7 +259,11 @@ class TableExamplePage extends Component<TableExamplePageProps> {
   }
 
   public render() {
-    return <TableExample {...this.props} />;
+    return (
+      <Pane height="100%">
+        <TableExample {...this.props} />
+      </Pane>
+    );
   }
 }
 
