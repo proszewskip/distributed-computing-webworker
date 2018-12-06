@@ -1,8 +1,10 @@
 import { Checkbox } from 'evergreen-ui';
 import React, { PureComponent, SyntheticEvent } from 'react';
-import { SelectInputComponentProps } from 'react-table/lib/hoc/selectTable';
+import { SelectAllInputComponentProps } from 'react-table/lib/hoc/selectTable';
 
-export class SelectCheckbox extends PureComponent<SelectInputComponentProps> {
+export class SelectAllCheckbox extends PureComponent<
+  SelectAllInputComponentProps
+> {
   public render() {
     const { checked } = this.props;
 
@@ -17,11 +19,10 @@ export class SelectCheckbox extends PureComponent<SelectInputComponentProps> {
   }
 
   private onChange = (event: MouseEvent) => {
-    const { id, row, onClick } = this.props;
+    const { onClick } = this.props;
 
-    const { shiftKey } = event;
     event.stopPropagation();
-    onClick(id, shiftKey, row);
+    onClick();
   };
 
   /**
