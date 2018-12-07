@@ -1,3 +1,4 @@
+import { Alert } from 'evergreen-ui';
 import Kitsu from 'kitsu';
 import React, { PureComponent } from 'react';
 import { ClipLoader } from 'react-spinners';
@@ -12,23 +13,33 @@ interface UpdateDistributedTaskProps {
   id: number;
 }
 
+interface UpdateDistributedTaskState {
+  fetchFinished: boolean;
+  fetchError: boolean;
+  model: UpdateDistributedTaskModel;
+}
+
 const kitsu = new Kitsu<UpdateDistributedTaskModel>({
   baseURL: config.serverIp,
 });
 
-export default class UpdateDistributedTask extends PureComponent<
+export class UpdateDistributedTask extends PureComponent<
   UpdateDistributedTaskProps,
-  UpdateDistributedTaskModel
+  UpdateDistributedTaskState
 > {
   constructor(props: UpdateDistributedTaskProps) {
     super(props);
 
     this.state = {
-      id: -1,
-      name: '',
-      description: '',
-      'trust-level-to-complete': NaN,
-      priority: NaN,
+      model: {
+        id: NaN,
+        name: '',
+        description: '',
+        'trust-level-to-complete': NaN,
+        priority: NaN,
+      },
+      fetchError: false,
+      fetchFinished: false,
     };
   }
 
@@ -36,18 +47,27 @@ export default class UpdateDistributedTask extends PureComponent<
     kitsu
       .get(`distributed-task/${this.props.id}`)
       .then((result) => result.data)
-      .then((result) => this.setState(result));
+      .then((result) => this.setState({ model: result, fetchFinished: true }))
+      .catch(() => {
+        this.setState({ fetchError: true, fetchFinished: true });
+      });
   };
 
   public render() {
+    const { id, name, description, priority } = this.state.model;
+    const { fetchFinished, fetchError } = this.state;
+
     return (
-      (this.state.id === -1 && <ClipLoader loading={true} />) || (
+      (!fetchFinished && <ClipLoader loading={true} />) ||
+      (fetchError && (
+        <Alert intent="danger" title="Failed to fetch resources" />
+      )) || (
         <UpdateDistributedTaskWithFormik
-          id={this.state.id}
-          name={this.state.name}
-          description={this.state.description}
-          priority={this.state.priority}
-          trust-level-to-complete={this.state['trust-level-to-complete']}
+          id={id}
+          name={name}
+          description={description}
+          priority={priority}
+          trust-level-to-complete={this.state.model['trust-level-to-complete']}
         />
       )
     );
