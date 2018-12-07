@@ -160,6 +160,7 @@ async function handleSubmitHandler(
 
   const formData = buildFormData(values);
 
+  // TODO: Use client library compliant with JSON:API
   const response = await fetch(urlToFetch, {
     method: 'POST',
     body: formData,

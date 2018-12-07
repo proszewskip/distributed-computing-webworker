@@ -21,9 +21,12 @@ import { config } from 'config';
 
 import { ServerError } from 'models';
 
+// TODO: Fetch initial values
+
 const urlToFetch = `${config.serverIp}/distributed-tasks`;
 
 interface UpdateDistributedTask {
+  id: number;
   name: string;
   description: string;
   priority: number;
@@ -31,6 +34,7 @@ interface UpdateDistributedTask {
 }
 
 const validationSchema = Yup.object<UpdateDistributedTask>().shape({
+  id: Yup.number().required(),
   name: Yup.string()
     .min(3, 'Must be longer than 3 characters')
     .required('Required'),
@@ -103,6 +107,7 @@ const UpdateDistributedTaskForm: StatelessComponent<
 
 function mapPropsToValues(props: UpdateDistributedTask): UpdateDistributedTask {
   return {
+    id: props.id,
     name: props.name,
     description: props.description,
     priority: props.priority,
@@ -144,6 +149,7 @@ async function handleSubmitHandler(
 
   const formData = buildFormData(values);
 
+  // TODO: Use client library compliant with JSON:API
   const response = await fetch(urlToFetch, {
     method: 'PUT',
     body: formData,
