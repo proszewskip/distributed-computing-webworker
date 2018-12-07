@@ -1,10 +1,10 @@
 import { Card, Pane } from 'evergreen-ui';
-import Head from 'next/head';
 import { always } from 'ramda';
 import React from 'react';
 
 import 'styles.css';
 
+import { Head } from 'components/head';
 import { Layout, LayoutProps } from 'components/layout';
 import { Sidebar, SidebarMenu } from 'components/sidebar';
 import { SidebarMenuProps } from 'components/sidebar';
@@ -35,10 +35,7 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
 
 const Index = () => (
   <>
-    <Head>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Distributed Computing</title>
-    </Head>
+    <Head />
 
     <Layout renderSidebar={renderSidebar}>
       <Pane display="flex" justifyContent="center" marginTop="2em">
