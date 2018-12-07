@@ -22,19 +22,20 @@ import { Layout, LayoutProps } from 'components/layout';
 import { AuthenticatedSidebar, Head } from 'product-specific';
 
 import { config } from 'config';
-
 import { FileList, ServerError } from 'models';
 
 const urlToFetch = `${config.serverIp}/distributed-task-definitions/add`;
 
-interface CreateDistributedTaskDefinition {
+interface CreateDistributedTaskDefinitionModel {
   name: string;
   description: string;
   MainDll: File | null;
   AdditionalDlls?: FileList;
 }
 
-const validationSchema = Yup.object<CreateDistributedTaskDefinition>().shape({
+const validationSchema = Yup.object<
+  CreateDistributedTaskDefinitionModel
+>().shape({
   name: Yup.string()
     .min(3, 'Must be longer than 3 characters')
     .required('Required'),
@@ -48,9 +49,9 @@ const validationSchema = Yup.object<CreateDistributedTaskDefinition>().shape({
 });
 
 type CreateDistributedTaskDefinitionProps = FormikProps<
-  CreateDistributedTaskDefinition
+  CreateDistributedTaskDefinitionModel
 > &
-  CreateDistributedTaskDefinition;
+  CreateDistributedTaskDefinitionModel;
 
 interface CreateDistributedTaskDefinitionResponse {
   Errors: Dictionary<ServerError>;
@@ -107,8 +108,8 @@ const CreateDistributedTaskDefinitionForm: StatelessComponent<
 );
 
 function mapPropsToValues(
-  props: CreateDistributedTaskDefinition,
-): CreateDistributedTaskDefinition {
+  props: CreateDistributedTaskDefinitionModel,
+): CreateDistributedTaskDefinitionModel {
   return {
     name: props.name,
     description: props.description,
@@ -129,7 +130,7 @@ function getErrorObject(
   return errorObject;
 }
 
-function buildFormData(values: CreateDistributedTaskDefinition): FormData {
+function buildFormData(values: CreateDistributedTaskDefinitionModel): FormData {
   const formData = new FormData();
   if (values.MainDll) {
     formData.append('MainDll', values.MainDll);
@@ -148,14 +149,16 @@ function buildFormData(values: CreateDistributedTaskDefinition): FormData {
 }
 
 async function handleSubmitHandler(
-  values: CreateDistributedTaskDefinition,
-  { setSubmitting, setErrors }: FormikActions<CreateDistributedTaskDefinition>,
+  values: CreateDistributedTaskDefinitionModel,
+  {
+    setSubmitting,
+    setErrors,
+  }: FormikActions<CreateDistributedTaskDefinitionModel>,
 ) {
   setSubmitting(true);
 
   const formData = buildFormData(values);
 
-  // TODO: Use client library compliant with JSON:API
   const response = await fetch(urlToFetch, {
     method: 'post',
     body: formData,
@@ -174,8 +177,8 @@ async function handleSubmitHandler(
 }
 
 const withFormikProps: WithFormikConfig<
-  CreateDistributedTaskDefinition,
-  CreateDistributedTaskDefinition
+  CreateDistributedTaskDefinitionModel,
+  CreateDistributedTaskDefinitionModel
 > = {
   handleSubmit: handleSubmitHandler,
   mapPropsToValues,
