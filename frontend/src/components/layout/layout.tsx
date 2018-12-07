@@ -3,6 +3,9 @@ import React, { MouseEventHandler, PureComponent, ReactNode } from 'react';
 
 import { Desktop, Mobile } from 'components/responsive-helpers';
 
+const desktopSidebarWidth = 220;
+const mobileSidebarWidth = 220;
+
 export interface LayoutProps {
   renderSidebar: () => ReactNode;
 }
@@ -31,7 +34,7 @@ export class Layout extends PureComponent<LayoutProps, LayoutState> {
             <IconButton
               icon="menu"
               onClick={this.openSidebar}
-              margin={majorScale(2)}
+              margin={majorScale(1)}
             />
 
             {this.renderMain()}
@@ -40,7 +43,7 @@ export class Layout extends PureComponent<LayoutProps, LayoutState> {
 
         <Desktop>
           <Pane display="flex" height="100%">
-            <Pane width={200} height="100%">
+            <Pane width={desktopSidebarWidth} height="100%">
               {this.props.renderSidebar()}
             </Pane>
 
@@ -62,7 +65,11 @@ export class Layout extends PureComponent<LayoutProps, LayoutState> {
       onClick={this.closeSidebar}
       background="overlay"
     >
-      <Pane onClick={this.stopPropagation} height="100%" width={200}>
+      <Pane
+        onClick={this.stopPropagation}
+        height="100%"
+        width={mobileSidebarWidth}
+      >
         {this.props.renderSidebar()}
       </Pane>
     </Pane>
