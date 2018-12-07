@@ -6,7 +6,7 @@ import {
   withFormik,
   WithFormikConfig,
 } from 'formik';
-import fetch from 'isomorphic-unfetch';
+import Kitsu, { JsonApiResponse } from 'kitsu';
 import { Dictionary } from 'lodash';
 import React, { StatelessComponent } from 'react';
 import { ClipLoader } from 'react-spinners';
@@ -19,13 +19,12 @@ import { withWarnOnUnsavedData } from 'components/form/with-warn-unsaved-form';
 
 import { config } from 'config';
 
-import { ServerError } from 'models';
+const kitsu = new Kitsu<UpdateDistributedTaskModel>({
+  baseURL: config.serverIp,
+  camelCaseTypes: false,
+});
 
-// TODO: Fetch initial values
-
-const urlToFetch = `${config.serverIp}/distributed-tasks`;
-
-interface UpdateDistributedTask {
+export interface UpdateDistributedTaskModel {
   id: number;
   name: string;
   description: string;
@@ -33,7 +32,7 @@ interface UpdateDistributedTask {
   'trust-level-to-complete': number;
 }
 
-const validationSchema = Yup.object<UpdateDistributedTask>().shape({
+const validationSchema = Yup.object<UpdateDistributedTaskModel>().shape({
   id: Yup.number().required(),
   name: Yup.string()
     .min(3, 'Must be longer than 3 characters')
@@ -47,12 +46,8 @@ const validationSchema = Yup.object<UpdateDistributedTask>().shape({
     .required(),
 });
 
-type UpdateDistributedTaskProps = FormikProps<UpdateDistributedTask> &
-  UpdateDistributedTask;
-
-interface UpdateDistributedTaskResponse {
-  Errors: Dictionary<ServerError>;
-}
+type UpdateDistributedTaskProps = FormikProps<UpdateDistributedTaskModel> &
+  UpdateDistributedTaskModel;
 
 const UpdateDistributedTaskForm: StatelessComponent<
   UpdateDistributedTaskProps
@@ -105,7 +100,9 @@ const UpdateDistributedTaskForm: StatelessComponent<
   </Pane>
 );
 
-function mapPropsToValues(props: UpdateDistributedTask): UpdateDistributedTask {
+function mapPropsToValues(
+  props: UpdateDistributedTaskModel,
+): UpdateDistributedTaskModel {
   return {
     id: props.id,
     name: props.name,
@@ -115,61 +112,47 @@ function mapPropsToValues(props: UpdateDistributedTask): UpdateDistributedTask {
   };
 }
 
-function getErrorObject(
-  response: UpdateDistributedTaskResponse,
-): Dictionary<string> {
-  const errorObject: Dictionary<string> = {};
+function getErrorsDictionary(
+  response: JsonApiResponse<UpdateDistributedTaskModel>,
+): Dictionary<string | undefined> {
+  const errorObject: Dictionary<string | undefined> = {};
 
-  for (const [, value] of Object.entries(response.Errors)) {
-    errorObject[value.title] = value.detail;
+  for (const [, value] of Object.entries(response.errors)) {
+    if (value.title !== undefined) {
+      errorObject[value.title] = value.detail;
+    }
   }
 
   return errorObject;
 }
 
-function buildFormData(values: UpdateDistributedTask): FormData {
-  const formData = new FormData();
-
-  formData.append('name', values.name);
-  formData.append('description', values.description);
-  formData.append('priority', values.priority.toString());
-  formData.append(
-    'trust-level-to-complete',
-    values['trust-level-to-complete'].toString(),
-  );
-
-  return formData;
-}
-
 async function handleSubmitHandler(
-  values: UpdateDistributedTask,
-  { setSubmitting, setErrors }: FormikActions<UpdateDistributedTask>,
+  values: UpdateDistributedTaskModel,
+  {
+    setSubmitting,
+    setErrors,
+    resetForm,
+  }: FormikActions<UpdateDistributedTaskModel>,
 ) {
   setSubmitting(true);
 
-  const formData = buildFormData(values);
+  kitsu
+    .patch('distributed-task', values)
+    .then(() => {
+      alert('Distributed Task updated');
+      resetForm();
+    })
+    .catch((errorsResponse: JsonApiResponse<UpdateDistributedTaskModel>) => {
+      const errorsObject = getErrorsDictionary(errorsResponse);
+      setErrors(errorsObject);
+    });
 
-  // TODO: Use client library compliant with JSON:API
-  const response = await fetch(urlToFetch, {
-    method: 'PUT',
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const responseBody: UpdateDistributedTaskResponse = await response.json();
-
-    const errorObject = getErrorObject(responseBody);
-
-    setErrors(errorObject);
-  } else {
-    alert('Distributed Task updated');
-  }
   setSubmitting(false);
 }
 
 const withFormikProps: WithFormikConfig<
-  UpdateDistributedTask,
-  UpdateDistributedTask
+  UpdateDistributedTaskModel,
+  UpdateDistributedTaskModel
 > = {
   handleSubmit: handleSubmitHandler,
   mapPropsToValues,
