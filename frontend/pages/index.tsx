@@ -1,4 +1,5 @@
 import { Card, Pane } from 'evergreen-ui';
+import { always } from 'ramda';
 import React from 'react';
 
 import 'styles.css';
@@ -6,8 +7,6 @@ import 'styles.css';
 import { Layout, LayoutProps } from 'components/layout';
 import { Sidebar, SidebarMenu } from 'components/sidebar';
 import { SidebarMenuProps } from 'components/sidebar';
-
-const always = <T extends {}>(v: T) => () => v;
 
 export const sidebarMenuItems: SidebarMenuProps['items'] = [
   {
