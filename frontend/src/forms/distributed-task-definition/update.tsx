@@ -21,14 +21,18 @@ import { config } from 'config';
 
 import { ServerError } from 'models';
 
+// TODO: Fetch initial values
+
 const urlToFetch = `${config.serverIp}/distributed-task-definitions`;
 
 interface UpdateDistributedTaskDefinition {
+  id: number;
   name: string;
   description: string;
 }
 
 const validationSchema = Yup.object<UpdateDistributedTaskDefinition>().shape({
+  id: Yup.number().required(),
   name: Yup.string()
     .min(3, 'Must be longer than 3 characters')
     .required('Required'),
@@ -83,6 +87,7 @@ function mapPropsToValues(
   props: UpdateDistributedTaskDefinition,
 ): UpdateDistributedTaskDefinition {
   return {
+    id: props.id,
     name: props.name,
     description: props.description,
   };
@@ -117,6 +122,7 @@ async function handleSubmitHandler(
 
   const formData = buildFormData(values);
 
+  // TODO: Use client library compliant with JSON:API
   const response = await fetch(urlToFetch, {
     method: 'PUT',
     body: formData,
