@@ -153,6 +153,7 @@ async function handleSubmitHandler(
   {
     setSubmitting,
     setErrors,
+    resetForm,
   }: FormikActions<CreateDistributedTaskDefinitionModel>,
 ) {
   setSubmitting(true);
@@ -172,6 +173,7 @@ async function handleSubmitHandler(
     setErrors(errorObject);
   } else {
     alert('Distributed Task Definition added');
+    resetForm(values);
   }
   setSubmitting(false);
 }
@@ -186,8 +188,6 @@ const withFormikProps: WithFormikConfig<
 };
 
 const FormWithWarn = withWarnOnUnsavedData(CreateDistributedTaskDefinitionForm);
-const CreateDistributedTaskDefinitionWithFormik = withFormik(withFormikProps)(
-  FormWithWarn,
-);
-
-export default CreateDistributedTaskDefinitionWithFormik;
+export const CreateDistributedTaskDefinitionWithFormik = withFormik(
+  withFormikProps,
+)(FormWithWarn);

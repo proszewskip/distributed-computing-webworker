@@ -118,7 +118,7 @@ async function handleSubmitHandler(
     .patch('distributed-task-definition', values)
     .then(() => {
       alert('Distributed Task Definition updated');
-      resetForm();
+      resetForm(values);
     })
     .catch(
       (

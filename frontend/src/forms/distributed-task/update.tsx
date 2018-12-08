@@ -140,7 +140,7 @@ async function handleSubmitHandler(
     .patch('distributed-task', values)
     .then(() => {
       alert('Distributed Task updated');
-      resetForm();
+      resetForm(values);
     })
     .catch((errorsResponse: JsonApiResponse<UpdateDistributedTaskModel>) => {
       const errorsObject = getErrorsDictionary(errorsResponse);
