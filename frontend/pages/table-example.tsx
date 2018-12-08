@@ -90,11 +90,13 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       Header: <Text>Name</Text>,
       Cell: TextCell,
       Filter: TextFilter,
+      minWidth: 150,
     },
     {
       accessor: 'main-dll-name',
       Header: <Text>Main DLL name</Text>,
       Cell: TextCell,
+      minWidth: 100,
     },
     {
       id: 'action',
@@ -116,6 +118,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
           </Button>
         </div>
       ),
+      minWidth: 180,
     },
   ];
 
