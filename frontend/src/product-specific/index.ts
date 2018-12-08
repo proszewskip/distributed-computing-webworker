@@ -1,2 +1,2 @@
-export * from './authenticated-sidebar-menu-items';
-export * from './authenticated-sidebar';
+export * from './sidebar';
+export * from './head';
