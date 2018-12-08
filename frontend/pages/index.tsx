@@ -3,9 +3,8 @@ import React from 'react';
 
 import 'styles.css';
 
-import { Head } from 'components/head';
 import { Layout, LayoutProps } from 'components/layout';
-import { AuthenticatedSidebar } from 'product-specific';
+import { AuthenticatedSidebar, Head } from 'product-specific';
 
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
   <AuthenticatedSidebar />
