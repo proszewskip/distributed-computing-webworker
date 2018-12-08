@@ -1,4 +1,4 @@
-import { Button, Heading, minorScale, Text } from 'evergreen-ui';
+import { Button, Heading, minorScale, Pane, Text } from 'evergreen-ui';
 import fetch from 'isomorphic-unfetch';
 import React, { Component, MouseEventHandler } from 'react';
 import { Column } from 'react-table';
@@ -30,7 +30,11 @@ import {
   WithSelectableRowsAdditionalProps,
 } from 'components/data-table/with-selectable-rows';
 
+import { Layout, LayoutProps } from 'components/layout';
+
 import { DistributedTaskDefinition } from 'models';
+
+import { AuthenticatedSidebar, Head } from 'product-specific';
 
 const SelectDataTable = selectTableHOC(DataTable);
 const Table = withSelectableRows(SelectDataTable);
@@ -86,11 +90,13 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       Header: <Text>Name</Text>,
       Cell: TextCell,
       Filter: TextFilter,
+      minWidth: 150,
     },
     {
       accessor: 'main-dll-name',
       Header: <Text>Main DLL name</Text>,
       Cell: TextCell,
+      minWidth: 100,
     },
     {
       id: 'action',
@@ -112,6 +118,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
           </Button>
         </div>
       ),
+      minWidth: 180,
     },
   ];
 
@@ -244,6 +251,10 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
   };
 }
 
+const renderSidebar: LayoutProps['renderSidebar'] = () => (
+  <AuthenticatedSidebar />
+);
+
 interface TableExamplePageProps extends Omit<TableExampleProps, 'data'> {
   data: DistributedTaskDefinition[];
 }
@@ -259,7 +270,17 @@ class TableExamplePage extends Component<TableExamplePageProps> {
   }
 
   public render() {
-    return <TableExample {...this.props} />;
+    return (
+      <>
+        <Head />
+
+        <Layout renderSidebar={renderSidebar}>
+          <Pane marginX={16}>
+            <TableExample {...this.props} />
+          </Pane>
+        </Layout>
+      </>
+    );
   }
 }
 

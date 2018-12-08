@@ -1,11 +1,11 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
 
-import Home from '../../pages/home';
+import Index from '../../pages/index';
 
-describe('Home page', () => {
+describe('index page', () => {
   it('should match snapshot', () => {
-    const component = renderer.create(<Home />);
+    const component = renderer.create(<Index />);
     const tree = component.toJSON();
 
     expect(tree).toMatchSnapshot();
