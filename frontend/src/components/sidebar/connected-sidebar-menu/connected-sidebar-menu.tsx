@@ -4,6 +4,7 @@ import React, { PureComponent } from 'react';
 import { urlMatchesRoute } from 'utils/url-matches-route';
 
 import { MenuItem, SidebarMenu } from '../sidebar-menu';
+
 import {
   AdvancedMenuItem,
   ConnectedSidebarMenuProps,
