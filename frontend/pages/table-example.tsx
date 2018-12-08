@@ -30,7 +30,11 @@ import {
   WithSelectableRowsAdditionalProps,
 } from 'components/data-table/with-selectable-rows';
 
+import { Layout, LayoutProps } from 'components/layout';
+
 import { DistributedTaskDefinition } from 'models';
+
+import { AuthenticatedSidebar, Head } from 'product-specific';
 
 const SelectDataTable = selectTableHOC(DataTable);
 const Table = withSelectableRows(SelectDataTable);
@@ -244,6 +248,10 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
   };
 }
 
+const renderSidebar: LayoutProps['renderSidebar'] = () => (
+  <AuthenticatedSidebar />
+);
+
 interface TableExamplePageProps extends Omit<TableExampleProps, 'data'> {
   data: DistributedTaskDefinition[];
 }
@@ -260,9 +268,15 @@ class TableExamplePage extends Component<TableExamplePageProps> {
 
   public render() {
     return (
-      <Pane height="100%">
-        <TableExample {...this.props} />
-      </Pane>
+      <>
+        <Head />
+
+        <Layout renderSidebar={renderSidebar}>
+          <Pane marginX={16}>
+            <TableExample {...this.props} />
+          </Pane>
+        </Layout>
+      </>
     );
   }
 }
