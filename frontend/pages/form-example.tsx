@@ -1,4 +1,4 @@
-import { Button, Pane } from 'evergreen-ui';
+import { Button, Heading, Pane } from 'evergreen-ui';
 import {
   Field,
   FormikActions,
@@ -22,6 +22,9 @@ import { FilePickerWithLabel } from 'components/form/file-picker';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
 import { withWarnOnUnsavedData } from 'components/form/with-warn-unsaved-form';
+import { Layout, LayoutProps } from 'components/layout';
+
+import { AuthenticatedSidebar, Head } from 'product-specific';
 
 const serverIp = 'http://localhost:5000';
 const entityPath = '/distributed-task-definitions/add';
@@ -163,11 +166,22 @@ const withFormikProps: WithFormikConfig<
 const ExampleFormWithWarn = withWarnOnUnsavedData(ExampleForm);
 const ExampleFormWithFormik = withFormik(withFormikProps)(ExampleFormWithWarn);
 
-const Basic = () => (
-  <div>
-    <h1>Example form</h1>
-    <ExampleFormWithFormik name="" description="" MainDll={null} />
-  </div>
+const renderSidebar: LayoutProps['renderSidebar'] = () => (
+  <AuthenticatedSidebar />
 );
 
-export default Basic;
+export default () => (
+  <>
+    <Head />
+
+    <Layout renderSidebar={renderSidebar}>
+      <Pane marginX={16}>
+        <Heading size={800} marginBottom={16}>
+          Example form
+        </Heading>
+
+        <ExampleFormWithFormik name="" description="" MainDll={null} />
+      </Pane>
+    </Layout>
+  </>
+);
