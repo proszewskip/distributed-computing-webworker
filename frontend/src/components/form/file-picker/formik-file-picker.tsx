@@ -3,6 +3,7 @@ import React, { PureComponent } from 'react';
 
 import { withLabel } from '../with-label';
 import { withValidation } from '../with-validation';
+
 import FormFilePicker, { FormFilePickerProps } from './form-file-picker';
 
 import { FileList } from 'models';
