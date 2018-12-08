@@ -115,15 +115,15 @@ function mapPropsToValues(
 function getErrorsDictionary(
   response: JsonApiResponse<UpdateDistributedTaskModel>,
 ): Dictionary<string | undefined> {
-  const errorObject: Dictionary<string | undefined> = {};
+  const errorsDictionary: Dictionary<string | undefined> = {};
 
   for (const [, value] of Object.entries(response.errors)) {
     if (value.title !== undefined) {
-      errorObject[value.title] = value.detail;
+      errorsDictionary[value.title] = value.detail;
     }
   }
 
-  return errorObject;
+  return errorsDictionary;
 }
 
 async function handleSubmitHandler(
@@ -142,8 +142,8 @@ async function handleSubmitHandler(
       alert('Distributed Task updated');
       resetForm(values);
     })
-    .catch((errorsResponse: JsonApiResponse<UpdateDistributedTaskModel>) => {
-      const errorsObject = getErrorsDictionary(errorsResponse);
+    .catch((response: JsonApiResponse<UpdateDistributedTaskModel>) => {
+      const errorsObject = getErrorsDictionary(response);
       setErrors(errorsObject);
     });
 

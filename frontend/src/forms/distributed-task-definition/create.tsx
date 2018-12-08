@@ -118,16 +118,16 @@ function mapPropsToValues(
   };
 }
 
-function getErrorObject(
+function getErrorsDictionary(
   response: CreateDistributedTaskDefinitionResponse,
 ): Dictionary<string> {
-  const errorObject: Dictionary<string> = {};
+  const errorsDictionary: Dictionary<string> = {};
 
   for (const [, value] of Object.entries(response.Errors)) {
-    errorObject[value.title] = value.detail;
+    errorsDictionary[value.title] = value.detail;
   }
 
-  return errorObject;
+  return errorsDictionary;
 }
 
 function buildFormData(values: CreateDistributedTaskDefinitionModel): FormData {
@@ -168,9 +168,9 @@ async function handleSubmitHandler(
   if (!response.ok) {
     const responseBody: CreateDistributedTaskDefinitionResponse = await response.json();
 
-    const errorObject = getErrorObject(responseBody);
+    const errorsDictionary = getErrorsDictionary(responseBody);
 
-    setErrors(errorObject);
+    setErrors(errorsDictionary);
   } else {
     alert('Distributed Task Definition added');
     resetForm(values);
@@ -188,6 +188,7 @@ const withFormikProps: WithFormikConfig<
 };
 
 const FormWithWarn = withWarnOnUnsavedData(CreateDistributedTaskDefinitionForm);
+
 export const CreateDistributedTaskDefinitionWithFormik = withFormik(
   withFormikProps,
 )(FormWithWarn);
