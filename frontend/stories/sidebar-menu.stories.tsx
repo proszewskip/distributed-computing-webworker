@@ -20,17 +20,17 @@ stories
 
     const items: SidebarMenuProps['items'] = [
       {
-        href: 'foo',
+        route: 'foo',
         title: 'First',
         isActive,
       },
       {
-        href: 'bar',
+        route: 'bar',
         title: 'Second',
         isActive,
       },
       {
-        href: 'currently-active',
+        route: 'currently-active',
         title: 'Currently active',
         isActive,
       },
@@ -41,32 +41,14 @@ stories
   .add('with an active item', () => {
     const items: SidebarMenuProps['items'] = [
       {
-        href: 'foo',
+        route: 'foo',
         title: 'Non active',
         isActive: () => false,
       },
       {
-        href: 'bar',
+        route: 'bar',
         title: 'Active',
         isActive: () => true,
-      },
-    ];
-
-    return <SidebarMenu items={items} />;
-  })
-  .add('using advanced href', () => {
-    const isActive = always(false);
-
-    const items: SidebarMenuProps['items'] = [
-      {
-        href: { path: 'foo', search: 'bar' },
-        title: 'With search params',
-        isActive,
-      },
-      {
-        href: { path: 'bar', query: { first: 'foo', extra: 'bar' } },
-        title: 'With query params',
-        isActive,
       },
     ];
 

@@ -7,12 +7,12 @@ describe('SidebarMenu', () => {
   it('should match snapshot', () => {
     const menuItems: SidebarMenuProps['items'] = [
       {
-        href: 'abc',
+        route: 'abc',
         title: 'Abc',
         isActive: () => true,
       },
       {
-        href: 'notactive',
+        route: 'notactive',
         title: 'Not active',
         isActive: () => false,
       },
