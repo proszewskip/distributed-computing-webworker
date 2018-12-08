@@ -154,7 +154,7 @@ function buildFormData(values: CreateDistributedTask): FormData {
 
 async function handleSubmitHandler(
   values: CreateDistributedTask,
-  { setSubmitting, setErrors }: FormikActions<CreateDistributedTask>,
+  { setSubmitting, setErrors, resetForm }: FormikActions<CreateDistributedTask>,
 ) {
   setSubmitting(true);
 
@@ -174,6 +174,7 @@ async function handleSubmitHandler(
     setErrors(errorObject);
   } else {
     alert('Distributed Task added');
+    resetForm(values);
   }
   setSubmitting(false);
 }
@@ -188,8 +189,6 @@ const withFormikProps: WithFormikConfig<
 };
 
 const FormWithWarn = withWarnOnUnsavedData(CreateDistributedTaskForm);
-const CreateDistributedTaskWithFormik = withFormik(withFormikProps)(
+export const CreateDistributedTaskWithFormik = withFormik(withFormikProps)(
   FormWithWarn,
 );
-
-export default CreateDistributedTaskWithFormik;
