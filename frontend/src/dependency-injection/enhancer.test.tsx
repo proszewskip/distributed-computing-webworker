@@ -1,7 +1,7 @@
 import React, { StatelessComponent } from 'react';
 import renderer from 'react-test-renderer';
 
-import { mockConsole } from 'utils/mock-console';
+import { mockConsole } from '../../__mocks__/mock-console';
 
 import DIContext, { DependenciesMap } from './context';
 import { DependenciesEnhancer, DependencyInjectionEnhancer } from './enhancer';
