@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Sidebar should match snapshot 1`] = `
+<div
+  className="📦bg_1eozcqw 📦dspl_flex 📦flx-drct_column 📦h_100prcnt 📦box-szg_border-box css-nil"
+>
+  <h2
+    className="📦mt_28px 📦mb_8px 📦fnt-sze_20px 📦f-wght_500 📦ln-ht_24px 📦ltr-spc_-0-07px 📦fnt-fam_wm9v6k 📦color_234361 📦pl_12px 📦pr_12px 📦box-szg_border-box"
+  >
+    Bar
+  </h2>
+  <div>
+    Foo
+  </div>
+</div>
+`;
