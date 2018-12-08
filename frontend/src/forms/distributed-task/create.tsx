@@ -19,20 +19,21 @@ import { Textarea } from 'components/form/textarea';
 import { withWarnOnUnsavedData } from 'components/form/with-warn-unsaved-form';
 
 import { config } from 'config';
-
 import { ServerError } from 'models';
 
 const urlToFetch = `${config.serverIp}/distributed-tasks/add`;
 
 interface CreateDistributedTask {
+  DistributedTaskDefinitionId: number;
   name: string;
   description: string;
   priority: number;
-  'trust-level-to-complete': number;
+  TrustLevelToComplete: number;
   InputData: File | null;
 }
 
 const validationSchema = Yup.object<CreateDistributedTask>().shape({
+  DistributedTaskDefinitionId: Yup.number().required('required'),
   name: Yup.string()
     .min(3, 'Must be longer than 3 characters')
     .required('Required'),
@@ -40,7 +41,7 @@ const validationSchema = Yup.object<CreateDistributedTask>().shape({
   priority: Yup.number()
     .positive('Priority cannot be less than 0')
     .required('Required'),
-  'trust-level-to-complete': Yup.number()
+  TrustLevelToComplete: Yup.number()
     .moreThan(0, 'Trust level to complete must be greater than 0')
     .required('Required'),
   InputData: Yup.mixed().test('Required', 'Required', (value) => {
@@ -86,7 +87,7 @@ const CreateDistributedTaskForm: StatelessComponent<
       />
 
       <Field
-        name="trust-level-to-complete"
+        name="TrustLevelToComplete"
         label="Trust level to complete"
         type="number"
         component={TextInputWithLabel}
@@ -114,24 +115,25 @@ const CreateDistributedTaskForm: StatelessComponent<
 
 function mapPropsToValues(props: CreateDistributedTask): CreateDistributedTask {
   return {
+    DistributedTaskDefinitionId: props.DistributedTaskDefinitionId,
     name: props.name,
     description: props.description,
     priority: props.priority,
-    'trust-level-to-complete': props['trust-level-to-complete'],
+    TrustLevelToComplete: props.TrustLevelToComplete,
     InputData: props.InputData,
   };
 }
 
-function getErrorObject(
+function getErrorsDictionary(
   response: CreateDistributedTaskResponse,
 ): Dictionary<string> {
-  const errorObject: Dictionary<string> = {};
+  const errorsDictionary: Dictionary<string> = {};
 
   for (const [, value] of Object.entries(response.Errors)) {
-    errorObject[value.title] = value.detail;
+    errorsDictionary[value.title] = value.detail;
   }
 
-  return errorObject;
+  return errorsDictionary;
 }
 
 function buildFormData(values: CreateDistributedTask): FormData {
@@ -141,8 +143,12 @@ function buildFormData(values: CreateDistributedTask): FormData {
   formData.append('description', values.description);
   formData.append('priority', values.priority.toString());
   formData.append(
-    'trust-level-to-complete',
-    values['trust-level-to-complete'].toString(),
+    'TrustLevelToComplete',
+    values.TrustLevelToComplete.toString(),
+  );
+  formData.append(
+    'DistributedTaskDefinitionId',
+    values.DistributedTaskDefinitionId.toString(),
   );
 
   if (values.InputData) {
@@ -160,7 +166,6 @@ async function handleSubmitHandler(
 
   const formData = buildFormData(values);
 
-  // TODO: Use client library compliant with JSON:API
   const response = await fetch(urlToFetch, {
     method: 'POST',
     body: formData,
@@ -169,9 +174,9 @@ async function handleSubmitHandler(
   if (!response.ok) {
     const responseBody: CreateDistributedTaskResponse = await response.json();
 
-    const errorObject = getErrorObject(responseBody);
+    const errorsDictionary = getErrorsDictionary(responseBody);
 
-    setErrors(errorObject);
+    setErrors(errorsDictionary);
   } else {
     alert('Distributed Task added');
     resetForm(values);
@@ -189,6 +194,7 @@ const withFormikProps: WithFormikConfig<
 };
 
 const FormWithWarn = withWarnOnUnsavedData(CreateDistributedTaskForm);
+
 export const CreateDistributedTaskWithFormik = withFormik(withFormikProps)(
   FormWithWarn,
 );

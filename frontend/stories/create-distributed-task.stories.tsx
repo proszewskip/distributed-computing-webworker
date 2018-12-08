@@ -9,16 +9,21 @@ import MockNextContext from 'dependency-injection/mock-next-router';
 
 const stories = storiesOf('Create Distributed Task form', module);
 
-const CreateDistributedTaskStory: StatelessComponent = () => (
+const CreateDistributedTaskStory: StatelessComponent<{ id: number }> = ({
+  id,
+}) => (
   <MockNextContext>
     <CreateDistributedTaskWithFormik
       name=""
       description=""
       priority={1}
-      trust-level-to-complete={1}
+      TrustLevelToComplete={1}
       InputData={null}
+      DistributedTaskDefinitionId={id}
     />
   </MockNextContext>
 );
 
-stories.add('Create', () => <CreateDistributedTaskStory />);
+stories.add('Create id:1', () => <CreateDistributedTaskStory id={1} />);
+
+stories.add('Create id:5', () => <CreateDistributedTaskStory id={5} />);
