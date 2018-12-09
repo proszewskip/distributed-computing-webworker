@@ -2,24 +2,21 @@ import { Omit } from 'types/omit';
 
 import { MenuItem, SidebarMenuProps } from '../sidebar-menu';
 
-type SharedMenuItemProperties = Omit<MenuItem, 'isActive' | 'href'>;
+type SharedMenuItemProperties = Omit<MenuItem, 'isActive'>;
 
 /**
- * A menu item that is active whenever the url matches the `href`.
+ * A menu item that is active whenever the url matches the `route`.
  */
 export interface SimpleMenuItem extends SharedMenuItemProperties {
-  href: string;
-
   /**
    * The URL prefix that will be used to determine if the item is active (based on the current route)
-   * When not supplied it defaults to the `href`
+   * When not supplied it defaults to the `route`
    */
   activeMatchPrefix?: string;
   isActive?: MenuItem['isActive'];
 }
 
 export interface AdvancedMenuItem extends SharedMenuItemProperties {
-  href: Exclude<MenuItem['href'], string>;
   isActive: MenuItem['isActive'];
 }
 

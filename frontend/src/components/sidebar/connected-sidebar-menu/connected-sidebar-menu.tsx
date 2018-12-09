@@ -34,7 +34,7 @@ export class PureConnectedSidebarMenu extends PureComponent<
 
   private modifySimpleMenuItem = (menuItem: SimpleMenuItem): MenuItem => ({
     isActive: this.currentRouteMatchesPathnamePrefix(
-      menuItem.activeMatchPrefix || menuItem.href,
+      menuItem.activeMatchPrefix || `${menuItem.route}/:param*`,
     ),
     ...menuItem,
   });

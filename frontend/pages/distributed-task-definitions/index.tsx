@@ -5,22 +5,27 @@ import { Layout, LayoutProps } from 'components/layout';
 
 import { AuthenticatedSidebar, Head } from 'product-specific';
 
+import { routes } from '../../routes';
+
+const { Link } = routes;
+
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
   <AuthenticatedSidebar />
 );
 
-const Index = () => (
+export default () => (
   <>
     <Head />
 
     <Layout renderSidebar={renderSidebar}>
       <Pane display="flex" justifyContent="center" marginTop="2em">
         <Card padding={80} border="default" background="tint2">
-          Info here
+          Distributed task definitions
+          <Link route="/distributed-task-definitions/1">
+            <a>See details</a>
+          </Link>
         </Card>
       </Pane>
     </Layout>
   </>
 );
-
-export default Index;
