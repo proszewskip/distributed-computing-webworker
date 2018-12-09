@@ -59,7 +59,7 @@ declare module 'kitsu' {
     links?: object;
     status?: number;
     code?: number;
-    title?: string;
+    title: string;
     detail?: string;
     source?: object;
     meta?: object;
