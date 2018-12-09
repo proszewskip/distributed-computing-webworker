@@ -1,2 +1,2 @@
-export * from './update-component';
+export * from './update';
 export * from './create';
