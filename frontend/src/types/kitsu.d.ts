@@ -1,52 +1,59 @@
+import { Dictionary } from 'lodash';
+
 declare module 'kitsu' {
-  class Kitsu<Model> {
+  class Kitsu {
     constructor(options: KitsuOptions);
 
     public delete(
       model: string,
       id: string | number,
-      headers?: Object,
+      headers?: Headers,
     ): Promise;
 
-    public get(
+    public get<Model>(
       model: string,
       params?: GetParams,
-      headers?: object,
-    ): Promise<JsonApiResponse<Model>>;
+      headers?: Headers,
+    ): Promise<JsonApiSuccessResponse<Model>>;
 
-    public patch(model: string, body: Model, headers?: Object): Promise;
+    public patch<Model>(model: string, body: Model, headers?: Headers): Promise;
 
-    public post(model: string, body: Model, headers?: Object): Promise;
+    public post<Model>(model: string, body: Model, headers?: Headers): Promise;
 
-    public self(params: SelfParams, headers?: object): Promise;
+    public self(params: SelfParams, headers?: Headers): Promise;
   }
+
+  type Headers = Dictionary<string>;
 
   interface KitsuOptions {
     baseURL?: string;
-    headers?: object;
+    headers?: Headers;
     camelCaseTypes?: boolean;
-    resourceCase?: boolean;
+    resourceCase?: string;
     pluralize?: boolean;
+    /**
+     * In milliseconds
+     */
     timeout?: number;
   }
 
   interface GetParams {
     page?: {
-      limit: number;
-      offset: number;
+      limit?: number;
+      offset?: number;
     };
-    field?: object;
-    filter?: object;
+    fields?: Dictionary<string>;
+    filter?: Dictionary<string>;
     sort?: string;
     include?: string;
   }
 
   interface SelfParams {
-    fields?: object;
+    fields?: Dictionary<string>;
     include?: string;
   }
 
-  export interface JsonApiError {
+  interface JsonApiError {
     id?: number;
     links?: object;
     status?: number;
@@ -57,8 +64,11 @@ declare module 'kitsu' {
     meta?: object;
   }
 
-  export interface JsonApiResponse<Model> {
+  export interface JsonApiSuccessResponse<Model> {
     data: Model;
+  }
+
+  export interface JsonApiErrorResponse<Model> {
     errors: JsonApiError[];
   }
 
