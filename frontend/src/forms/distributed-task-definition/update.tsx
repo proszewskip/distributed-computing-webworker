@@ -68,9 +68,16 @@ class UpdateDistributedTaskDefinitionFormWithoutDependencies extends Component<
       .get<UpdateDistributedTaskDefinitionModel>(
         `distributed-task-definitions/${this.props.id}`,
       )
-      .then((jsonApiResponse) =>
-        this.setState({ data: jsonApiResponse.data, fetchFinished: true }),
-      )
+      .then((jsonApiResponse) => {
+        const model: UpdateDistributedTaskDefinitionModel = {
+          description: jsonApiResponse.data.description,
+          id: jsonApiResponse.data.id,
+          name: jsonApiResponse.data.name,
+        };
+
+        return model;
+      })
+      .then((model) => this.setState({ data: model, fetchFinished: true }))
       .catch(() => {
         this.setState({ fetchError: true, fetchFinished: true });
       });
