@@ -13,6 +13,8 @@ using Server.Models;
 using Server.Services;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Server.Filters;
 using Server.Services.Api;
 
 namespace Server
@@ -73,6 +75,7 @@ namespace Server
                     options.OutputFormatters.Add(new JsonOutputFormatter(new JsonSerializerSettings()
                     {
                         ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                        ContractResolver = new CamelCasePropertyNamesContractResolver()
                     }, ArrayPool<char>.Shared));
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
@@ -89,7 +92,9 @@ namespace Server
                 .AddScoped<IResourceService<DistributedTaskDefinition>, DistributedTaskDefinitionService>()
                 .AddScoped<IResourceService<DistributedTask>, DistributedTaskService>()
                 .AddScoped<IFinishComputationService, FinishComputationService>()
-                .AddScoped<IJsonApiResponseFactory, JsonApiResponseFactory>();
+                .AddScoped<IJsonApiResponseFactory, JsonApiResponseFactory>()
+                .AddScoped<IJsonApiActionResultFactory, JsonApiActionResultFactory>()
+                .AddScoped<FormatErrorActionFilter>();
 
             services.AddSingleton<IPathsProvider, PathsProvider>();
         }

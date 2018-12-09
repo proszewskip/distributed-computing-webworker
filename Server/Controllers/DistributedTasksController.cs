@@ -7,12 +7,14 @@ using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Server.DTO;
+using Server.Filters;
 using Server.Models;
 using Server.Services;
 using Server.Validation;
 
 namespace Server.Controllers
 {
+    [ServiceFilter(typeof(FormatErrorActionFilter))]
     public class DistributedTasksController : JsonApiController<DistributedTask>
     {
         private readonly IResourceService<DistributedTask> _distributedTaskResourceService;
