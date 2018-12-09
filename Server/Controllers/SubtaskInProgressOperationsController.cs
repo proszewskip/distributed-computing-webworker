@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
 using Server.DTO;
+using Server.Filters;
 using Server.Models;
 using Server.Services.Api;
 using Server.Validation;
@@ -10,6 +11,7 @@ using Server.Validation;
 namespace Server.Controllers
 {
     [Route("subtasks-in-progress")]
+    [ServiceFilter(typeof(FormatErrorActionFilter))]
     public class SubtaskInProgressOperationsController : Controller
     {
         private readonly IFinishComputationService _finishComputationService;
