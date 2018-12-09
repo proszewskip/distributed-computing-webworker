@@ -8,9 +8,7 @@ interface WarnOnUnsavedDataProps {
 type WarnOnUnsavedDataPropsWithRouter = WarnOnUnsavedDataProps &
   WithRouterProps;
 
-export class WarnOnUnsavedData extends Component<
-  WarnOnUnsavedDataPropsWithRouter
-> {
+class WarnOnUnsavedData extends Component<WarnOnUnsavedDataPropsWithRouter> {
   private leaveMessage: string =
     'You have unsaved changes, are you sure you want to leave?';
 

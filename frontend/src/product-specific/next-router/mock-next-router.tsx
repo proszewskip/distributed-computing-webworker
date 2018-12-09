@@ -5,9 +5,7 @@ interface MockNextContextProps {
   router?: object;
 }
 
-export default class MockNextContext extends React.Component<
-  MockNextContextProps
-> {
+export class MockNextContext extends React.Component<MockNextContextProps> {
   public static childContextTypes = {
     headManager: {},
     router: {},
