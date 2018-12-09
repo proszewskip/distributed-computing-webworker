@@ -1,7 +1,6 @@
 import { Alert, Button, Pane } from 'evergreen-ui';
-import { Field, Form, Formik, FormikActions, FormikProps } from 'formik';
+import { Field, Form, Formik, FormikConfig } from 'formik';
 import { JsonApiErrorResponse } from 'kitsu';
-import { Dictionary } from 'lodash';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
 import * as Yup from 'yup';
@@ -9,7 +8,9 @@ import * as Yup from 'yup';
 import { ErrorAlert } from 'components/form/errors/error-alert';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
-import { WarnOnUnsavedForm } from 'components/form/with-warn-unsaved-form';
+import { WarnOnUnsavedForm } from 'components/form/warn-on-unsaved-form';
+
+import { getErrorsDictionary } from 'utils/get-errors-dictionary';
 
 import { BaseDependencies } from 'product-specific';
 
@@ -34,6 +35,16 @@ export class UpdateDistributedTaskDefinitionForm extends Component<
   UpdateDistributedTaskDefinitionProps,
   UpdateDistributedTaskDefinitionState
 > {
+  public state: UpdateDistributedTaskDefinitionState = {
+    data: {
+      name: '',
+      description: '',
+      id: this.props.id,
+    },
+    fetchError: false,
+    fetchFinished: false,
+  };
+
   private validationSchema = Yup.object<
     UpdateDistributedTaskDefinitionModel
   >().shape({
@@ -43,20 +54,6 @@ export class UpdateDistributedTaskDefinitionForm extends Component<
       .required('Required'),
     description: Yup.string(),
   });
-
-  constructor(props: any) {
-    super(props);
-
-    this.state = {
-      data: {
-        name: '',
-        description: '',
-        id: props.id,
-      },
-      fetchError: false,
-      fetchFinished: false,
-    };
-  }
 
   public componentDidMount = () => {
     this.props.kitsu
@@ -84,19 +81,14 @@ export class UpdateDistributedTaskDefinitionForm extends Component<
           onSubmit={this.handleSubmitHandler}
           render={this.renderForm}
           validationSchema={this.validationSchema}
-        >
-          {({ dirty }) => <WarnOnUnsavedForm warn={dirty} />}}
-        </Formik>
+        />
       )
     );
   }
 
-  private renderForm = ({
-    values,
-    touched,
-    errors,
-    isSubmitting,
-  }: FormikProps<UpdateDistributedTaskDefinitionModel>) => {
+  private renderForm: FormikConfig<
+    UpdateDistributedTaskDefinitionModel
+  >['render'] = ({ values, touched, errors, isSubmitting, dirty }) => {
     return (
       <Pane width="30%">
         <Form>
@@ -127,32 +119,14 @@ export class UpdateDistributedTaskDefinitionForm extends Component<
 
           <ClipLoader loading={isSubmitting} />
         </Form>
+        <WarnOnUnsavedForm warn={dirty} />
       </Pane>
     );
   };
 
-  private getErrorsDictionary = (
-    response: JsonApiErrorResponse<UpdateDistributedTaskDefinitionModel>,
-  ) => {
-    const errorsDictionary: Dictionary<string> = {};
-
-    for (const [, value] of Object.entries(response.errors)) {
-      if (value.title !== undefined) {
-        errorsDictionary[value.title] = value.detail ? value.detail : '';
-      }
-    }
-
-    return errorsDictionary;
-  };
-
-  private handleSubmitHandler = async (
-    values: UpdateDistributedTaskDefinitionModel,
-    {
-      setSubmitting,
-      setErrors,
-      resetForm,
-    }: FormikActions<UpdateDistributedTaskDefinitionModel>,
-  ) => {
+  private handleSubmitHandler: FormikConfig<
+    UpdateDistributedTaskDefinitionModel
+  >['onSubmit'] = async (values, { setSubmitting, setErrors, resetForm }) => {
     setSubmitting(true);
 
     this.props.kitsu
@@ -167,7 +141,7 @@ export class UpdateDistributedTaskDefinitionForm extends Component<
             UpdateDistributedTaskDefinitionModel
           >,
         ) => {
-          const errorsDictionary = this.getErrorsDictionary(errorsResponse);
+          const errorsDictionary = getErrorsDictionary(errorsResponse);
           setErrors(errorsDictionary);
         },
       );

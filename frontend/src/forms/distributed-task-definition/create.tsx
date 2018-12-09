@@ -1,8 +1,7 @@
 import { Button, Pane } from 'evergreen-ui';
-import { Field, Form, Formik, FormikActions, FormikProps } from 'formik';
+import { Field, Form, Formik, FormikConfig } from 'formik';
 import fetch from 'isomorphic-unfetch';
-import { JsonApiErrorResponse } from 'kitsu';
-import { Dictionary } from 'lodash';
+import identity from 'ramda/es/identity';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
 import * as Yup from 'yup';
@@ -11,12 +10,15 @@ import { ErrorAlert } from 'components/form/errors/error-alert';
 import { FilePickerWithLabel } from 'components/form/file-picker';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
-import { WarnOnUnsavedForm } from 'components/form/with-warn-unsaved-form';
+import { WarnOnUnsavedForm } from 'components/form/warn-on-unsaved-form';
 
-import { config } from 'config';
+import { getErrorsDictionary } from 'utils/get-errors-dictionary';
+import { getFormData } from 'utils/get-form-data';
+
 import { FileList } from 'models';
+import { config } from 'product-specific';
 
-const urlToFetch = `${config.serverIp}/distributed-task-definitions/add`;
+const urlToFetch = `${config.serverUrl}/distributed-task-definitions/add`;
 
 interface CreateDistributedTaskDefinitionModel {
   name: string;
@@ -33,6 +35,15 @@ export class CreateDistributedTaskDefinitionForm extends Component<
   {},
   CreateDistributedTaskDefinitionState
 > {
+  public state: CreateDistributedTaskDefinitionState = {
+    data: {
+      MainDll: null,
+      name: '',
+      description: '',
+      AdditionalDlls: undefined,
+    },
+  };
+
   private validationSchema = Yup.object<
     CreateDistributedTaskDefinitionModel
   >().shape({
@@ -40,26 +51,11 @@ export class CreateDistributedTaskDefinitionForm extends Component<
       .min(3, 'Must be longer than 3 characters')
       .required('Required'),
     description: Yup.string(),
-    MainDll: Yup.mixed().test('Required', 'Required', (value) => {
-      return value;
-    }),
+    MainDll: Yup.mixed().test('Required', 'Required', identity),
     AdditionalDlls: Yup.array<File>()
       .min(1, 'Required')
       .required('Required'),
   });
-
-  constructor(props: any) {
-    super(props);
-
-    this.state = {
-      data: {
-        MainDll: null,
-        name: '',
-        description: '',
-        AdditionalDlls: undefined,
-      },
-    };
-  }
 
   public render() {
     return (
@@ -68,18 +64,13 @@ export class CreateDistributedTaskDefinitionForm extends Component<
         onSubmit={this.handleSubmitHandler}
         render={this.renderForm}
         validationSchema={this.validationSchema}
-      >
-        {({ dirty }) => <WarnOnUnsavedForm warn={dirty} />}
-      </Formik>
+      />
     );
   }
 
-  private renderForm = ({
-    values,
-    touched,
-    errors,
-    isSubmitting,
-  }: FormikProps<CreateDistributedTaskDefinitionModel>) => {
+  private renderForm: FormikConfig<
+    CreateDistributedTaskDefinitionModel
+  >['render'] = ({ values, touched, errors, isSubmitting, dirty }) => {
     return (
       <Pane width="30%">
         <Form>
@@ -125,53 +116,17 @@ export class CreateDistributedTaskDefinitionForm extends Component<
 
           <ClipLoader loading={isSubmitting} />
         </Form>
+        <WarnOnUnsavedForm warn={dirty} />
       </Pane>
     );
   };
 
-  private getErrorsDictionary = (
-    response: JsonApiErrorResponse<CreateDistributedTaskDefinitionModel>,
-  ) => {
-    const errorsDictionary: Dictionary<string> = {};
-
-    for (const [, value] of Object.entries(response.errors)) {
-      if (value.title) {
-        errorsDictionary[value.title] = value.detail ? value.detail : '';
-      }
-    }
-
-    return errorsDictionary;
-  };
-
-  private buildFormData = (values: CreateDistributedTaskDefinitionModel) => {
-    const formData = new FormData();
-    if (values.MainDll) {
-      formData.append('MainDll', values.MainDll);
-    }
-
-    if (values.AdditionalDlls) {
-      for (const file of values.AdditionalDlls) {
-        formData.append('AdditionalDlls', file);
-      }
-    }
-
-    formData.append('name', values.name);
-    formData.append('description', values.description);
-
-    return formData;
-  };
-
-  private handleSubmitHandler = async (
-    values: CreateDistributedTaskDefinitionModel,
-    {
-      setSubmitting,
-      setErrors,
-      resetForm,
-    }: FormikActions<CreateDistributedTaskDefinitionModel>,
-  ) => {
+  private handleSubmitHandler: FormikConfig<
+    CreateDistributedTaskDefinitionModel
+  >['onSubmit'] = async (values, { setSubmitting, setErrors, resetForm }) => {
     setSubmitting(true);
 
-    const formData = this.buildFormData(values);
+    const formData = getFormData(values);
 
     const response = await fetch(urlToFetch, {
       method: 'post',
@@ -181,7 +136,7 @@ export class CreateDistributedTaskDefinitionForm extends Component<
     if (!response.ok) {
       const responseBody = await response.json();
 
-      const errorsDictionary = this.getErrorsDictionary(responseBody);
+      const errorsDictionary = getErrorsDictionary(responseBody);
 
       setErrors(errorsDictionary);
     } else {
