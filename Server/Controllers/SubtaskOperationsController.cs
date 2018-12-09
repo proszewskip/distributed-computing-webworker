@@ -5,6 +5,7 @@ using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Server.DTO;
+using Server.Filters;
 using Server.Models;
 using Server.Services;
 using Server.Validation;
@@ -12,6 +13,7 @@ using Server.Validation;
 namespace Server.Controllers
 {
     [Route("subtasks")]
+    [ServiceFilter(typeof(FormatErrorActionFilter))]
     public class SubtaskOperationsController : Controller
     {
         private readonly DistributedComputingDbContext _dbContext;

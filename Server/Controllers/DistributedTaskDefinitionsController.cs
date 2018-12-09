@@ -9,12 +9,14 @@ using Microsoft.Extensions.DependencyModel.Resolution;
 using Microsoft.Extensions.Logging;
 using Server.DTO;
 using Server.Exceptions;
+using Server.Filters;
 using Server.Models;
 using Server.Services;
 using Server.Validation;
 
 namespace Server.Controllers
 {
+    [ServiceFilter(typeof(FormatErrorActionFilter))]
     public class DistributedTaskDefinitionsController : JsonApiController<DistributedTaskDefinition>
     {
         private readonly IProblemPluginFacadeFactory _problemPluginFacadeFactory;

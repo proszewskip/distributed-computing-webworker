@@ -3,10 +3,12 @@ using System.Threading.Tasks;
 using JsonApiDotNetCore.Controllers;
 using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
+using Server.Filters;
 using Server.Models;
 
 namespace Server.Controllers
 {
+    [ServiceFilter(typeof(FormatErrorActionFilter))]
     public class DistributedNodesController : BaseJsonApiController<DistributedNode, Guid>
     {
         private readonly IResourceService<DistributedNode, Guid> _resourceService;
