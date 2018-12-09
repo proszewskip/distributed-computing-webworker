@@ -73,9 +73,19 @@ class UpdateDistributedTaskFormWithoutDependencies extends Component<
   public componentDidMount = () => {
     this.props.kitsu
       .get<UpdateDistributedTaskModel>(`distributed-task/${this.props.id}`)
-      .then((jsonApiResponse) =>
-        this.setState({ data: jsonApiResponse.data, fetchFinished: true }),
-      )
+      .then((jsonApiResponse) => {
+        const model: UpdateDistributedTaskModel = {
+          'trust-level-to-complete':
+            jsonApiResponse.data['trust-level-to-complete'],
+          description: jsonApiResponse.data.description,
+          id: jsonApiResponse.data.id,
+          name: jsonApiResponse.data.name,
+          priority: jsonApiResponse.data.priority,
+        };
+
+        return model;
+      })
+      .then((model) => this.setState({ data: model, fetchFinished: true }))
       .catch(() => {
         this.setState({ fetchError: true, fetchFinished: true });
       });
