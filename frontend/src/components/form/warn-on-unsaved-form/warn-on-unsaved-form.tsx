@@ -1,16 +1,18 @@
 import { withRouter, WithRouterProps } from 'next/router';
 import { Component } from 'react';
 
-interface WarnOnUnsavedDataProps {
+export interface WarnOnUnsavedDataProps {
   warn: boolean;
+  leaveMessage?: string;
 }
 
 type WarnOnUnsavedDataPropsWithRouter = WarnOnUnsavedDataProps &
   WithRouterProps;
 
 class WarnOnUnsavedData extends Component<WarnOnUnsavedDataPropsWithRouter> {
-  private leaveMessage: string =
-    'You have unsaved changes, are you sure you want to leave?';
+  public static defaultProps = {
+    leaveMessage: 'You have unsaved changes, are you sure you want to leave?',
+  };
 
   public handleWindowClose = (e: Event) => {
     if (!this.props.warn) {
@@ -24,7 +26,7 @@ class WarnOnUnsavedData extends Component<WarnOnUnsavedDataPropsWithRouter> {
   public handleRedirection = () => {
     const { router } = this.props;
 
-    if (!this.props.warn || confirm(this.leaveMessage)) {
+    if (!this.props.warn || confirm(this.props.leaveMessage)) {
       return;
     }
 
@@ -38,7 +40,7 @@ class WarnOnUnsavedData extends Component<WarnOnUnsavedDataPropsWithRouter> {
 
     router.events.on('routeChangeStart', this.handleRedirection);
 
-    throw Error;
+    throw new Error();
   };
 
   public componentDidMount = () => {

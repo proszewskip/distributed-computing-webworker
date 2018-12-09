@@ -23,7 +23,6 @@ export class MockNextContext extends React.Component<MockNextContextProps> {
         route: '/',
         pathname: '/',
         query: {},
-        // TODO: Properly mock the following methods
         back: () => null,
         beforePopState: () => null,
         prefetch: () => null,
@@ -31,7 +30,6 @@ export class MockNextContext extends React.Component<MockNextContextProps> {
         reload: () => null,
         replace: () => null,
         events: {
-          // TODO: Implement EventEmitter
           on: () => null,
           off: () => null,
           trigger: () => null,
