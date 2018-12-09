@@ -1,6 +1,9 @@
-import { Dictionary } from 'lodash';
-
 declare module 'kitsu' {
+  type Dictionary<V> = {
+    [key: string]: V;
+  };
+  type Headers = Dictionary<string>;
+
   class Kitsu {
     constructor(options: KitsuOptions);
 
@@ -23,9 +26,7 @@ declare module 'kitsu' {
     public self(params: SelfParams, headers?: Headers): Promise;
   }
 
-  type Headers = Dictionary<string>;
-
-  interface KitsuOptions {
+  export interface KitsuOptions {
     baseURL?: string;
     headers?: Headers;
     camelCaseTypes?: boolean;
@@ -37,7 +38,7 @@ declare module 'kitsu' {
     timeout?: number;
   }
 
-  interface GetParams {
+  export interface GetParams {
     page?: {
       limit?: number;
       offset?: number;
@@ -48,12 +49,12 @@ declare module 'kitsu' {
     include?: string;
   }
 
-  interface SelfParams {
+  export interface SelfParams {
     fields?: Dictionary<string>;
     include?: string;
   }
 
-  interface JsonApiError {
+  export interface JsonApiError {
     id?: number;
     links?: object;
     status?: number;
