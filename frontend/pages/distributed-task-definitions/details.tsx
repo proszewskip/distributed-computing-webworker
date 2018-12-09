@@ -1,12 +1,16 @@
 import {
+  BackButton,
+  Button,
   Card,
   Heading,
   majorScale,
   minorScale,
   Pane,
   Text,
+  toaster,
 } from 'evergreen-ui';
 import { NextComponentClass } from 'next';
+import { withRouter, WithRouterProps } from 'next/router';
 import React, { PureComponent, ReactNode } from 'react';
 
 import { ErrorPage, RequestErrorInfo } from 'components/errors';
@@ -34,7 +38,7 @@ interface DetailsInitialProps {
   error?: RequestError;
 }
 
-class DetailsPage extends PureComponent<DetailsInitialProps> {
+class DetailsPage extends PureComponent<DetailsInitialProps & WithRouterProps> {
   public static getInitialProps: NextComponentClass<
     DetailsInitialProps
   >['getInitialProps'] = ({ query }) => {
@@ -78,7 +82,7 @@ class DetailsPage extends PureComponent<DetailsInitialProps> {
   }
 
   private renderDetails = (): ReactNode => {
-    const { data } = this.props;
+    const { data, id } = this.props;
 
     if (!data) {
       return null;
@@ -88,6 +92,26 @@ class DetailsPage extends PureComponent<DetailsInitialProps> {
 
     return (
       <>
+        <Pane marginBottom={majorScale(2)}>
+          <BackButton
+            onClick={this.onBackButtonClick}
+            marginRight={minorScale(2)}
+          />
+
+          <Button
+            marginRight={minorScale(2)}
+            iconBefore="trash"
+            intent="danger"
+            onClick={this.onDeleteButtonClick}
+          >
+            Delete
+          </Button>
+
+          <Link route={`/distributed-task-definitions/${id}/edit`}>
+            <Button iconBefore="edit">Edit</Button>
+          </Link>
+        </Pane>
+
         <Card
           background="tint2"
           display="grid"
@@ -158,6 +182,19 @@ class DetailsPage extends PureComponent<DetailsInitialProps> {
       </ErrorPage>
     );
   };
+
+  private onDeleteButtonClick = () => {
+    const kitsu = kitsuFactory();
+
+    kitsu.delete('distributed-task-definition', this.props.id).then(() => {
+      toaster.success('The entity has been deleted');
+      this.props.router.back();
+    });
+  };
+
+  private onBackButtonClick = () => {
+    this.props.router.back();
+  };
 }
 
-export default DetailsPage;
+export default withRouter(DetailsPage);
