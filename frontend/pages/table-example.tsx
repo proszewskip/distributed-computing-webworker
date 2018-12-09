@@ -109,7 +109,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
             intent="danger"
             onClick={this.onDeleteButtonClick(cellProps.original.id)}
           >
-            Remove
+            Delete
           </Button>
 
           <Link
