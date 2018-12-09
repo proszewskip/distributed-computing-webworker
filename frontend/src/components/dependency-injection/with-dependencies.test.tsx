@@ -1,7 +1,7 @@
 import React, { StatelessComponent } from 'react';
 import renderer from 'react-test-renderer';
 
-import { mockConsole } from '../../__mocks__/mock-console';
+import { mockConsole } from '../../../__mocks__/mock-console';
 
 import { DependenciesProvider, DependencyInjectionProvider } from './provider';
 import { DependenciesExtractor, withDependencies } from './with-dependencies';
