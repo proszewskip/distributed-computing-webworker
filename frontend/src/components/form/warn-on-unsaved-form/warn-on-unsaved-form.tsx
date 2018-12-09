@@ -54,6 +54,10 @@ class WarnOnUnsavedData extends Component<WarnOnUnsavedDataPropsWithRouter> {
 
     this.props.router.events.off('routeChangeStart', this.handleRedirection);
   };
+
+  public render = () => {
+    return null;
+  };
 }
 
 export const WarnOnUnsavedForm = withRouter<WarnOnUnsavedDataProps>(

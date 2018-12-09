@@ -11,6 +11,8 @@ import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
 import { WarnOnUnsavedForm } from 'components/form/warn-on-unsaved-form';
 
+import { MockNextContext } from '../__mocks__/next-context-provider-mock';
+
 const stories = storiesOf('Example form', module);
 
 interface ExampleModel {
@@ -94,7 +96,9 @@ export class ExampleForm extends Component<ExampleFormProps, ExampleFormState> {
 
           <ClipLoader loading={isSubmitting} />
         </Form>
-        <WarnOnUnsavedForm warn={dirty} />}
+        <MockNextContext>
+          <WarnOnUnsavedForm warn={dirty} />
+        </MockNextContext>
       </Pane>
     );
   };
