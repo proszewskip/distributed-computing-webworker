@@ -1,6 +1,6 @@
 import { Alert, Button, Pane } from 'evergreen-ui';
 import { Field, Form, Formik, FormikActions, FormikProps } from 'formik';
-import Kitsu, { JsonApiResponse } from 'kitsu';
+import { JsonApiErrorResponse } from 'kitsu';
 import { Dictionary } from 'lodash';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
@@ -11,12 +11,7 @@ import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
 import { WarnOnUnsavedForm } from 'components/form/with-warn-unsaved-form';
 
-import { config } from 'config';
-
-const kitsu = new Kitsu<UpdateDistributedTaskDefinitionModel>({
-  baseURL: config.serverIp,
-  camelCaseTypes: false,
-});
+import { BaseDependencies } from 'product-specific';
 
 interface UpdateDistributedTaskDefinitionModel {
   id: number;
@@ -32,6 +27,7 @@ interface UpdateDistributedTaskDefinitionState {
 
 interface UpdateDistributedTaskDefinitionProps {
   id: number;
+  kitsu: BaseDependencies['kitsu'];
 }
 
 export class UpdateDistributedTaskDefinitionForm extends Component<
@@ -63,10 +59,13 @@ export class UpdateDistributedTaskDefinitionForm extends Component<
   }
 
   public componentDidMount = () => {
-    kitsu
-      .get(`distributed-task-definitions/${this.props.id}`)
-      .then((result) => result.data)
-      .then((result) => this.setState({ data: result, fetchFinished: true }))
+    this.props.kitsu
+      .get<UpdateDistributedTaskDefinitionModel>(
+        `distributed-task-definitions/${this.props.id}`,
+      )
+      .then((jsonApiResponse) =>
+        this.setState({ data: jsonApiResponse.data, fetchFinished: true }),
+      )
       .catch(() => {
         this.setState({ fetchError: true, fetchFinished: true });
       });
@@ -133,7 +132,7 @@ export class UpdateDistributedTaskDefinitionForm extends Component<
   };
 
   private getErrorsDictionary = (
-    response: JsonApiResponse<UpdateDistributedTaskDefinitionModel>,
+    response: JsonApiErrorResponse<UpdateDistributedTaskDefinitionModel>,
   ) => {
     const errorsDictionary: Dictionary<string> = {};
 
@@ -156,7 +155,7 @@ export class UpdateDistributedTaskDefinitionForm extends Component<
   ) => {
     setSubmitting(true);
 
-    kitsu
+    this.props.kitsu
       .patch('distributed-task-definition', values)
       .then(() => {
         alert('Distributed Task Definition updated');
@@ -164,7 +163,9 @@ export class UpdateDistributedTaskDefinitionForm extends Component<
       })
       .catch(
         (
-          errorsResponse: JsonApiResponse<UpdateDistributedTaskDefinitionModel>,
+          errorsResponse: JsonApiErrorResponse<
+            UpdateDistributedTaskDefinitionModel
+          >,
         ) => {
           const errorsDictionary = this.getErrorsDictionary(errorsResponse);
           setErrors(errorsDictionary);

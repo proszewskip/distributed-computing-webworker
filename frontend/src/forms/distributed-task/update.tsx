@@ -1,6 +1,6 @@
 import { Alert, Button, Pane } from 'evergreen-ui';
 import { Field, Form, Formik, FormikActions, FormikProps } from 'formik';
-import Kitsu, { JsonApiResponse } from 'kitsu';
+import { JsonApiErrorResponse } from 'kitsu';
 import { Dictionary } from 'lodash';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
@@ -11,12 +11,7 @@ import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
 import { WarnOnUnsavedForm } from 'components/form/with-warn-unsaved-form';
 
-import { config } from 'config';
-
-const kitsu = new Kitsu<UpdateDistributedTaskModel>({
-  baseURL: config.serverIp,
-  camelCaseTypes: false,
-});
+import { BaseDependencies } from 'product-specific';
 
 export interface UpdateDistributedTaskModel {
   id: number;
@@ -28,6 +23,7 @@ export interface UpdateDistributedTaskModel {
 
 interface UpdateDistributedTaskProps {
   id: number;
+  kitsu: BaseDependencies['kitsu'];
 }
 
 interface UpdateDistributedTaskState {
@@ -71,10 +67,11 @@ export class UpdateDistributedTaskForm extends Component<
   }
 
   public componentDidMount = () => {
-    kitsu
-      .get(`distributed-task/${this.props.id}`)
-      .then((result) => result.data)
-      .then((result) => this.setState({ data: result, fetchFinished: true }))
+    this.props.kitsu
+      .get<UpdateDistributedTaskModel>(`distributed-task/${this.props.id}`)
+      .then((jsonApiResponse) =>
+        this.setState({ data: jsonApiResponse.data, fetchFinished: true }),
+      )
       .catch(() => {
         this.setState({ fetchError: true, fetchFinished: true });
       });
@@ -157,7 +154,7 @@ export class UpdateDistributedTaskForm extends Component<
   };
 
   private getErrorsDictionary = (
-    response: JsonApiResponse<UpdateDistributedTaskModel>,
+    response: JsonApiErrorResponse<UpdateDistributedTaskModel>,
   ) => {
     const errorsDictionary: Dictionary<string> = {};
 
@@ -180,13 +177,13 @@ export class UpdateDistributedTaskForm extends Component<
   ) => {
     setSubmitting(true);
 
-    kitsu
+    this.props.kitsu
       .patch('distributed-task', values)
       .then(() => {
         alert('Distributed Task updated');
         resetForm(values);
       })
-      .catch((response: JsonApiResponse<UpdateDistributedTaskModel>) => {
+      .catch((response: JsonApiErrorResponse<UpdateDistributedTaskModel>) => {
         const errorsObject = this.getErrorsDictionary(response);
         setErrors(errorsObject);
       });
