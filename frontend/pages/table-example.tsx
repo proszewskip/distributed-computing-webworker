@@ -96,7 +96,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       accessor: 'main-dll-name',
       Header: <Text>Main DLL name</Text>,
       Cell: TextCell,
-      minWidth: 100,
+      minWidth: 150,
     },
     {
       id: 'action',
@@ -129,7 +129,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
           </Link>
         </Pane>
       ),
-      minWidth: 180,
+      minWidth: 290,
     },
   ];
 
