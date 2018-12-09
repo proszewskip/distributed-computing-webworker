@@ -5,6 +5,10 @@ import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
 import * as Yup from 'yup';
 
+import {
+  DependenciesExtractor,
+  withDependencies,
+} from 'components/dependency-injection/with-dependencies';
 import { ErrorAlert } from 'components/form/errors/error-alert';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
@@ -26,12 +30,16 @@ interface UpdateDistributedTaskDefinitionState {
   data: UpdateDistributedTaskDefinitionModel;
 }
 
-interface UpdateDistributedTaskDefinitionProps {
-  id: number;
+interface UpdateDistributedTaskDefinitionDependencies {
   kitsu: BaseDependencies['kitsu'];
 }
 
-export class UpdateDistributedTaskDefinitionForm extends Component<
+interface UpdateDistributedTaskDefinitionProps
+  extends UpdateDistributedTaskDefinitionDependencies {
+  id: number;
+}
+
+class UpdateDistributedTaskDefinitionFormWithoutDependencies extends Component<
   UpdateDistributedTaskDefinitionProps,
   UpdateDistributedTaskDefinitionState
 > {
@@ -149,3 +157,12 @@ export class UpdateDistributedTaskDefinitionForm extends Component<
     setSubmitting(false);
   };
 }
+
+const dependenciesExtractor: DependenciesExtractor<
+  BaseDependencies,
+  UpdateDistributedTaskDefinitionDependencies
+> = ({ kitsu }) => ({ kitsu });
+
+export const UpdateDistributedTaskDefinitionForm = withDependencies(
+  dependenciesExtractor,
+)(UpdateDistributedTaskDefinitionFormWithoutDependencies);

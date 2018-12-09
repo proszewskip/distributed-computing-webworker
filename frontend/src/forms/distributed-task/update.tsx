@@ -5,6 +5,10 @@ import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
 import * as Yup from 'yup';
 
+import {
+  DependenciesExtractor,
+  withDependencies,
+} from 'components/dependency-injection/with-dependencies';
 import { ErrorAlert } from 'components/form/errors/error-alert';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
@@ -22,9 +26,12 @@ export interface UpdateDistributedTaskModel {
   'trust-level-to-complete': number;
 }
 
-interface UpdateDistributedTaskProps {
-  id: number;
+interface UpdateDistributedTaskDependencies {
   kitsu: BaseDependencies['kitsu'];
+}
+
+interface UpdateDistributedTaskProps extends UpdateDistributedTaskDependencies {
+  id: number;
 }
 
 interface UpdateDistributedTaskState {
@@ -33,7 +40,7 @@ interface UpdateDistributedTaskState {
   data: UpdateDistributedTaskModel;
 }
 
-export class UpdateDistributedTaskForm extends Component<
+class UpdateDistributedTaskFormWithoutDependencies extends Component<
   UpdateDistributedTaskProps,
   UpdateDistributedTaskState
 > {
@@ -169,3 +176,12 @@ export class UpdateDistributedTaskForm extends Component<
     setSubmitting(false);
   };
 }
+
+const dependenciesExtractor: DependenciesExtractor<
+  BaseDependencies,
+  UpdateDistributedTaskDependencies
+> = ({ kitsu }) => ({ kitsu });
+
+export const UpdateDistributedTaskForm = withDependencies(
+  dependenciesExtractor,
+)(UpdateDistributedTaskFormWithoutDependencies);

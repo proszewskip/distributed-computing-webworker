@@ -1,7 +1,6 @@
 import { Button, Pane } from 'evergreen-ui';
 import { Field, Form, Formik, FormikConfig } from 'formik';
 import fetch from 'isomorphic-unfetch';
-import identity from 'ramda/es/identity';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
 import * as Yup from 'yup';
@@ -63,7 +62,7 @@ export class CreateDistributedTaskForm extends Component<
     TrustLevelToComplete: Yup.number()
       .moreThan(0, 'Trust level to complete must be greater than 0')
       .required('Required'),
-    InputData: Yup.mixed().test('Required', 'Required', identity),
+    InputData: Yup.mixed().test('Required', 'Required', (value) => value),
   });
 
   public render() {
