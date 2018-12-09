@@ -1,8 +1,7 @@
 import { Button, Pane } from 'evergreen-ui';
-import { Field, Form, Formik, FormikActions, FormikProps } from 'formik';
+import { Field, Form, Formik, FormikConfig } from 'formik';
 import fetch from 'isomorphic-unfetch';
-import { JsonApiErrorResponse } from 'kitsu';
-import { Dictionary } from 'lodash';
+import identity from 'ramda/es/identity';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
 import * as Yup from 'yup';
@@ -11,11 +10,14 @@ import { ErrorAlert } from 'components/form/errors/error-alert';
 import { FilePickerWithLabel } from 'components/form/file-picker';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
-import { WarnOnUnsavedForm } from 'components/form/with-warn-unsaved-form';
+import { WarnOnUnsavedForm } from 'components/form/warn-on-unsaved-form';
 
-import { config } from 'config';
+import { getErrorsDictionary } from 'utils/get-errors-dictionary';
+import { getFormData } from 'utils/get-form-data';
 
-const urlToFetch = `${config.serverIp}/distributed-tasks/add`;
+import { config } from 'product-specific';
+
+const urlToFetch = `${config.serverUrl}/distributed-tasks/add`;
 
 interface CreateDistributedTaskModel {
   DistributedTaskDefinitionId: number;
@@ -38,6 +40,17 @@ export class CreateDistributedTaskForm extends Component<
   CreateDistributedTaskProps,
   CreateDistributedTaskState
 > {
+  public state: CreateDistributedTaskState = {
+    data: {
+      name: '',
+      description: '',
+      DistributedTaskDefinitionId: this.props.id,
+      InputData: null,
+      TrustLevelToComplete: NaN,
+      priority: NaN,
+    },
+  };
+
   private validationSchema = Yup.object<CreateDistributedTaskModel>().shape({
     DistributedTaskDefinitionId: Yup.number().required('required'),
     name: Yup.string()
@@ -50,25 +63,8 @@ export class CreateDistributedTaskForm extends Component<
     TrustLevelToComplete: Yup.number()
       .moreThan(0, 'Trust level to complete must be greater than 0')
       .required('Required'),
-    InputData: Yup.mixed().test('Required', 'Required', (value) => {
-      return value;
-    }),
+    InputData: Yup.mixed().test('Required', 'Required', identity),
   });
-
-  constructor(props: any) {
-    super(props);
-
-    this.state = {
-      data: {
-        name: '',
-        description: '',
-        DistributedTaskDefinitionId: props.id,
-        InputData: null,
-        TrustLevelToComplete: NaN,
-        priority: NaN,
-      },
-    };
-  }
 
   public render() {
     return (
@@ -77,18 +73,17 @@ export class CreateDistributedTaskForm extends Component<
         onSubmit={this.handleSubmitHandler}
         render={this.renderForm}
         validationSchema={this.validationSchema}
-      >
-        {({ dirty }) => <WarnOnUnsavedForm warn={dirty} />}
-      </Formik>
+      />
     );
   }
 
-  private renderForm = ({
+  private renderForm: FormikConfig<CreateDistributedTaskModel>['render'] = ({
     values,
     touched,
     errors,
     isSubmitting,
-  }: FormikProps<CreateDistributedTaskModel>) => {
+    dirty,
+  }) => {
     return (
       <Pane width="30%">
         <Form>
@@ -141,57 +136,17 @@ export class CreateDistributedTaskForm extends Component<
 
           <ClipLoader loading={isSubmitting} />
         </Form>
+        <WarnOnUnsavedForm warn={dirty} />
       </Pane>
     );
   };
 
-  private getErrorsDictionary = (
-    response: JsonApiErrorResponse<CreateDistributedTaskModel>,
-  ): Dictionary<string> => {
-    const errorsDictionary: Dictionary<string> = {};
-
-    for (const [, value] of Object.entries(response.errors)) {
-      if (value.title) {
-        errorsDictionary[value.title] = value.detail ? value.detail : '';
-      }
-    }
-
-    return errorsDictionary;
-  };
-
-  private buildFormData = (values: CreateDistributedTaskModel): FormData => {
-    const formData = new FormData();
-
-    formData.append('name', values.name);
-    formData.append('description', values.description);
-    formData.append('priority', values.priority.toString());
-    formData.append(
-      'TrustLevelToComplete',
-      values.TrustLevelToComplete.toString(),
-    );
-    formData.append(
-      'DistributedTaskDefinitionId',
-      values.DistributedTaskDefinitionId.toString(),
-    );
-
-    if (values.InputData) {
-      formData.append('InputData', values.InputData);
-    }
-
-    return formData;
-  };
-
-  private handleSubmitHandler = async (
-    values: CreateDistributedTaskModel,
-    {
-      setSubmitting,
-      setErrors,
-      resetForm,
-    }: FormikActions<CreateDistributedTaskModel>,
-  ) => {
+  private handleSubmitHandler: FormikConfig<
+    CreateDistributedTaskModel
+  >['onSubmit'] = async (values, { setSubmitting, setErrors, resetForm }) => {
     setSubmitting(true);
 
-    const formData = this.buildFormData(values);
+    const formData = getFormData(values);
 
     const response = await fetch(urlToFetch, {
       method: 'POST',
@@ -201,7 +156,7 @@ export class CreateDistributedTaskForm extends Component<
     if (!response.ok) {
       const responseBody = await response.json();
 
-      const errorsDictionary = this.getErrorsDictionary(responseBody);
+      const errorsDictionary = getErrorsDictionary(responseBody);
 
       setErrors(errorsDictionary);
     } else {

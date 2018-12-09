@@ -1,6 +1,6 @@
 import { storiesOf } from '@storybook/react';
 import { Button, Pane } from 'evergreen-ui';
-import { Field, Form, Formik, FormikActions, FormikProps } from 'formik';
+import { Field, Form, Formik, FormikActions, FormikConfig } from 'formik';
 import 'normalize.css';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
@@ -9,7 +9,7 @@ import * as Yup from 'yup';
 import { ErrorAlert } from 'components/form/errors/error-alert';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
-import { WarnOnUnsavedForm } from 'components/form/with-warn-unsaved-form';
+import { WarnOnUnsavedForm } from 'components/form/warn-on-unsaved-form';
 
 const stories = storiesOf('Example form', module);
 
@@ -22,33 +22,29 @@ interface ExampleFormState {
   data: ExampleModel;
 }
 
-type onSubmitType = (
+type onSubmitCallback = (
   values: ExampleModel,
   formikActions: FormikActions<ExampleModel>,
 ) => void;
 
 interface ExampleFormProps {
-  onSubmit: onSubmitType;
+  onSubmit: onSubmitCallback;
 }
 
 export class ExampleForm extends Component<ExampleFormProps, ExampleFormState> {
+  public state: ExampleFormState = {
+    data: {
+      name: '',
+      description: '',
+    },
+  };
+
   private validationSchema = Yup.object<ExampleModel>().shape({
     name: Yup.string()
       .min(3, 'Must be longer than 3 characters')
       .required('Required'),
     description: Yup.string(),
   });
-
-  constructor(props: any) {
-    super(props);
-
-    this.state = {
-      data: {
-        name: '',
-        description: '',
-      },
-    };
-  }
 
   public render() {
     return (
@@ -57,18 +53,17 @@ export class ExampleForm extends Component<ExampleFormProps, ExampleFormState> {
         onSubmit={this.props.onSubmit}
         render={this.renderForm}
         validationSchema={this.validationSchema}
-      >
-        {({ dirty }) => <WarnOnUnsavedForm warn={dirty} />}
-      </Formik>
+      />
     );
   }
 
-  private renderForm = ({
+  private renderForm: FormikConfig<ExampleModel>['render'] = ({
     values,
     touched,
     errors,
     isSubmitting,
-  }: FormikProps<ExampleModel>) => {
+    dirty,
+  }) => {
     return (
       <Pane width="30%">
         <Form>
@@ -99,6 +94,7 @@ export class ExampleForm extends Component<ExampleFormProps, ExampleFormState> {
 
           <ClipLoader loading={isSubmitting} />
         </Form>
+        <WarnOnUnsavedForm warn={dirty} />}
       </Pane>
     );
   };
