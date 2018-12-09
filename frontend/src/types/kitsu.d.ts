@@ -69,7 +69,7 @@ declare module 'kitsu' {
     data: Model;
   }
 
-  export interface JsonApiErrorResponse<Model> {
+  export interface JsonApiErrorResponse {
     errors: JsonApiError[];
   }
 
