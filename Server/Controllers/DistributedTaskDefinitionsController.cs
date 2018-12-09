@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using JsonApiDotNetCore.Controllers;
 using JsonApiDotNetCore.Internal;
 using JsonApiDotNetCore.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyModel.Resolution;
 using Microsoft.Extensions.Logging;
