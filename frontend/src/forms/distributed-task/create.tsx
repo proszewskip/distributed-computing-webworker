@@ -199,7 +199,7 @@ export class CreateDistributedTaskForm extends Component<
     });
 
     if (!response.ok) {
-      const responseBody: CreateDistributedTaskResponse = await response.json();
+      const responseBody = await response.json();
 
       const errorsDictionary = this.getErrorsDictionary(responseBody);
 
