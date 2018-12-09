@@ -1,6 +1,8 @@
 import NextHead from 'next/head';
 import React, { StatelessComponent } from 'react';
 
+import 'styles.css';
+
 interface HeadProps {
   title?: string;
 }

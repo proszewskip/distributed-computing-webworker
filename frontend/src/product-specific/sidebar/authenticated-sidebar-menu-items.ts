@@ -2,15 +2,19 @@ import { ConnectedMenuItem } from 'components/sidebar';
 
 export const authenticatedSidebarMenuItems: ConnectedMenuItem[] = [
   {
-    href: '/',
+    route: '/',
     title: 'Home',
   },
   {
-    href: '/form-example',
+    route: '/form-example',
     title: 'Form example',
   },
   {
-    href: '/table-example',
+    route: '/table-example',
     title: 'Table example',
+  },
+  {
+    route: '/distributed-task-definitions',
+    title: 'Distributed Task Definitions',
   },
 ];

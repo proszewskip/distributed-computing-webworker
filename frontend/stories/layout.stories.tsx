@@ -13,12 +13,12 @@ const stories = storiesOf('Layout', module);
 const DefaultLayout: StatelessComponent = ({ children: additionalText }) => {
   const menuItems: SidebarMenuProps['items'] = [
     {
-      href: 'test',
+      route: 'test',
       isActive: () => false,
       title: 'Foo',
     },
     {
-      href: 'test2',
+      route: 'test2',
       isActive: () => true,
       title: 'Bar',
     },
