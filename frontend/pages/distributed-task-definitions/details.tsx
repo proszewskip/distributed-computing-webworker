@@ -1,17 +1,17 @@
-import { Card, Pane } from 'evergreen-ui';
-import { NextStatelessComponent } from 'next';
-import React, { StatelessComponent } from 'react';
+import { Heading, majorScale, Pane } from 'evergreen-ui';
+import { NextComponentClass } from 'next';
+import React, { PureComponent, ReactNode } from 'react';
 
-import {
-  DependenciesExtractor,
-  withDependencies,
-} from 'components/dependency-injection/with-dependencies';
+import { ErrorPage, RequestErrorInfo } from 'components/errors';
 import { Layout, LayoutProps } from 'components/layout';
 import { Link } from 'components/link';
 
+import { RequestError, transformRequestError } from 'error-handling';
+
+import { DistributedTaskDefinition } from 'models';
+
 import {
   AuthenticatedSidebar,
-  BaseDependencies,
   BaseDependenciesProvider,
   Head,
   kitsuFactory,
@@ -23,74 +23,80 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
 
 interface DetailsInitialProps {
   id: number;
+  data?: DistributedTaskDefinition;
+  error?: RequestError;
 }
 
-interface DependencyUserDependencies {
-  kitsu: BaseDependencies['kitsu'];
-}
+class DetailsPage extends PureComponent<DetailsInitialProps> {
+  public static getInitialProps: NextComponentClass<
+    DetailsInitialProps
+  >['getInitialProps'] = ({ query }) => {
+    const id = parseInt(query.id as string, 10);
 
-const DependencyUser: StatelessComponent<DependencyUserDependencies> = ({
-  kitsu,
-}) => {
-  console.log('I have access to', kitsu);
+    const kitsu = kitsuFactory();
 
-  return <div>I have access!</div>;
-};
+    return kitsu
+      .get<DistributedTaskDefinition>(`distributed-task-definition/${id}`)
+      .then((result) => ({
+        id,
+        data: result.data,
+      }))
+      .catch(
+        (error): DetailsInitialProps => ({
+          id,
+          error: transformRequestError(error),
+        }),
+      );
+  };
 
-const dependencyUserDependenciesExtractor: DependenciesExtractor<
-  BaseDependencies,
-  DependencyUserDependencies
-> = ({ kitsu }) => ({ kitsu });
+  public render() {
+    return (
+      <>
+        <Head />
 
-const EnhancedDependencyUser = withDependencies(
-  dependencyUserDependenciesExtractor,
-)(DependencyUser);
+        <BaseDependenciesProvider>
+          <Layout renderSidebar={renderSidebar}>
+            <Pane margin={majorScale(1)}>
+              <Heading size={700} marginBottom={majorScale(1)}>
+                Distributed Task Definition details
+              </Heading>
 
-const Details: NextStatelessComponent<DetailsInitialProps> = ({ id }) => (
-  <>
-    <Head />
-
-    <BaseDependenciesProvider>
-      <Layout renderSidebar={renderSidebar}>
-        <Pane display="flex" justifyContent="center" marginTop="2em">
-          <Card padding={80} border="default" background="tint2">
-            {id}
-
-            <EnhancedDependencyUser />
-
-            <Link
-              route="distributed-task-definition-details"
-              params={{ id: id + 1 }}
-            >
-              <a>Next one</a>
-            </Link>
-          </Card>
-        </Pane>
-      </Layout>
-    </BaseDependenciesProvider>
-  </>
-);
-
-Details.getInitialProps = async ({ query }) => {
-  /**
-   * There is no access to the dependenciesHere, so in `getInitialProps`, `kitsuFactory` has to be
-   * called explicitly.
-   */
-
-  const id = parseInt(query.id as string, 10);
-
-  const kitsu = kitsuFactory();
-  try {
-    const result = await kitsu.get(`distributed-task-definition/${id}`);
-    console.log(result);
-  } catch (error) {
-    console.log('Error', error);
+              {this.renderErrors()}
+              {this.renderDetails()}
+            </Pane>
+          </Layout>
+        </BaseDependenciesProvider>
+      </>
+    );
   }
 
-  console.log(query);
-  return {
-    id,
-  };
-};
+  private renderDetails = (): ReactNode => {
+    const { data } = this.props;
 
-export default Details;
+    if (!data) {
+      return null;
+    }
+
+    return <div>{data.name}</div>;
+  };
+
+  private renderErrors = (): ReactNode => {
+    const { error } = this.props;
+
+    if (!error) {
+      return null;
+    }
+
+    return (
+      <ErrorPage>
+        <RequestErrorInfo error={error} />
+
+        <Link route="/distributed-task-definitions">
+          <a>Go back to the list of distributed task definitions</a>
+        </Link>
+      </ErrorPage>
+    );
+  };
+}
+
+export default DetailsPage;
