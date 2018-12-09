@@ -1,7 +1,6 @@
 import { Button, Pane } from 'evergreen-ui';
 import { Field, Form, Formik, FormikConfig } from 'formik';
 import fetch from 'isomorphic-unfetch';
-import identity from 'ramda/es/identity';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
 import * as Yup from 'yup';
@@ -51,7 +50,7 @@ export class CreateDistributedTaskDefinitionForm extends Component<
       .min(3, 'Must be longer than 3 characters')
       .required('Required'),
     description: Yup.string(),
-    MainDll: Yup.mixed().test('Required', 'Required', identity),
+    MainDll: Yup.mixed().test('Required', 'Required', (value) => value),
     AdditionalDlls: Yup.array<File>()
       .min(1, 'Required')
       .required('Required'),
