@@ -1,4 +1,4 @@
-import { Button, Heading, minorScale, Pane, Text } from 'evergreen-ui';
+import { Button, Heading, minorScale, Pane, Text, toaster } from 'evergreen-ui';
 import fetch from 'isomorphic-unfetch';
 import React, { Component, MouseEventHandler } from 'react';
 import { Column } from 'react-table';
@@ -29,12 +29,12 @@ import {
   withSelectableRows,
   WithSelectableRowsAdditionalProps,
 } from 'components/data-table/with-selectable-rows';
-
 import { Layout, LayoutProps } from 'components/layout';
+import { Link } from 'components/link';
 
 import { DistributedTaskDefinition } from 'models';
 
-import { AuthenticatedSidebar, Head } from 'product-specific';
+import { AuthenticatedSidebar, Head, kitsuFactory } from 'product-specific';
 
 const SelectDataTable = selectTableHOC(DataTable);
 const Table = withSelectableRows(SelectDataTable);
@@ -101,22 +101,33 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
     {
       id: 'action',
       Header: <Text>Action</Text>,
-      Cell: (cellProps: any) => (
-        <div onClick={preventPropagationHandler}>
+      Cell: (cellProps) => (
+        <Pane onClick={preventPropagationHandler}>
           <Button
-            appearance="primary"
+            marginRight={minorScale(2)}
+            iconBefore="trash"
             intent="danger"
-            onClick={this.onRowClick(cellProps.original)}
+            onClick={this.onDeleteButtonClick(cellProps.original.id)}
           >
             Remove
           </Button>
-          <Button
-            appearance="primary"
-            onClick={this.onRowClick(cellProps.original)}
+
+          <Link
+            route={`/distributed-task-definitions/${
+              cellProps.original.id
+            }/edit`}
           >
-            See details
-          </Button>
-        </div>
+            <Button iconBefore="edit" marginRight={minorScale(2)}>
+              Edit
+            </Button>
+          </Link>
+
+          <Link
+            route={`/distributed-task-definitions/${cellProps.original.id}`}
+          >
+            <Button iconBefore="chevron-right">See details</Button>
+          </Link>
+        </Pane>
       ),
       minWidth: 180,
     },
@@ -146,28 +157,26 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
     } = this.state;
 
     return (
-      <div>
-        <DataTableView
-          header={<Heading size={600}>Distributed Task definitions</Heading>}
-          renderActionButtons={this.renderActionButtons}
-        >
-          <Table
-            data={data}
-            columns={this.columns}
-            filterableColumnIds={this.filterableColumnIds}
-            filteringEnabled={filteringEnabled}
-            loading={loading}
-            selectedRowIds={selectedRowIds}
-            onSelectionChange={this.onSelectionChange}
-            renderSummary={this.renderSummary}
-            totalRecordsCount={totalRecordsCount}
-            onFetchData={this.fetchData}
-            initialPage={1}
-            initialPageSize={20}
-            getForceFetchData={this.getFetchDataCallback}
-          />
-        </DataTableView>
-      </div>
+      <DataTableView
+        header={<Heading size={600}>Distributed Task definitions</Heading>}
+        renderActionButtons={this.renderActionButtons}
+      >
+        <Table
+          data={data}
+          columns={this.columns}
+          filterableColumnIds={this.filterableColumnIds}
+          filteringEnabled={filteringEnabled}
+          loading={loading}
+          selectedRowIds={selectedRowIds}
+          onSelectionChange={this.onSelectionChange}
+          renderSummary={this.renderSummary}
+          totalRecordsCount={totalRecordsCount}
+          onFetchData={this.fetchData}
+          initialPage={1}
+          initialPageSize={20}
+          getForceFetchData={this.getFetchDataCallback}
+        />
+      </DataTableView>
     );
   }
 
@@ -204,8 +213,13 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
     });
   };
 
-  private onRowClick = (value: any) => () => {
-    console.log('Clicked', value);
+  private onDeleteButtonClick = (id: string) => () => {
+    const kitsu = kitsuFactory();
+
+    kitsu.delete('distributed-task-definition', id).then(() => {
+      toaster.success('The entity has been deleted');
+      this.forceFetchData();
+    });
   };
 
   private renderActionButtons: DataTableViewProps['renderActionButtons'] = () => (
