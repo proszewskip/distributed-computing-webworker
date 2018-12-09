@@ -1,6 +1,7 @@
 import { Button, Pane } from 'evergreen-ui';
 import { Field, Form, Formik, FormikActions, FormikProps } from 'formik';
 import fetch from 'isomorphic-unfetch';
+import { JsonApiErrorResponse } from 'kitsu';
 import { Dictionary } from 'lodash';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
@@ -13,7 +14,6 @@ import { Textarea } from 'components/form/textarea';
 import { WarnOnUnsavedForm } from 'components/form/with-warn-unsaved-form';
 
 import { config } from 'config';
-import { ServerError } from 'models';
 
 const urlToFetch = `${config.serverIp}/distributed-tasks/add`;
 
@@ -24,10 +24,6 @@ interface CreateDistributedTaskModel {
   priority: number;
   TrustLevelToComplete: number;
   InputData: File | null;
-}
-
-interface CreateDistributedTaskResponse {
-  Errors: Dictionary<ServerError>;
 }
 
 interface CreateDistributedTaskProps {
@@ -150,12 +146,14 @@ export class CreateDistributedTaskForm extends Component<
   };
 
   private getErrorsDictionary = (
-    response: CreateDistributedTaskResponse,
+    response: JsonApiErrorResponse<CreateDistributedTaskModel>,
   ): Dictionary<string> => {
     const errorsDictionary: Dictionary<string> = {};
 
-    for (const [, value] of Object.entries(response.Errors)) {
-      errorsDictionary[value.title] = value.detail;
+    for (const [, value] of Object.entries(response.errors)) {
+      if (value.title) {
+        errorsDictionary[value.title] = value.detail ? value.detail : '';
+      }
     }
 
     return errorsDictionary;
