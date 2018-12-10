@@ -1,7 +1,7 @@
 import { JsonApiErrorResponse } from 'kitsu';
 import { Dictionary } from 'lodash';
 
-export function getErrorsDictionary(response: JsonApiErrorResponse<any>) {
+export function getErrorsDictionary(response: JsonApiErrorResponse) {
   const errorsDictionary: Dictionary<string> = {};
 
   if (!response.errors) {
