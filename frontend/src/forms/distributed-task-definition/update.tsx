@@ -12,7 +12,7 @@ import {
 import { ErrorAlert } from 'components/form/errors/error-alert';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
-import { WarnOnUnsavedForm } from 'components/form/warn-on-unsaved-form';
+import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
 
 import { getErrorsDictionary } from 'utils/get-errors-dictionary';
 
@@ -34,12 +34,14 @@ interface UpdateDistributedTaskDefinitionDependencies {
   kitsu: BaseDependencies['kitsu'];
 }
 
-interface UpdateDistributedTaskDefinitionProps
-  extends UpdateDistributedTaskDefinitionDependencies {
+interface UpdateDistributedTaskDefinitionOwnProps {
   id: number;
 }
 
-class UpdateDistributedTaskDefinitionFormWithoutDependencies extends Component<
+type UpdateDistributedTaskDefinitionProps = UpdateDistributedTaskDefinitionOwnProps &
+  UpdateDistributedTaskDefinitionDependencies;
+
+class PureUpdateDistributedTaskDefinitionForm extends Component<
   UpdateDistributedTaskDefinitionProps,
   UpdateDistributedTaskDefinitionState
 > {
@@ -63,7 +65,7 @@ class UpdateDistributedTaskDefinitionFormWithoutDependencies extends Component<
     description: Yup.string(),
   });
 
-  public componentDidMount = () => {
+  public getInitialProps = () => {
     this.props.kitsu
       .get<UpdateDistributedTaskDefinitionModel>(
         `distributed-task-definitions/${this.props.id}`,
@@ -105,7 +107,7 @@ class UpdateDistributedTaskDefinitionFormWithoutDependencies extends Component<
     UpdateDistributedTaskDefinitionModel
   >['render'] = ({ values, touched, errors, isSubmitting, dirty }) => {
     return (
-      <Pane width="30%">
+      <Pane maxWidth={600}>
         <Form>
           <ErrorAlert touched={touched} errors={errors} values={values} />
 
@@ -134,7 +136,7 @@ class UpdateDistributedTaskDefinitionFormWithoutDependencies extends Component<
 
           <ClipLoader loading={isSubmitting} />
         </Form>
-        <WarnOnUnsavedForm warn={dirty} />
+        <WarnOnUnsavedData warn={dirty} />
       </Pane>
     );
   };
@@ -172,4 +174,4 @@ const dependenciesExtractor: DependenciesExtractor<
 
 export const UpdateDistributedTaskDefinitionForm = withDependencies(
   dependenciesExtractor,
-)(UpdateDistributedTaskDefinitionFormWithoutDependencies);
+)(PureUpdateDistributedTaskDefinitionForm);
