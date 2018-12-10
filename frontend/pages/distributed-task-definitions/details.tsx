@@ -1,17 +1,17 @@
-import { Card, Pane } from 'evergreen-ui';
-import { NextStatelessComponent } from 'next';
-import React, { StatelessComponent } from 'react';
+import { Heading, majorScale, Pane, toaster } from 'evergreen-ui';
+import { withRouter, WithRouterProps } from 'next/router';
+import React, { PureComponent } from 'react';
+
+import { Layout, LayoutProps } from 'components/layout';
 
 import {
-  DependenciesExtractor,
-  withDependencies,
-} from 'components/dependency-injection/with-dependencies';
-import { Layout, LayoutProps } from 'components/layout';
-import { Link } from 'components/link';
+  DistributedTaskDefinitionDetails,
+  getDistributedTaskDefinitionDetailsInitialProps,
+} from 'features/distributed-task-definitions';
+import { DistributedTaskDefinitionDetailsInitialProps } from 'features/distributed-task-definitions/details/types';
 
 import {
   AuthenticatedSidebar,
-  BaseDependencies,
   BaseDependenciesProvider,
   Head,
   kitsuFactory,
@@ -21,76 +21,49 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
   <AuthenticatedSidebar />
 );
 
-interface DetailsInitialProps {
-  id: number;
-}
+const kitsu = kitsuFactory();
 
-interface DependencyUserDependencies {
-  kitsu: BaseDependencies['kitsu'];
-}
+class DetailsPage extends PureComponent<
+  DistributedTaskDefinitionDetailsInitialProps & WithRouterProps
+> {
+  public static getInitialProps = getDistributedTaskDefinitionDetailsInitialProps(
+    kitsu,
+  );
 
-const DependencyUser: StatelessComponent<DependencyUserDependencies> = ({
-  kitsu,
-}) => {
-  console.log('I have access to', kitsu);
+  public render() {
+    return (
+      <>
+        <Head />
 
-  return <div>I have access!</div>;
-};
+        <BaseDependenciesProvider>
+          <Layout renderSidebar={renderSidebar}>
+            <Pane margin={majorScale(1)}>
+              <Heading size={700} marginBottom={majorScale(1)}>
+                Distributed Task Definition details
+              </Heading>
 
-const dependencyUserDependenciesExtractor: DependenciesExtractor<
-  BaseDependencies,
-  DependencyUserDependencies
-> = ({ kitsu }) => ({ kitsu });
-
-const EnhancedDependencyUser = withDependencies(
-  dependencyUserDependenciesExtractor,
-)(DependencyUser);
-
-const Details: NextStatelessComponent<DetailsInitialProps> = ({ id }) => (
-  <>
-    <Head />
-
-    <BaseDependenciesProvider>
-      <Layout renderSidebar={renderSidebar}>
-        <Pane display="flex" justifyContent="center" marginTop="2em">
-          <Card padding={80} border="default" background="tint2">
-            {id}
-
-            <EnhancedDependencyUser />
-
-            <Link
-              route="distributed-task-definition-details"
-              params={{ id: id + 1 }}
-            >
-              <a>Next one</a>
-            </Link>
-          </Card>
-        </Pane>
-      </Layout>
-    </BaseDependenciesProvider>
-  </>
-);
-
-Details.getInitialProps = async ({ query }) => {
-  /**
-   * There is no access to the dependenciesHere, so in `getInitialProps`, `kitsuFactory` has to be
-   * called explicitly.
-   */
-
-  const id = parseInt(query.id as string, 10);
-
-  const kitsu = kitsuFactory();
-  try {
-    const result = await kitsu.get(`distributed-task-definition/${id}`);
-    console.log(result);
-  } catch (error) {
-    console.log('Error', error);
+              <DistributedTaskDefinitionDetails
+                {...this.props}
+                onBackButtonClick={this.onBackButtonClick}
+                onDeleteButtonClick={this.onDeleteButtonClick}
+              />
+            </Pane>
+          </Layout>
+        </BaseDependenciesProvider>
+      </>
+    );
   }
 
-  console.log(query);
-  return {
-    id,
+  private onDeleteButtonClick = () => {
+    kitsu.delete('distributed-task-definition', this.props.id).then(() => {
+      toaster.success('The task definition has been deleted');
+      this.props.router.back();
+    });
   };
-};
 
-export default Details;
+  private onBackButtonClick = () => {
+    this.props.router.back();
+  };
+}
+
+export default withRouter(DetailsPage);
