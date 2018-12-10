@@ -11,8 +11,8 @@ export const JsonApiErrorsInfo: StatelessComponent<JsonApiErrorsInfoProps> = ({
   errors,
 }) => (
   <>
-    {errors.map((error) => (
-      <ErrorInfo key={error.title} title={error.title}>
+    {errors.map((error, index) => (
+      <ErrorInfo key={index} title={error.title}>
         {error.detail}
       </ErrorInfo>
     ))}
