@@ -12,7 +12,7 @@ import {
 import { ErrorAlert } from 'components/form/errors/error-alert';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
-import { WarnOnUnsavedForm } from 'components/form/warn-on-unsaved-form';
+import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
 
 import { getErrorsDictionary } from 'utils/get-errors-dictionary';
 
@@ -30,9 +30,12 @@ interface UpdateDistributedTaskDependencies {
   kitsu: BaseDependencies['kitsu'];
 }
 
-interface UpdateDistributedTaskProps extends UpdateDistributedTaskDependencies {
+interface UpdateDistributedTaskOwnProps {
   id: number;
 }
+
+type UpdateDistributedTaskProps = UpdateDistributedTaskOwnProps &
+  UpdateDistributedTaskDependencies;
 
 interface UpdateDistributedTaskState {
   fetchFinished: boolean;
@@ -40,7 +43,7 @@ interface UpdateDistributedTaskState {
   data: UpdateDistributedTaskModel;
 }
 
-class UpdateDistributedTaskFormWithoutDependencies extends Component<
+class PureUpdateDistributedTaskForm extends Component<
   UpdateDistributedTaskProps,
   UpdateDistributedTaskState
 > {
@@ -70,7 +73,7 @@ class UpdateDistributedTaskFormWithoutDependencies extends Component<
       .required('Required'),
   });
 
-  public componentDidMount = () => {
+  public getInitialProps = () => {
     this.props.kitsu
       .get<UpdateDistributedTaskModel>(`distributed-task/${this.props.id}`)
       .then((jsonApiResponse) => {
@@ -117,7 +120,7 @@ class UpdateDistributedTaskFormWithoutDependencies extends Component<
     dirty,
   }) => {
     return (
-      <Pane width="30%">
+      <Pane maxWidth={600}>
         <Form>
           <ErrorAlert touched={touched} errors={errors} values={values} />
 
@@ -162,7 +165,7 @@ class UpdateDistributedTaskFormWithoutDependencies extends Component<
 
           <ClipLoader loading={isSubmitting} />
         </Form>
-        <WarnOnUnsavedForm warn={dirty} />
+        <WarnOnUnsavedData warn={dirty} />
       </Pane>
     );
   };
@@ -194,4 +197,4 @@ const dependenciesExtractor: DependenciesExtractor<
 
 export const UpdateDistributedTaskForm = withDependencies(
   dependenciesExtractor,
-)(UpdateDistributedTaskFormWithoutDependencies);
+)(PureUpdateDistributedTaskForm);
