@@ -102,7 +102,9 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
           <Pane>
             <Text>Description</Text>
           </Pane>
-          <Pane>{data.description}</Pane>
+          <Pane>
+            <Text>{data.description}</Text>
+          </Pane>
 
           <Pane>
             <Text>Main DLL name</Text>
