@@ -1,9 +1,7 @@
 import { WithRouterProps } from 'next/router';
 
-import { DistributedTaskDefinition } from 'models';
-
 import { RequestError } from 'error-handling';
-
+import { DistributedTaskDefinition } from 'models';
 import { BaseDependencies } from 'product-specific';
 
 export interface DistributedTaskDefinitionDetailsInitialProps {
