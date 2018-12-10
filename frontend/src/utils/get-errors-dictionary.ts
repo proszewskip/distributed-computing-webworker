@@ -7,11 +7,11 @@ export function getErrorsDictionary(response: JsonApiErrorResponse<any>) {
   if (!response.errors) {
     errorsDictionary['Undefined error'] = '';
   } else {
-    for (const [, value] of Object.entries(response.errors)) {
+    Object.values(response.errors).forEach((value) => {
       if (value.title) {
-        errorsDictionary[value.title] = value.detail ? value.detail : '';
+        errorsDictionary[value.title] = value.detail || '';
       }
-    }
+    });
   }
 
   return errorsDictionary;
