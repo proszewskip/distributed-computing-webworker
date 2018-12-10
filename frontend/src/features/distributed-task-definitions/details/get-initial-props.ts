@@ -1,9 +1,8 @@
 import Kitsu from 'kitsu';
 import { NextComponentClass } from 'next';
 
-import { DistributedTaskDefinition } from 'models';
-
 import { transformRequestError } from 'error-handling';
+import { DistributedTaskDefinition } from 'models';
 
 import { DistributedTaskDefinitionDetailsInitialProps } from './types';
 

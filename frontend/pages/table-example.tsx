@@ -33,7 +33,6 @@ import { Layout, LayoutProps } from 'components/layout';
 import { Link } from 'components/link';
 
 import { DistributedTaskDefinition } from 'models';
-
 import { AuthenticatedSidebar, Head, kitsuFactory } from 'product-specific';
 
 const SelectDataTable = selectTableHOC(DataTable);
