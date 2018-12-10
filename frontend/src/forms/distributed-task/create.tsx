@@ -1,6 +1,7 @@
 import { Button, Pane } from 'evergreen-ui';
 import { Field, Form, Formik, FormikConfig } from 'formik';
 import fetch from 'isomorphic-unfetch';
+import { identity } from 'ramda';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
 import * as Yup from 'yup';
@@ -9,7 +10,7 @@ import { ErrorAlert } from 'components/form/errors/error-alert';
 import { FilePickerWithLabel } from 'components/form/file-picker';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
-import { WarnOnUnsavedForm } from 'components/form/warn-on-unsaved-form';
+import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
 
 import { getErrorsDictionary } from 'utils/get-errors-dictionary';
 import { getFormData } from 'utils/get-form-data';
@@ -20,9 +21,9 @@ const urlToFetch = `${config.serverUrl}/distributed-tasks/add`;
 
 interface CreateDistributedTaskModel {
   DistributedTaskDefinitionId: number;
-  name: string;
-  description: string;
-  priority: number;
+  Name: string;
+  Description: string;
+  Priority: number;
   TrustLevelToComplete: number;
   InputData: File | null;
 }
@@ -41,28 +42,28 @@ export class CreateDistributedTaskForm extends Component<
 > {
   public state: CreateDistributedTaskState = {
     data: {
-      name: '',
-      description: '',
+      Name: '',
+      Description: '',
       DistributedTaskDefinitionId: this.props.id,
       InputData: null,
       TrustLevelToComplete: NaN,
-      priority: NaN,
+      Priority: NaN,
     },
   };
 
   private validationSchema = Yup.object<CreateDistributedTaskModel>().shape({
     DistributedTaskDefinitionId: Yup.number().required('required'),
-    name: Yup.string()
+    Name: Yup.string()
       .min(3, 'Must be longer than 3 characters')
       .required('Required'),
-    description: Yup.string(),
-    priority: Yup.number()
+    Description: Yup.string(),
+    Priority: Yup.number()
       .positive('Priority cannot be less than 0')
       .required('Required'),
     TrustLevelToComplete: Yup.number()
       .moreThan(0, 'Trust level to complete must be greater than 0')
       .required('Required'),
-    InputData: Yup.mixed().test('Required', 'Required', (value) => value),
+    InputData: Yup.mixed().test('Required', 'Required', identity),
   });
 
   public render() {
@@ -84,19 +85,19 @@ export class CreateDistributedTaskForm extends Component<
     dirty,
   }) => {
     return (
-      <Pane width="30%">
+      <Pane maxWidth={600}>
         <Form>
           <ErrorAlert touched={touched} errors={errors} values={values} />
 
           <Field
-            name="name"
+            name="Name"
             label="Name"
             component={TextInputWithLabel}
             width="100%"
           />
 
           <Field
-            name="description"
+            name="Description"
             label="Description"
             component={Textarea}
             width="100%"
@@ -104,7 +105,7 @@ export class CreateDistributedTaskForm extends Component<
           />
 
           <Field
-            name="priority"
+            name="Priority"
             label="Priority"
             type="number"
             component={TextInputWithLabel}
@@ -135,7 +136,7 @@ export class CreateDistributedTaskForm extends Component<
 
           <ClipLoader loading={isSubmitting} />
         </Form>
-        <WarnOnUnsavedForm warn={dirty} />
+        <WarnOnUnsavedData warn={dirty} />
       </Pane>
     );
   };

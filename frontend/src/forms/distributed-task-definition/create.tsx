@@ -1,6 +1,7 @@
 import { Button, Pane } from 'evergreen-ui';
 import { Field, Form, Formik, FormikConfig } from 'formik';
 import fetch from 'isomorphic-unfetch';
+import { identity } from 'ramda';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
 import * as Yup from 'yup';
@@ -9,7 +10,7 @@ import { ErrorAlert } from 'components/form/errors/error-alert';
 import { FilePickerWithLabel } from 'components/form/file-picker';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
-import { WarnOnUnsavedForm } from 'components/form/warn-on-unsaved-form';
+import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
 
 import { getErrorsDictionary } from 'utils/get-errors-dictionary';
 import { getFormData } from 'utils/get-form-data';
@@ -20,8 +21,8 @@ import { config } from 'product-specific';
 const urlToFetch = `${config.serverUrl}/distributed-task-definitions/add`;
 
 interface CreateDistributedTaskDefinitionModel {
-  name: string;
-  description: string;
+  Name: string;
+  Description: string;
   MainDll: File | null;
   AdditionalDlls?: FileList;
 }
@@ -37,8 +38,8 @@ export class CreateDistributedTaskDefinitionForm extends Component<
   public state: CreateDistributedTaskDefinitionState = {
     data: {
       MainDll: null,
-      name: '',
-      description: '',
+      Name: '',
+      Description: '',
       AdditionalDlls: undefined,
     },
   };
@@ -46,11 +47,11 @@ export class CreateDistributedTaskDefinitionForm extends Component<
   private validationSchema = Yup.object<
     CreateDistributedTaskDefinitionModel
   >().shape({
-    name: Yup.string()
+    Name: Yup.string()
       .min(3, 'Must be longer than 3 characters')
       .required('Required'),
-    description: Yup.string(),
-    MainDll: Yup.mixed().test('Required', 'Required', (value) => value),
+    Description: Yup.string(),
+    MainDll: Yup.mixed().test('Required', 'Required', identity),
     AdditionalDlls: Yup.array<File>()
       .min(1, 'Required')
       .required('Required'),
@@ -71,19 +72,19 @@ export class CreateDistributedTaskDefinitionForm extends Component<
     CreateDistributedTaskDefinitionModel
   >['render'] = ({ values, touched, errors, isSubmitting, dirty }) => {
     return (
-      <Pane width="30%">
+      <Pane maxWidth={600}>
         <Form>
           <ErrorAlert touched={touched} errors={errors} values={values} />
 
           <Field
-            name="name"
+            name="Name"
             label="Name"
             component={TextInputWithLabel}
             width="100%"
           />
 
           <Field
-            name="description"
+            name="Description"
             label="Description"
             component={Textarea}
             width="100%"
@@ -115,7 +116,7 @@ export class CreateDistributedTaskDefinitionForm extends Component<
 
           <ClipLoader loading={isSubmitting} />
         </Form>
-        <WarnOnUnsavedForm warn={dirty} />
+        <WarnOnUnsavedData warn={dirty} />
       </Pane>
     );
   };
