@@ -15,55 +15,39 @@ import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
 import { getErrorsDictionary } from 'utils/get-errors-dictionary';
 import { getFormData } from 'utils/get-form-data';
 
+import {
+  CreateDistributedTaskDefinitionModel,
+  CreateDistributedTaskDefinitionState,
+} from './types';
+
 import { config } from 'product-specific';
 
-const urlToFetch = `${config.serverUrl}/distributed-tasks/add`;
+const urlToFetch = `${config.serverUrl}/distributed-task-definitions/add`;
 
-interface CreateDistributedTaskModel {
-  DistributedTaskDefinitionId: number;
-  Name: string;
-  Description: string;
-  Priority: number;
-  TrustLevelToComplete: number;
-  InputData: File | null;
-}
-
-interface CreateDistributedTaskProps {
-  id: number;
-}
-
-interface CreateDistributedTaskState {
-  data: CreateDistributedTaskModel;
-}
-
-export class CreateDistributedTaskForm extends Component<
-  CreateDistributedTaskProps,
-  CreateDistributedTaskState
+export class CreateDistributedTaskDefinitionForm extends Component<
+  {},
+  CreateDistributedTaskDefinitionState
 > {
-  public state: CreateDistributedTaskState = {
+  public state: CreateDistributedTaskDefinitionState = {
     data: {
+      MainDll: null,
       Name: '',
       Description: '',
-      DistributedTaskDefinitionId: this.props.id,
-      InputData: null,
-      TrustLevelToComplete: NaN,
-      Priority: NaN,
+      AdditionalDlls: undefined,
     },
   };
 
-  private validationSchema = Yup.object<CreateDistributedTaskModel>().shape({
-    DistributedTaskDefinitionId: Yup.number().required('required'),
+  private validationSchema = Yup.object<
+    CreateDistributedTaskDefinitionModel
+  >().shape({
     Name: Yup.string()
       .min(3, 'Must be longer than 3 characters')
       .required('Required'),
     Description: Yup.string(),
-    Priority: Yup.number()
-      .positive('Priority cannot be less than 0')
+    MainDll: Yup.mixed().test('Required', 'Required', identity),
+    AdditionalDlls: Yup.array<File>()
+      .min(1, 'Required')
       .required('Required'),
-    TrustLevelToComplete: Yup.number()
-      .moreThan(0, 'Trust level to complete must be greater than 0')
-      .required('Required'),
-    InputData: Yup.mixed().test('Required', 'Required', identity),
   });
 
   public render() {
@@ -77,13 +61,9 @@ export class CreateDistributedTaskForm extends Component<
     );
   }
 
-  private renderForm: FormikConfig<CreateDistributedTaskModel>['render'] = ({
-    values,
-    touched,
-    errors,
-    isSubmitting,
-    dirty,
-  }) => {
+  private renderForm: FormikConfig<
+    CreateDistributedTaskDefinitionModel
+  >['render'] = ({ values, touched, errors, isSubmitting, dirty }) => {
     return (
       <Pane maxWidth={600}>
         <Form>
@@ -105,25 +85,18 @@ export class CreateDistributedTaskForm extends Component<
           />
 
           <Field
-            name="Priority"
-            label="Priority"
-            type="number"
-            component={TextInputWithLabel}
-            width="100%"
-          />
-
-          <Field
-            name="TrustLevelToComplete"
-            label="Trust level to complete"
-            type="number"
-            component={TextInputWithLabel}
-            width="100%"
-          />
-
-          <Field
-            name="InputData"
-            label="Task input"
+            name="MainDll"
+            label="MainDll"
             component={FilePickerWithLabel}
+            accept=".dll"
+          />
+
+          <Field
+            name="AdditionalDlls"
+            label="AdditionalDlls"
+            component={FilePickerWithLabel}
+            accept=".dll"
+            multiple={true}
           />
 
           <Button type="button" onClick={() => alert('Cancel')}>
@@ -142,14 +115,14 @@ export class CreateDistributedTaskForm extends Component<
   };
 
   private handleSubmitHandler: FormikConfig<
-    CreateDistributedTaskModel
+    CreateDistributedTaskDefinitionModel
   >['onSubmit'] = async (values, { setSubmitting, setErrors, resetForm }) => {
     setSubmitting(true);
 
     const formData = getFormData(values);
 
     const response = await fetch(urlToFetch, {
-      method: 'POST',
+      method: 'post',
       body: formData,
     });
 
@@ -160,7 +133,7 @@ export class CreateDistributedTaskForm extends Component<
 
       setErrors(errorsDictionary);
     } else {
-      alert('Distributed Task added');
+      alert('Distributed Task Definition added');
       resetForm(values);
     }
     setSubmitting(false);
