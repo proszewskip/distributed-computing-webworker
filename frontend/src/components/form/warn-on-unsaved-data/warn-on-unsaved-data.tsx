@@ -9,8 +9,10 @@ export interface WarnOnUnsavedDataProps {
 type WarnOnUnsavedDataPropsWithRouter = WarnOnUnsavedDataProps &
   WithRouterProps;
 
-class WarnOnUnsavedData extends Component<WarnOnUnsavedDataPropsWithRouter> {
-  public static defaultProps = {
+class PureWarnOnUnsavedData extends Component<
+  WarnOnUnsavedDataPropsWithRouter
+> {
+  public static defaultProps: Partial<WarnOnUnsavedDataPropsWithRouter> = {
     leaveMessage: 'You have unsaved changes, are you sure you want to leave?',
   };
 
@@ -60,6 +62,6 @@ class WarnOnUnsavedData extends Component<WarnOnUnsavedDataPropsWithRouter> {
   };
 }
 
-export const WarnOnUnsavedForm = withRouter<WarnOnUnsavedDataProps>(
-  WarnOnUnsavedData,
+export const WarnOnUnsavedData = withRouter<WarnOnUnsavedDataProps>(
+  PureWarnOnUnsavedData,
 );
