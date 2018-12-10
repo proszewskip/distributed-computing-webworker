@@ -9,7 +9,7 @@ import * as Yup from 'yup';
 import { ErrorAlert } from 'components/form/errors/error-alert';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
-import { WarnOnUnsavedForm } from 'components/form/warn-on-unsaved-form';
+import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
 
 import { MockNextContext } from '../__mocks__/next-context-provider-mock';
 
@@ -24,13 +24,13 @@ interface ExampleFormState {
   data: ExampleModel;
 }
 
-type onSubmitCallback = (
+type OnSubmitCallback = (
   values: ExampleModel,
   formikActions: FormikActions<ExampleModel>,
 ) => void;
 
 interface ExampleFormProps {
-  onSubmit: onSubmitCallback;
+  onSubmit: OnSubmitCallback;
 }
 
 export class ExampleForm extends Component<ExampleFormProps, ExampleFormState> {
@@ -67,7 +67,7 @@ export class ExampleForm extends Component<ExampleFormProps, ExampleFormState> {
     dirty,
   }) => {
     return (
-      <Pane width="30%">
+      <Pane maxWidth={600}>
         <Form>
           <ErrorAlert touched={touched} errors={errors} values={values} />
 
@@ -97,7 +97,7 @@ export class ExampleForm extends Component<ExampleFormProps, ExampleFormState> {
           <ClipLoader loading={isSubmitting} />
         </Form>
         <MockNextContext>
-          <WarnOnUnsavedForm warn={dirty} />
+          <WarnOnUnsavedData warn={dirty} />
         </MockNextContext>
       </Pane>
     );
