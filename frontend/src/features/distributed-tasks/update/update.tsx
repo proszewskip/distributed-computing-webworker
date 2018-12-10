@@ -1,4 +1,4 @@
-import { Alert, Button, Pane } from 'evergreen-ui';
+import { Button, Pane } from 'evergreen-ui';
 import { Field, Form, Formik, FormikConfig } from 'formik';
 import { JsonApiErrorResponse } from 'kitsu';
 import React, { Component } from 'react';
@@ -16,32 +16,14 @@ import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
 
 import { getErrorsDictionary } from 'utils/get-errors-dictionary';
 
+import {
+  UpdateDistributedTaskDependencies,
+  UpdateDistributedTaskModel,
+  UpdateDistributedTaskProps,
+  UpdateDistributedTaskState,
+} from './types';
+
 import { BaseDependencies } from 'product-specific';
-
-export interface UpdateDistributedTaskModel {
-  id: number;
-  name: string;
-  description: string;
-  priority: number;
-  'trust-level-to-complete': number;
-}
-
-interface UpdateDistributedTaskDependencies {
-  kitsu: BaseDependencies['kitsu'];
-}
-
-interface UpdateDistributedTaskOwnProps {
-  id: number;
-}
-
-type UpdateDistributedTaskProps = UpdateDistributedTaskOwnProps &
-  UpdateDistributedTaskDependencies;
-
-interface UpdateDistributedTaskState {
-  fetchFinished: boolean;
-  fetchError: boolean;
-  data: UpdateDistributedTaskModel;
-}
 
 class PureUpdateDistributedTaskForm extends Component<
   UpdateDistributedTaskProps,
@@ -49,18 +31,16 @@ class PureUpdateDistributedTaskForm extends Component<
 > {
   public state: UpdateDistributedTaskState = {
     data: {
-      id: this.props.id,
-      name: '',
-      description: '',
-      'trust-level-to-complete': NaN,
-      priority: NaN,
+      id: this.props.data.id,
+      name: this.props.data.name,
+      description: this.props.data.description,
+      'trust-level-to-complete': this.props.data['trust-level-to-complete'],
+      priority: this.props.data.priority,
     },
-    fetchError: false,
-    fetchFinished: false,
   };
 
   private validationSchema = Yup.object<UpdateDistributedTaskModel>().shape({
-    id: Yup.number().required(),
+    id: Yup.string().required(),
     name: Yup.string()
       .min(3, 'Must be longer than 3 characters')
       .required('Required'),
@@ -73,42 +53,14 @@ class PureUpdateDistributedTaskForm extends Component<
       .required('Required'),
   });
 
-  public getInitialProps = () => {
-    this.props.kitsu
-      .get<UpdateDistributedTaskModel>(`distributed-task/${this.props.id}`)
-      .then((jsonApiResponse) => {
-        const model: UpdateDistributedTaskModel = {
-          'trust-level-to-complete':
-            jsonApiResponse.data['trust-level-to-complete'],
-          description: jsonApiResponse.data.description,
-          id: jsonApiResponse.data.id,
-          name: jsonApiResponse.data.name,
-          priority: jsonApiResponse.data.priority,
-        };
-
-        return model;
-      })
-      .then((model) => this.setState({ data: model, fetchFinished: true }))
-      .catch(() => {
-        this.setState({ fetchError: true, fetchFinished: true });
-      });
-  };
-
   public render() {
-    const { fetchFinished, fetchError } = this.state;
-
     return (
-      (!fetchFinished && <ClipLoader loading={true} />) ||
-      (fetchError && (
-        <Alert intent="danger" title="Failed to fetch resources" />
-      )) || (
-        <Formik
-          initialValues={this.state.data}
-          onSubmit={this.handleSubmitHandler}
-          render={this.renderForm}
-          validationSchema={this.validationSchema}
-        />
-      )
+      <Formik
+        initialValues={this.state.data}
+        onSubmit={this.handleSubmitHandler}
+        render={this.renderForm}
+        validationSchema={this.validationSchema}
+      />
     );
   }
 
@@ -181,7 +133,7 @@ class PureUpdateDistributedTaskForm extends Component<
         alert('Distributed Task updated');
         resetForm(values);
       })
-      .catch((response: JsonApiErrorResponse<UpdateDistributedTaskModel>) => {
+      .catch((response: JsonApiErrorResponse) => {
         const errorsObject = getErrorsDictionary(response);
         setErrors(errorsObject);
       });

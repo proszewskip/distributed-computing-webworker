@@ -1,4 +1,4 @@
-import { Alert, Button, Pane } from 'evergreen-ui';
+import { Button, Pane } from 'evergreen-ui';
 import { Field, Form, Formik, FormikConfig } from 'formik';
 import { JsonApiErrorResponse } from 'kitsu';
 import React, { Component } from 'react';
@@ -18,28 +18,12 @@ import { getErrorsDictionary } from 'utils/get-errors-dictionary';
 
 import { BaseDependencies } from 'product-specific';
 
-interface UpdateDistributedTaskDefinitionModel {
-  id: number;
-  name: string;
-  description: string;
-}
-
-interface UpdateDistributedTaskDefinitionState {
-  fetchFinished: boolean;
-  fetchError: boolean;
-  data: UpdateDistributedTaskDefinitionModel;
-}
-
-interface UpdateDistributedTaskDefinitionDependencies {
-  kitsu: BaseDependencies['kitsu'];
-}
-
-interface UpdateDistributedTaskDefinitionOwnProps {
-  id: number;
-}
-
-type UpdateDistributedTaskDefinitionProps = UpdateDistributedTaskDefinitionOwnProps &
-  UpdateDistributedTaskDefinitionDependencies;
+import {
+  UpdateDistributedTaskDefinitionDependencies,
+  UpdateDistributedTaskDefinitionModel,
+  UpdateDistributedTaskDefinitionProps,
+  UpdateDistributedTaskDefinitionState,
+} from './types';
 
 class PureUpdateDistributedTaskDefinitionForm extends Component<
   UpdateDistributedTaskDefinitionProps,
@@ -47,59 +31,30 @@ class PureUpdateDistributedTaskDefinitionForm extends Component<
 > {
   public state: UpdateDistributedTaskDefinitionState = {
     data: {
-      name: '',
-      description: '',
-      id: this.props.id,
+      name: this.props.data.name,
+      description: this.props.data.name,
+      id: this.props.data.id,
     },
-    fetchError: false,
-    fetchFinished: false,
   };
 
   private validationSchema = Yup.object<
     UpdateDistributedTaskDefinitionModel
   >().shape({
-    id: Yup.number().required(),
+    id: Yup.string().required(),
     name: Yup.string()
       .min(3, 'Must be longer than 3 characters')
       .required('Required'),
     description: Yup.string(),
   });
 
-  public getInitialProps = () => {
-    this.props.kitsu
-      .get<UpdateDistributedTaskDefinitionModel>(
-        `distributed-task-definitions/${this.props.id}`,
-      )
-      .then((jsonApiResponse) => {
-        const model: UpdateDistributedTaskDefinitionModel = {
-          description: jsonApiResponse.data.description,
-          id: jsonApiResponse.data.id,
-          name: jsonApiResponse.data.name,
-        };
-
-        return model;
-      })
-      .then((model) => this.setState({ data: model, fetchFinished: true }))
-      .catch(() => {
-        this.setState({ fetchError: true, fetchFinished: true });
-      });
-  };
-
   public render() {
-    const { fetchFinished, fetchError } = this.state;
-
     return (
-      (!fetchFinished && <ClipLoader loading={true} />) ||
-      (fetchError && (
-        <Alert intent="danger" title="Failed to fetch resources" />
-      )) || (
-        <Formik
-          initialValues={this.state.data}
-          onSubmit={this.handleSubmitHandler}
-          render={this.renderForm}
-          validationSchema={this.validationSchema}
-        />
-      )
+      <Formik
+        initialValues={this.state.data}
+        onSubmit={this.handleSubmitHandler}
+        render={this.renderForm}
+        validationSchema={this.validationSchema}
+      />
     );
   }
 
@@ -152,16 +107,10 @@ class PureUpdateDistributedTaskDefinitionForm extends Component<
         alert('Distributed Task Definition updated');
         resetForm(values);
       })
-      .catch(
-        (
-          errorsResponse: JsonApiErrorResponse<
-            UpdateDistributedTaskDefinitionModel
-          >,
-        ) => {
-          const errorsDictionary = getErrorsDictionary(errorsResponse);
-          setErrors(errorsDictionary);
-        },
-      );
+      .catch((errorsResponse: JsonApiErrorResponse) => {
+        const errorsDictionary = getErrorsDictionary(errorsResponse);
+        setErrors(errorsDictionary);
+      });
 
     setSubmitting(false);
   };
