@@ -1,17 +1,15 @@
 import { List } from 'immutable';
-import { Entity } from 'models';
+import Kitsu from 'kitsu';
 import { Omit } from 'ramda';
 
 import { ForceFetchData } from 'components/data-table/data-table';
 
-export interface DistributedNodeModel extends Entity {
-  'trust-level': number;
-  'last-keep-alive-time': number;
-}
+import { DistributedNodeModel } from 'models';
 
 export interface DistributedNodesTableProps {
   data: DistributedNodeModel[];
   totalRecordsCount: number;
+  kitsu: Kitsu;
 }
 
 export interface DistributedNodesTableState
