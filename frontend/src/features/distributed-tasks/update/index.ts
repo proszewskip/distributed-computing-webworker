@@ -1,4 +1,4 @@
-export { UpdateDistributedTaskForm } from './update';
+export { UpdateDistributedTaskForm } from './form';
 export {
   UpdateDistributedTaskDependencies,
   UpdateDistributedTaskModel,

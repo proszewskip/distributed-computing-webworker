@@ -3,7 +3,6 @@ import { Field, Form, Formik, FormikConfig } from 'formik';
 import { JsonApiErrorResponse } from 'kitsu';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
-import * as Yup from 'yup';
 
 import {
   DependenciesExtractor,
@@ -16,42 +15,29 @@ import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
 
 import { getErrorsDictionary } from 'utils/get-errors-dictionary';
 
-import {
-  UpdateDistributedTaskDependencies,
-  UpdateDistributedTaskModel,
-  UpdateDistributedTaskProps,
-  UpdateDistributedTaskState,
-} from './types';
-
 import { BaseDependencies } from 'product-specific';
 
-class PureUpdateDistributedTaskForm extends Component<
-  UpdateDistributedTaskProps,
-  UpdateDistributedTaskState
+import {
+  UpdateDistributedTaskDefinitionDependencies,
+  UpdateDistributedTaskDefinitionModel,
+  UpdateDistributedTaskDefinitionProps,
+  UpdateDistributedTaskDefinitionState,
+} from './types';
+import { ValidationSchema } from './validation-schema';
+
+class PureUpdateDistributedTaskDefinitionForm extends Component<
+  UpdateDistributedTaskDefinitionProps,
+  UpdateDistributedTaskDefinitionState
 > {
-  public state: UpdateDistributedTaskState = {
+  public state: UpdateDistributedTaskDefinitionState = {
     data: {
-      id: this.props.data.id,
       name: this.props.data.name,
-      description: this.props.data.description,
-      'trust-level-to-complete': this.props.data['trust-level-to-complete'],
-      priority: this.props.data.priority,
+      description: this.props.data.name,
+      id: this.props.data.id,
     },
   };
 
-  private validationSchema = Yup.object<UpdateDistributedTaskModel>().shape({
-    id: Yup.string().required(),
-    name: Yup.string()
-      .min(3, 'Must be longer than 3 characters')
-      .required('Required'),
-    description: Yup.string(),
-    priority: Yup.number()
-      .positive('Priority cannot be less than 0')
-      .required('Required'),
-    'trust-level-to-complete': Yup.number()
-      .moreThan(0, 'Trust level to complete must be greater than 0')
-      .required('Required'),
-  });
+  private validationSchema = ValidationSchema;
 
   public render() {
     return (
@@ -64,13 +50,9 @@ class PureUpdateDistributedTaskForm extends Component<
     );
   }
 
-  private renderForm: FormikConfig<UpdateDistributedTaskModel>['render'] = ({
-    values,
-    touched,
-    errors,
-    isSubmitting,
-    dirty,
-  }) => {
+  private renderForm: FormikConfig<
+    UpdateDistributedTaskDefinitionModel
+  >['render'] = ({ values, touched, errors, isSubmitting, dirty }) => {
     return (
       <Pane maxWidth={600}>
         <Form>
@@ -91,22 +73,6 @@ class PureUpdateDistributedTaskForm extends Component<
             height="6rem"
           />
 
-          <Field
-            name="priority"
-            label="Priority"
-            type="number"
-            component={TextInputWithLabel}
-            width="100%"
-          />
-
-          <Field
-            name="trust-level-to-complete"
-            label="Trust level to complete"
-            type="number"
-            component={TextInputWithLabel}
-            width="100%"
-          />
-
           <Button type="button" onClick={() => alert('Cancel')}>
             Cancel
           </Button>
@@ -123,19 +89,19 @@ class PureUpdateDistributedTaskForm extends Component<
   };
 
   private handleSubmitHandler: FormikConfig<
-    UpdateDistributedTaskModel
+    UpdateDistributedTaskDefinitionModel
   >['onSubmit'] = async (values, { setSubmitting, setErrors, resetForm }) => {
     setSubmitting(true);
 
     this.props.kitsu
-      .patch('distributed-task', values)
+      .patch('distributed-task-definition', values)
       .then(() => {
-        alert('Distributed Task updated');
+        alert('Distributed Task Definition updated');
         resetForm(values);
       })
-      .catch((response: JsonApiErrorResponse) => {
-        const errorsObject = getErrorsDictionary(response);
-        setErrors(errorsObject);
+      .catch((errorsResponse: JsonApiErrorResponse) => {
+        const errorsDictionary = getErrorsDictionary(errorsResponse);
+        setErrors(errorsDictionary);
       });
 
     setSubmitting(false);
@@ -144,9 +110,9 @@ class PureUpdateDistributedTaskForm extends Component<
 
 const dependenciesExtractor: DependenciesExtractor<
   BaseDependencies,
-  UpdateDistributedTaskDependencies
+  UpdateDistributedTaskDefinitionDependencies
 > = ({ kitsu }) => ({ kitsu });
 
-export const UpdateDistributedTaskForm = withDependencies(
+export const UpdateDistributedTaskDefinitionForm = withDependencies(
   dependenciesExtractor,
-)(PureUpdateDistributedTaskForm);
+)(PureUpdateDistributedTaskDefinitionForm);
