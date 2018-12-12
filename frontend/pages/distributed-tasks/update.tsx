@@ -7,15 +7,18 @@ import { ErrorPage, RequestErrorInfo } from 'components/errors';
 import { Layout, LayoutProps } from 'components/layout';
 
 import { RequestError, transformRequestError } from 'error-handling';
+
+import {
+  UpdateDistributedTaskForm,
+  UpdateDistributedTaskModel,
+} from 'features/distributed-tasks/update/';
+
 import {
   AuthenticatedSidebar,
   BaseDependenciesProvider,
   Head,
   kitsuFactory,
 } from 'product-specific';
-
-import { UpdateDistributedTaskModel } from 'features/distributed-tasks/update/types';
-import { UpdateDistributedTaskForm } from 'features/distributed-tasks/update/update';
 
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
   <AuthenticatedSidebar />
