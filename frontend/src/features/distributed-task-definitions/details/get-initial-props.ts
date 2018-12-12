@@ -19,7 +19,7 @@ export const getDistributedTaskDefinitionDetailsInitialProps = (
     .get<DistributedTaskDefinition>(`distributed-task-definition/${id}`)
     .then((result) => ({
       id,
-      data: result.data,
+      data: result.data as DistributedTaskDefinition,
     }))
     .catch(
       (error): DistributedTaskDefinitionDetailsInitialProps => ({
