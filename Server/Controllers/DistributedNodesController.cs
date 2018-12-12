@@ -22,10 +22,7 @@ namespace Server.Controllers
         }
 
         [HttpGet]
-        public override async Task<IActionResult> GetAsync()
-        {
-            return await base.GetAsync();
-        }
+        public override Task<IActionResult> GetAsync() => base.GetAsync();
 
 
         [HttpPost("register")]
