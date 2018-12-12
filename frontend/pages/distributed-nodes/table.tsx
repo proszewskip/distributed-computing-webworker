@@ -11,7 +11,7 @@ import {
   DistributedNodesTableProps,
 } from 'features/distributed-nodes/table';
 
-import { getEntities } from 'utils/get-entities';
+import { getEntities } from 'utils/table/get-entities';
 
 import { AuthenticatedSidebar } from 'product-specific';
 
