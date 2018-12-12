@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import { CreateDistributedTaskModel } from '.';
 
 export const ValidationSchema = Yup.object<CreateDistributedTaskModel>().shape({
-  DistributedTaskDefinitionId: Yup.number().required('required'),
+  DistributedTaskDefinitionId: Yup.string().required('required'),
   Name: Yup.string()
     .min(3, 'Must be longer than 3 characters')
     .required('Required'),

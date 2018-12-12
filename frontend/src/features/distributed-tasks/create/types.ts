@@ -1,5 +1,5 @@
 export interface CreateDistributedTaskModel {
-  DistributedTaskDefinitionId: number;
+  DistributedTaskDefinitionId: string;
   Name: string;
   Description: string;
   Priority: number;
