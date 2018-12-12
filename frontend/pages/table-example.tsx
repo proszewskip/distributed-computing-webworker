@@ -54,6 +54,7 @@ interface TableExampleState extends Omit<TableExampleProps, 'data'> {
   loading: boolean;
   selectedRowIds: WithSelectableRowsAdditionalProps['selectedRowIds'];
   filteringEnabled: boolean;
+  forceFetchDataCallback: ForceFetchData;
 }
 
 async function getEntities<T extends { id: string }>(
@@ -143,6 +144,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       loading: false,
       selectedRowIds: Set(),
       filteringEnabled: false,
+      forceFetchDataCallback: () => null,
     };
   }
 
@@ -217,14 +219,14 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
 
     kitsu.delete('distributed-task-definition', id).then(() => {
       toaster.success('The entity has been deleted');
-      this.forceFetchData();
+      this.state.forceFetchDataCallback();
     });
   };
 
   private renderActionButtons: DataTableViewProps['renderActionButtons'] = () => (
     <>
       <RefreshActionButton
-        onClick={this.forceFetchData}
+        onClick={this.state.forceFetchDataCallback}
         disabled={this.state.loading}
       />
       <DeleteActionButton
@@ -247,7 +249,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
       ({ filteringEnabled }) => ({
         filteringEnabled: !filteringEnabled,
       }),
-      this.forceFetchData,
+      this.state.forceFetchDataCallback,
     );
   };
 
@@ -255,12 +257,12 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
     selectedRowIds,
   ) => this.setState({ selectedRowIds });
 
-  private forceFetchData: ForceFetchData = () => null;
-
   private getFetchDataCallback: DataTableProps['getForceFetchData'] = (
     fetchData,
   ) => {
-    this.forceFetchData = fetchData;
+    this.setState({
+      forceFetchDataCallback: fetchData,
+    });
   };
 }
 
