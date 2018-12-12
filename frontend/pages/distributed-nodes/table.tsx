@@ -1,27 +1,31 @@
-import { DistributedNodeModel } from 'features/distributed-nodes/table/types';
-import { LayoutProps, Layout } from 'components/layout';
-import { AuthenticatedSidebar } from 'product-specific';
-import React, { Component } from 'react';
-import { Omit } from 'lodash';
-import { DistributedTaskDefinition } from 'models';
-import Head from 'next/head';
 import { Pane } from 'evergreen-ui';
+import { Omit } from 'lodash';
+import Head from 'next/head';
+import React, { Component } from 'react';
+
+import { Layout, LayoutProps } from 'components/layout';
+
+import {
+  DistributedNodeModel,
+  DistributedNodesTable,
+  DistributedNodesTableProps,
+} from 'features/distributed-nodes/table';
+
+import { getEntities } from 'utils/get-entities';
+
+import { AuthenticatedSidebar } from 'product-specific';
 
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
   <AuthenticatedSidebar />
 );
 
-interface TableExamplePageProps
-  extends Omit<DistributedNodesTableProps, 'data'> {
-  data: DistributedTaskDefinition[];
+interface TablePageProps extends Omit<DistributedNodesTableProps, 'data'> {
+  data: DistributedNodeModel[];
 }
 
-// tslint:disable-next-line:max-classes-per-file
-export default class TableExamplePage extends Component<TableExamplePageProps> {
-  public static async getInitialProps(): Promise<
-    Partial<TableExamplePageProps>
-  > {
-    return getEntities<DistributedNodeModel>(distributedTaskDefinitionsUrl);
+export default class TableExamplePage extends Component<TablePageProps> {
+  public static async getInitialProps(): Promise<Partial<TablePageProps>> {
+    return getEntities<DistributedNodeModel>('distributed-node');
   }
 
   public render() {
