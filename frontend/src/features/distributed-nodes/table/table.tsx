@@ -20,7 +20,8 @@ import { TextFilter } from 'components/data-table/styled-data-table';
 
 import { Link } from 'components/link';
 
-import { getEntities } from 'utils/get-entities';
+import { getEntities } from 'utils/table/get-entities';
+
 import {
   DistributedNodeModel,
   DistributedNodesTableProps,
