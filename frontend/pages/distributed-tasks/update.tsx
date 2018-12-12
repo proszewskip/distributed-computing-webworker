@@ -11,7 +11,7 @@ import { RequestError, transformRequestError } from 'error-handling';
 import {
   UpdateDistributedTaskForm,
   UpdateDistributedTaskModel,
-} from 'features/distributed-tasks/update/';
+} from 'features/distributed-tasks/update';
 
 import {
   AuthenticatedSidebar,
