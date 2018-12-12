@@ -68,11 +68,11 @@ declare module 'kitsu' {
   }
 
   export interface MetaAttributes {
-    'total-records': number;
+    'total-records'?: number;
   }
 
   export interface JsonApiSuccessResponse<Model> {
-    data?: Model | Model[];
+    data: Model | Model[];
     meta?: MetaAttributes;
   }
 
