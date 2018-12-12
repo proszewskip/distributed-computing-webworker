@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react';
 
 import { Layout, LayoutProps } from 'components/layout';
 
-import { CreateDistributedTaskDefinitionForm } from 'features/distributed-task-definitions/create/create';
+import { CreateDistributedTaskDefinitionForm } from 'features/distributed-task-definitions/create';
 
 import {
   AuthenticatedSidebar,

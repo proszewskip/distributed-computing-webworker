@@ -1,2 +1,5 @@
 export { UpdateDistributedTaskDefinitionForm } from './update';
-export { UpdateDistributedTaskDefinitionDependencies } from './types';
+export {
+  UpdateDistributedTaskDefinitionDependencies,
+  UpdateDistributedTaskDefinitionModel,
+} from './types';

@@ -6,8 +6,10 @@ import React, { PureComponent, ReactNode } from 'react';
 import { ErrorPage, RequestErrorInfo } from 'components/errors';
 import { Layout, LayoutProps } from 'components/layout';
 
-import { UpdateDistributedTaskDefinitionModel } from 'features/distributed-task-definitions/update/types';
-import { UpdateDistributedTaskDefinitionForm } from 'features/distributed-task-definitions/update/update';
+import {
+  UpdateDistributedTaskDefinitionForm,
+  UpdateDistributedTaskDefinitionModel,
+} from 'features/distributed-task-definitions/update';
 
 import { RequestError, transformRequestError } from 'error-handling';
 import {
