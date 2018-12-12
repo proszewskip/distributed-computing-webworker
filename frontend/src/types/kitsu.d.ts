@@ -42,6 +42,8 @@ declare module 'kitsu' {
     page?: {
       limit?: number;
       offset?: number;
+      number?: number;
+      size?: number;
     };
     fields?: Dictionary<string>;
     filter?: Dictionary<string>;
@@ -65,8 +67,13 @@ declare module 'kitsu' {
     meta?: object;
   }
 
+  export interface MetaAttributes {
+    'total-records': number;
+  }
+
   export interface JsonApiSuccessResponse<Model> {
-    data: Model;
+    data?: Model | Model[];
+    meta?: MetaAttributes;
   }
 
   export interface JsonApiErrorResponse {
