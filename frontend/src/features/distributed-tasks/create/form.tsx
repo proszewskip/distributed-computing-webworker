@@ -1,10 +1,8 @@
 import { Button, Pane } from 'evergreen-ui';
 import { Field, Form, Formik, FormikConfig } from 'formik';
 import fetch from 'isomorphic-unfetch';
-import { identity } from 'ramda';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
-import * as Yup from 'yup';
 
 import { ErrorAlert } from 'components/form/errors/error-alert';
 import { FilePickerWithLabel } from 'components/form/file-picker';
@@ -20,6 +18,7 @@ import {
   CreateDistributedTaskProps,
   CreateDistributedTaskState,
 } from './types';
+import { ValidationSchema } from './validation-schema';
 
 import { config } from 'product-specific';
 
@@ -40,20 +39,7 @@ export class CreateDistributedTaskForm extends Component<
     },
   };
 
-  private validationSchema = Yup.object<CreateDistributedTaskModel>().shape({
-    DistributedTaskDefinitionId: Yup.number().required('required'),
-    Name: Yup.string()
-      .min(3, 'Must be longer than 3 characters')
-      .required('Required'),
-    Description: Yup.string(),
-    Priority: Yup.number()
-      .positive('Priority cannot be less than 0')
-      .required('Required'),
-    TrustLevelToComplete: Yup.number()
-      .moreThan(0, 'Trust level to complete must be greater than 0')
-      .required('Required'),
-    InputData: Yup.mixed().test('Required', 'Required', identity),
-  });
+  private validationSchema = ValidationSchema;
 
   public render() {
     return (

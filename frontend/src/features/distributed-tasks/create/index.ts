@@ -1,1 +1,2 @@
-export { CreateDistributedTaskForm } from './create';
+export { CreateDistributedTaskForm } from './form';
+export { CreateDistributedTaskModel } from './types';
