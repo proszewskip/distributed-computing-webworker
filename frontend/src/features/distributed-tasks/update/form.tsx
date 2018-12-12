@@ -13,7 +13,7 @@ import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
 import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
 
-import { getErrorsDictionary } from 'utils/get-errors-dictionary';
+import { getErrorsDictionary } from 'utils/forms/get-errors-dictionary';
 
 import {
   UpdateDistributedTaskDependencies,
