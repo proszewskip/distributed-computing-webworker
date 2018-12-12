@@ -1,9 +1,9 @@
 import { identity } from 'ramda';
 import * as Yup from 'yup';
 
-import { CreateDistributedTaskDefinitionModel } from '.';
+import { CreateDistributedTaskDefinitionModel } from './types';
 
-export const ValidationSchema = Yup.object<
+export const validationSchema = Yup.object<
   CreateDistributedTaskDefinitionModel
 >().shape({
   Name: Yup.string()

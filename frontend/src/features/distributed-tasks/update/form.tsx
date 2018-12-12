@@ -23,7 +23,7 @@ import {
 } from './types';
 
 import { BaseDependencies } from 'product-specific';
-import { ValidationSchema } from './validation-schema';
+import { validationSchema } from './validation-schema';
 
 class PureUpdateDistributedTaskForm extends Component<
   UpdateDistributedTaskProps,
@@ -39,15 +39,13 @@ class PureUpdateDistributedTaskForm extends Component<
     },
   };
 
-  private validationSchema = ValidationSchema;
-
   public render() {
     return (
       <Formik
         initialValues={this.state.data}
         onSubmit={this.handleSubmitHandler}
         render={this.renderForm}
-        validationSchema={this.validationSchema}
+        validationSchema={validationSchema}
       />
     );
   }

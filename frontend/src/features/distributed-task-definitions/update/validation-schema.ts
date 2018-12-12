@@ -1,8 +1,8 @@
 import * as Yup from 'yup';
 
-import { UpdateDistributedTaskDefinitionModel } from '.';
+import { UpdateDistributedTaskDefinitionModel } from './types';
 
-export const ValidationSchema = Yup.object<
+export const validationSchema = Yup.object<
   UpdateDistributedTaskDefinitionModel
 >().shape({
   id: Yup.string().required(),

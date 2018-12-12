@@ -23,7 +23,7 @@ import {
   UpdateDistributedTaskDefinitionProps,
   UpdateDistributedTaskDefinitionState,
 } from './types';
-import { ValidationSchema } from './validation-schema';
+import { validationSchema } from './validation-schema';
 
 class PureUpdateDistributedTaskDefinitionForm extends Component<
   UpdateDistributedTaskDefinitionProps,
@@ -37,15 +37,13 @@ class PureUpdateDistributedTaskDefinitionForm extends Component<
     },
   };
 
-  private validationSchema = ValidationSchema;
-
   public render() {
     return (
       <Formik
         initialValues={this.state.data}
         onSubmit={this.handleSubmitHandler}
         render={this.renderForm}
-        validationSchema={this.validationSchema}
+        validationSchema={validationSchema}
       />
     );
   }

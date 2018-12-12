@@ -1,9 +1,9 @@
 import { identity } from 'ramda';
 import * as Yup from 'yup';
 
-import { CreateDistributedTaskModel } from '.';
+import { CreateDistributedTaskModel } from './types';
 
-export const ValidationSchema = Yup.object<CreateDistributedTaskModel>().shape({
+export const validationSchema = Yup.object<CreateDistributedTaskModel>().shape({
   DistributedTaskDefinitionId: Yup.string().required('required'),
   Name: Yup.string()
     .min(3, 'Must be longer than 3 characters')
