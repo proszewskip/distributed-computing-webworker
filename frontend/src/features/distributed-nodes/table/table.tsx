@@ -89,6 +89,7 @@ export class DistributedNodesTable extends Component<
       data: List(data),
       loading: false,
       filteringEnabled: false,
+      forceFetchDataCallback: () => null,
     };
   }
 
@@ -148,7 +149,7 @@ export class DistributedNodesTable extends Component<
   private renderActionButtons: DataTableViewProps['renderActionButtons'] = () => (
     <>
       <RefreshActionButton
-        onClick={this.getForceFetchData}
+        onClick={this.state.forceFetchDataCallback}
         disabled={this.state.loading}
       />
       <ToggleFiltersActionButton
@@ -163,19 +164,15 @@ export class DistributedNodesTable extends Component<
       ({ filteringEnabled }) => ({
         filteringEnabled: !filteringEnabled,
       }),
-      this.forceFetchData,
+      this.state.forceFetchDataCallback,
     );
-  };
-
-  private forceFetchData: ForceFetchData = () => null;
-
-  private getForceFetchData: ForceFetchData = () => {
-    this.forceFetchData();
   };
 
   private getFetchDataCallback: DataTableProps['getForceFetchData'] = (
     fetchData,
   ) => {
-    this.forceFetchData = fetchData;
+    this.setState({
+      forceFetchDataCallback: fetchData,
+    });
   };
 }
