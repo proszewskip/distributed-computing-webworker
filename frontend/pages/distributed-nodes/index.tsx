@@ -19,7 +19,7 @@ import {
 
 import { getEntities } from 'utils/table/get-entities';
 
-import { DistributedNodeModel } from 'models';
+import { DistributedNode } from 'models';
 import {
   AuthenticatedSidebar,
   BaseDependencies,
@@ -57,7 +57,7 @@ export default class DistributedNodesPage extends Component<
   public static getInitialProps: GetInitialPropsFn = () => {
     const kitsu = kitsuFactory();
 
-    return getEntities<DistributedNodeModel>(kitsu, 'distributed-node');
+    return getEntities<DistributedNode>(kitsu, 'distributed-node');
   };
 
   public render() {
