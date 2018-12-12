@@ -9,11 +9,11 @@ namespace Server.Models
     {
         private static readonly double DefaultTrustLevel = 1;
 
+        /// <remarks>
+        /// ModelId is used to allow filtering of distributed nodes by id.
+        /// </remarks>
         [Attr("id")]
-        public string ModelId {
-            get => this.Id.ToString();
-            set { }
-        }
+        public string ModelId => Id.ToString();
 
         [Required]
         [Attr("last-keep-alive-time")]
