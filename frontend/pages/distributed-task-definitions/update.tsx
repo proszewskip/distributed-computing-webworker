@@ -23,10 +23,7 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
   <AuthenticatedSidebar />
 );
 
-const kitsu = kitsuFactory();
-
 export interface UpdatePageProps {
-  id: number;
   errors?: RequestError;
   data?: UpdateDistributedTaskDefinitionModel;
 }
@@ -35,6 +32,8 @@ type GetInitialPropsFn = NextComponentClass<UpdatePageProps>['getInitialProps'];
 
 class UpdatePage extends PureComponent<UpdatePageProps & WithRouterProps> {
   public static getInitialProps: GetInitialPropsFn = ({ query }) => {
+    const kitsu = kitsuFactory();
+
     const id = parseInt(query.id as string, 10);
 
     return kitsu
@@ -47,11 +46,9 @@ class UpdatePage extends PureComponent<UpdatePageProps & WithRouterProps> {
           id: jsonApiResponse.data.id,
           name: jsonApiResponse.data.name,
         },
-        id,
       }))
       .catch((error) => ({
-        id,
-        error: transformRequestError(error),
+        errors: transformRequestError(error),
       }));
   };
 
