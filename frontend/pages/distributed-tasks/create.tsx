@@ -17,17 +17,19 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
 );
 
 export interface CreatePageProps {
-  id: string;
+  distributedTaskDefinitionId: string;
 }
 
 type GetInitialPropsFn = NextComponentClass<CreatePageProps>['getInitialProps'];
 
 export default class CreatePage extends PureComponent<CreatePageProps> {
   public static getInitialProps: GetInitialPropsFn = ({ query }) => {
-    return { id: query.id as string };
+    return { distributedTaskDefinitionId: query.id as string };
   };
 
   public render() {
+    const { distributedTaskDefinitionId } = this.props;
+
     return (
       <>
         <Head />
@@ -38,7 +40,7 @@ export default class CreatePage extends PureComponent<CreatePageProps> {
               <Heading size={700} marginBottom={majorScale(1)}>
                 Create Distributed Task
               </Heading>
-              <CreateDistributedTaskForm id={this.props.id} />
+              <CreateDistributedTaskForm id={distributedTaskDefinitionId} />
             </Pane>
           </Layout>
         </BaseDependenciesProvider>
