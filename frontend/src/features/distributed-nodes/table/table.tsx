@@ -1,13 +1,10 @@
-import { Button, Heading, minorScale, Pane, Text } from 'evergreen-ui';
+import { distanceInWordsToNow } from 'date-fns';
+import { Button, Heading, minorScale, Pane, Text, Tooltip } from 'evergreen-ui';
 import { List } from 'immutable';
 import React, { Component, MouseEventHandler } from 'react';
 import { Column } from 'react-table';
 
-import {
-  DataTable,
-  DataTableProps,
-  ForceFetchData,
-} from 'components/data-table/data-table';
+import { DataTable, DataTableProps } from 'components/data-table/data-table';
 import {
   DataTableView,
   DataTableViewProps,
@@ -23,12 +20,19 @@ import { Link } from 'components/link';
 import { getEntities } from 'utils/table/get-entities';
 
 import {
-  DistributedNodeModel,
   DistributedNodesTableProps,
   DistributedNodesTableState,
 } from './types';
 
+import { DistributedNode } from 'models';
+
 const TextCell = (row: { value: any }) => <Text>{row.value}</Text>;
+
+const DateCell = (row: { value: any }) => (
+  <Tooltip content={new Date(row.value).toLocaleString()}>
+    <Text>{distanceInWordsToNow(row.value)}</Text>
+  </Tooltip>
+);
 
 const preventPropagationHandler: MouseEventHandler = (event) =>
   event.stopPropagation();
@@ -50,25 +54,21 @@ export class DistributedNodesTable extends Component<
     {
       accessor: 'last-keep-alive-time',
       Header: <Text>Last alive</Text>,
-      Cell: TextCell,
+      Cell: DateCell,
       minWidth: 150,
     },
     {
       accessor: 'trust-level',
       Header: <Text>Trust level</Text>,
       Cell: TextCell,
-      minWidth: 150,
+      minWidth: 100,
     },
     {
       id: 'action',
       Header: <Text>Action</Text>,
       Cell: (cellProps) => (
         <Pane onClick={preventPropagationHandler}>
-          <Link
-            route={`/distributed-task-definitions/${
-              cellProps.original.id
-            }/edit`}
-          >
+          <Link route={`/distributed-nodes/${cellProps.original.id}/edit`}>
             <Button iconBefore="edit" marginRight={minorScale(2)}>
               Edit
             </Button>
@@ -122,17 +122,12 @@ export class DistributedNodesTable extends Component<
     pageSize,
     page,
   }) => {
-    const { filteringEnabled } = this.state;
     this.setState({ loading: true });
 
-    const searchParams = new URLSearchParams();
-    if (filtered && filteringEnabled) {
-      filtered.forEach(({ id, value }: any) => {
-        searchParams.set(`filter[${id}]`, `like:${value}`);
-      });
-    }
+    const kitsu = this.props.kitsu;
 
-    const { data, totalRecordsCount } = await getEntities<DistributedNodeModel>(
+    const { data, totalRecordsCount } = await getEntities<DistributedNode>(
+      kitsu,
       'distributed-node',
       filtered,
       page,
