@@ -8,7 +8,7 @@ export interface CreateDistributedTaskModel {
 }
 
 export interface CreateDistributedTaskProps {
-  id: number;
+  id: string;
 }
 
 export interface CreateDistributedTaskState {
