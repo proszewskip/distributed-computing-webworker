@@ -32,7 +32,7 @@ const TextCell = (row: { value: any }) => <Text>{row.value}</Text>;
 const preventPropagationHandler: MouseEventHandler = (event) =>
   event.stopPropagation();
 
-export default class DistributedNodesTable extends Component<
+export class DistributedNodesTable extends Component<
   DistributedNodesTableProps,
   DistributedNodesTableState
 > {
