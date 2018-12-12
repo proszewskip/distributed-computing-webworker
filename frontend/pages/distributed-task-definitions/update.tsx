@@ -25,7 +25,7 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
 
 export interface UpdatePageProps {
   errors?: RequestError;
-  data?: UpdateDistributedTaskDefinitionModel;
+  modelData?: UpdateDistributedTaskDefinitionModel;
 }
 
 type GetInitialPropsFn = NextComponentClass<UpdatePageProps>['getInitialProps'];
@@ -40,11 +40,12 @@ class UpdatePage extends PureComponent<UpdatePageProps & WithRouterProps> {
       .get<UpdateDistributedTaskDefinitionModel>(
         `distributed-task-definition/${id}`,
       )
-      .then((jsonApiResponse) => ({
-        data: {
-          description: jsonApiResponse.data.description,
-          id: jsonApiResponse.data.id,
-          name: jsonApiResponse.data.name,
+      .then((jsonApiResponse) => jsonApiResponse.data)
+      .then((data: UpdateDistributedTaskDefinitionModel) => ({
+        modelData: {
+          description: data.description,
+          id: data.id,
+          name: data.name,
         },
       }))
       .catch((error) => ({
@@ -73,13 +74,13 @@ class UpdatePage extends PureComponent<UpdatePageProps & WithRouterProps> {
   }
 
   private renderForm = (): ReactNode => {
-    const { data } = this.props;
+    const { modelData } = this.props;
 
-    if (!data) {
+    if (!modelData) {
       return null;
     }
 
-    return <UpdateDistributedTaskDefinitionForm data={data} />;
+    return <UpdateDistributedTaskDefinitionForm data={modelData} />;
   };
 
   private renderErrors = (): ReactNode => {

@@ -26,7 +26,7 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
 
 export interface UpdatePageProps {
   errors?: RequestError;
-  data?: UpdateDistributedTaskModel;
+  modelData?: UpdateDistributedTaskModel;
 }
 
 type GetInitialPropsFn = NextComponentClass<UpdatePageProps>['getInitialProps'];
@@ -39,14 +39,14 @@ class UpdatePage extends PureComponent<UpdatePageProps & WithRouterProps> {
 
     return kitsu
       .get<UpdateDistributedTaskModel>(`distributed-task/${id}`)
-      .then((jsonApiResponse) => ({
-        data: {
-          description: jsonApiResponse.data.description,
-          id: jsonApiResponse.data.id,
-          name: jsonApiResponse.data.name,
-          priority: jsonApiResponse.data.priority,
-          'trust-level-to-complete':
-            jsonApiResponse.data['trust-level-to-complete'],
+      .then((jsonApiResponse) => jsonApiResponse.data)
+      .then((data) => ({
+        modelData: {
+          description: data.description,
+          id: data.id,
+          name: data.name,
+          priority: data.priority,
+          'trust-level-to-complete': data['trust-level-to-complete'],
         },
       }))
       .catch((error) => ({
@@ -75,13 +75,13 @@ class UpdatePage extends PureComponent<UpdatePageProps & WithRouterProps> {
   }
 
   private renderForm = (): ReactNode => {
-    const { data } = this.props;
+    const { modelData } = this.props;
 
-    if (!data) {
+    if (!modelData) {
       return null;
     }
 
-    return <UpdateDistributedTaskForm data={data} />;
+    return <UpdateDistributedTaskForm data={modelData} />;
   };
 
   private renderErrors = (): ReactNode => {
