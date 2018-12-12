@@ -17,7 +17,7 @@ import {
   CreateDistributedTaskDefinitionModel,
   CreateDistributedTaskDefinitionState,
 } from './types';
-import { ValidationSchema } from './validation-schema';
+import { validationSchema } from './validation-schema';
 
 import { config } from 'product-specific';
 
@@ -36,15 +36,13 @@ export class CreateDistributedTaskDefinitionForm extends Component<
     },
   };
 
-  private validationSchema = ValidationSchema;
-
   public render() {
     return (
       <Formik
         initialValues={this.state.data}
         onSubmit={this.handleSubmitHandler}
         render={this.renderForm}
-        validationSchema={this.validationSchema}
+        validationSchema={validationSchema}
       />
     );
   }

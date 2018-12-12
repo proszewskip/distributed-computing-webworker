@@ -1,8 +1,8 @@
 import * as Yup from 'yup';
 
-import { UpdateDistributedTaskModel } from '.';
+import { UpdateDistributedTaskModel } from './types';
 
-export const ValidationSchema = Yup.object<UpdateDistributedTaskModel>().shape({
+export const validationSchema = Yup.object<UpdateDistributedTaskModel>().shape({
   id: Yup.string().required(),
   name: Yup.string()
     .min(3, 'Must be longer than 3 characters')
