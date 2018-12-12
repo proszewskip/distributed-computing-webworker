@@ -9,6 +9,12 @@ namespace Server.Models
     {
         private static readonly double DefaultTrustLevel = 1;
 
+        [Attr("id")]
+        public string ModelId {
+            get => this.Id.ToString();
+            set { }
+        }
+
         [Required]
         [Attr("last-keep-alive-time")]
         public DateTime LastKeepAliveTime { get; set; }

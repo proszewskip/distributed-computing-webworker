@@ -21,6 +21,13 @@ namespace Server.Controllers
             _resourceService = resourceService;
         }
 
+        [HttpGet]
+        public override async Task<IActionResult> GetAsync()
+        {
+            return await base.GetAsync();
+        }
+
+
         [HttpPost("register")]
         public Task<IActionResult> Register()
         {
