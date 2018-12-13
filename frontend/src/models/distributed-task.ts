@@ -6,7 +6,7 @@ export interface DistributedTask extends Entity {
   priority: number;
   'trust-level-to-complete': number;
   errors: string[];
-  status: number;
+  status: DistributedTaskStatus;
 }
 
 export enum DistributedTaskStatus {
