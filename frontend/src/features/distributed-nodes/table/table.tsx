@@ -105,7 +105,7 @@ export class PureDistributedNodesTable extends Component<
 
     return (
       <DataTableView
-        header={<Heading size={600}>Distributed Task definitions</Heading>}
+        header={<Heading size={600}>Distributed nodes</Heading>}
         renderActionButtons={this.renderActionButtons}
       >
         <DataTable
