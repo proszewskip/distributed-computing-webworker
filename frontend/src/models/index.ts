@@ -4,3 +4,4 @@ export * from './entity';
 export * from './file-list';
 export * from './distributed-node';
 export * from './distributed-task';
+export * from './subtask';
