@@ -1,13 +1,16 @@
 import { WithRouterProps } from 'next/router';
 
+import { SubtasksTableOwnProps } from 'features/subtasks/table/table';
+
 import { RequestError } from 'error-handling';
 import { DistributedTask } from 'models';
 import { BaseDependencies } from 'product-specific';
 
 export interface DistributedTaskDetailsInitialProps {
   id: number;
-  data?: DistributedTask;
-  error?: RequestError;
+  detailsData?: DistributedTask;
+  tableData?: SubtasksTableOwnProps;
+  errors?: RequestError;
 }
 
 export interface DistributedTaskDetailsProps {
