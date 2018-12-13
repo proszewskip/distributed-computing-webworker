@@ -15,16 +15,23 @@ import {
 } from 'components/data-table/data-table-view/action-buttons';
 import { TextFilter } from 'components/data-table/styled-data-table';
 
+import {
+  DependenciesExtractor,
+  withDependencies,
+} from 'components/dependency-injection/with-dependencies';
+
 import { Link } from 'components/link';
 
 import { getEntities } from 'utils/table/get-entities';
 
 import {
+  DistributedNodesTableDependencies,
   DistributedNodesTableProps,
   DistributedNodesTableState,
 } from './types';
 
 import { DistributedNode } from 'models';
+import { BaseDependencies } from 'product-specific';
 
 const TextCell = (row: { value: any }) => <Text>{row.value}</Text>;
 
@@ -37,7 +44,7 @@ const DateCell = (row: { value: any }) => (
 const preventPropagationHandler: MouseEventHandler = (event) =>
   event.stopPropagation();
 
-export class DistributedNodesTable extends Component<
+export class PureDistributedNodesTable extends Component<
   DistributedNodesTableProps,
   DistributedNodesTableState
 > {
@@ -124,7 +131,7 @@ export class DistributedNodesTable extends Component<
   }) => {
     this.setState({ loading: true });
 
-    const kitsu = this.props.kitsu;
+    const { kitsu } = this.props;
 
     const { data, totalRecordsCount } = await getEntities<DistributedNode>(
       kitsu,
@@ -171,3 +178,12 @@ export class DistributedNodesTable extends Component<
     });
   };
 }
+
+const dependenciesExtractor: DependenciesExtractor<
+  BaseDependencies,
+  DistributedNodesTableDependencies
+> = ({ kitsu }) => ({ kitsu });
+
+export const DistributedNodesTable = withDependencies(dependenciesExtractor)(
+  PureDistributedNodesTable,
+);

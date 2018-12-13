@@ -6,11 +6,17 @@ import { ForceFetchData } from 'components/data-table/data-table';
 
 import { DistributedNode } from 'models';
 
-export interface DistributedNodesTableProps {
-  data: DistributedNode[];
-  totalRecordsCount: number;
+export interface DistributedNodesTableDependencies {
   kitsu: Kitsu;
 }
+
+export interface DistributedNodesTableOwnProps {
+  data: DistributedNode[];
+  totalRecordsCount: number;
+}
+
+export type DistributedNodesTableProps = DistributedNodesTableDependencies &
+  DistributedNodesTableOwnProps;
 
 export interface DistributedNodesTableState
   extends Omit<DistributedNodesTableProps, 'data'> {
