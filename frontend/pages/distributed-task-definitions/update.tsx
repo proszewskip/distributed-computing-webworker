@@ -40,7 +40,10 @@ class UpdatePage extends PureComponent<UpdatePageProps & WithRouterProps> {
       .get<UpdateDistributedTaskDefinitionModel>(
         `distributed-task-definition/${id}`,
       )
-      .then((jsonApiResponse) => jsonApiResponse.data)
+      .then(
+        (jsonApiResponse) =>
+          jsonApiResponse.data as UpdateDistributedTaskDefinitionModel,
+      )
       .then((data) => ({
         modelData: {
           description: data.description,
