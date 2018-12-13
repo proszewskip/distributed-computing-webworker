@@ -19,3 +19,9 @@ routes.add(
   '/distributed-task-definitions/:id',
   'distributed-task-definitions/details',
 );
+
+routes.add(
+  'distributed-tasks-details',
+  '/distributed-tasks/:id',
+  'distributed-tasks/details',
+);
