@@ -39,7 +39,9 @@ class UpdatePage extends PureComponent<UpdatePageProps & WithRouterProps> {
 
     return kitsu
       .get<UpdateDistributedTaskModel>(`distributed-task/${id}`)
-      .then((jsonApiResponse) => jsonApiResponse.data)
+      .then(
+        (jsonApiResponse) => jsonApiResponse.data as UpdateDistributedTaskModel,
+      )
       .then((data) => ({
         modelData: {
           description: data.description,
