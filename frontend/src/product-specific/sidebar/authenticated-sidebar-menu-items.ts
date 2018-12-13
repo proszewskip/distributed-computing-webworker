@@ -17,4 +17,8 @@ export const authenticatedSidebarMenuItems: ConnectedMenuItem[] = [
     route: '/distributed-task-definitions',
     title: 'Distributed Task Definitions',
   },
+  {
+    route: '/distributed-nodes',
+    title: 'Distributed Nodes',
+  },
 ];
