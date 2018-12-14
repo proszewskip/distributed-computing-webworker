@@ -6,23 +6,17 @@ import { RequestError } from 'error-handling';
 import { DistributedTask } from 'models';
 import { BaseDependencies } from 'product-specific';
 
-export interface DistributedTaskDetailsInitialProps {
-  id: number;
+export interface DistributedTaskDetailsProps {
+  distributedTaskDefinitionId: number;
   detailsData?: DistributedTask;
   tableData?: SubtasksTableOwnProps;
   errors?: RequestError;
-}
-
-export interface DistributedTaskDetailsProps {
-  onDeleteButtonClick: () => void;
-  onBackButtonClick: () => void;
 }
 
 export interface DistributedTaskDetailsDependencies {
   kitsu: BaseDependencies['kitsu'];
 }
 
-export type PureDistributedTaskDetailsProps = DistributedTaskDetailsInitialProps &
-  DistributedTaskDetailsProps &
+export type PureDistributedTaskDetailsProps = DistributedTaskDetailsProps &
   DistributedTaskDetailsDependencies &
   WithRouterProps;

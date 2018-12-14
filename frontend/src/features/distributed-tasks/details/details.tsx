@@ -1,13 +1,11 @@
 import {
-  Alert,
   BackButton,
   Button,
-  Card,
   Heading,
   majorScale,
   minorScale,
   Pane,
-  Text,
+  toaster,
 } from 'evergreen-ui';
 import { withRouter } from 'next/router';
 import React, { PureComponent, ReactNode } from 'react';
@@ -24,9 +22,9 @@ import { Link } from 'components/link';
 import { DistributedTaskStatus } from 'models';
 import { BaseDependencies, config } from 'product-specific';
 
+import { getDetailsGrid } from './get-details-grid';
 import {
   DistributedTaskDetailsDependencies,
-  DistributedTaskDetailsInitialProps,
   DistributedTaskDetailsProps,
   PureDistributedTaskDetailsProps,
 } from './types';
@@ -51,7 +49,7 @@ export class PureDistributedTaskDetails extends PureComponent<
   }
 
   private renderDetails = (): ReactNode => {
-    const { detailsData, id, tableData } = this.props;
+    const { detailsData, tableData } = this.props;
 
     if (!detailsData || !tableData) {
       return null;
@@ -61,122 +59,13 @@ export class PureDistributedTaskDetails extends PureComponent<
 
     return (
       <>
-        <Pane marginBottom={majorScale(2)}>
-          <BackButton
-            onClick={this.props.onBackButtonClick}
-            marginRight={minorScale(2)}
-          />
+        {this.renderActionButtons()}
 
-          <Button
-            marginRight={minorScale(2)}
-            iconBefore="trash"
-            intent="danger"
-            onClick={this.props.onDeleteButtonClick}
-          >
-            Delete
-          </Button>
+        {getDetailsGrid(detailsData)}
 
-          <Link route={`/distributed-tasks/${id}/edit`}>
-            <Button iconBefore="edit" marginRight={minorScale(2)}>
-              Edit
-            </Button>
-          </Link>
-
-          <Button
-            marginRight={minorScale(2)}
-            iconBefore="download"
-            onClick={this.downloadInput}
-          >
-            Download input
-          </Button>
-
-          {detailsData.status === DistributedTaskStatus.Done && (
-            <Button
-              marginRight={minorScale(2)}
-              iconBefore="download"
-              intent="success"
-              onClick={this.downloadResult}
-            >
-              Download result
-            </Button>
-          )}
-        </Pane>
-
-        <Card
-          background="tint2"
-          display="grid"
-          gridTemplateColumns="minmax(min-content, max-content) 1fr"
-          gridGap={minorScale(4)}
-          padding={minorScale(2)}
-          maxWidth={600}
-          overflow="auto"
-          marginBottom={majorScale(2)}
-        >
-          <Pane>
-            <Text>ID</Text>
-          </Pane>
-          <Pane>
-            <Text>{detailsData.id}</Text>
-          </Pane>
-
-          <Pane>
-            <Text>Name</Text>
-          </Pane>
-          <Pane>
-            <Text>{detailsData.name}</Text>
-          </Pane>
-
-          <Pane>
-            <Text>Description</Text>
-          </Pane>
-          <Pane>
-            <Text>{detailsData.description}</Text>
-          </Pane>
-
-          <Pane>
-            <Text>Priority</Text>
-          </Pane>
-          <Pane>
-            <Text>{detailsData.priority}</Text>
-          </Pane>
-
-          <Pane>
-            <Text>Trust level to complete</Text>
-          </Pane>
-          <Pane>
-            <Text>{detailsData['trust-level-to-complete']}</Text>
-          </Pane>
-
-          <Pane>
-            <Text>Status</Text>
-          </Pane>
-          <Pane>
-            <Text>
-              {(detailsData.status === DistributedTaskStatus.Done && 'Done') ||
-                (detailsData.status === DistributedTaskStatus.Error &&
-                  'Errors occured') ||
-                (detailsData.status === DistributedTaskStatus.InProgress &&
-                  'In progress')}
-            </Text>
-          </Pane>
-          {detailsData.errors.length > 0 && (
-            <>
-              <Pane>
-                <Text>Errors</Text>
-              </Pane>
-              <Pane>
-                <Text>
-                  {detailsData.errors.map((error) => (
-                    <Alert title={error} intent="danger" />
-                  ))}
-                </Text>
-              </Pane>
-            </>
-          )}
-        </Card>
-
-        <Heading>Subtasks </Heading>
+        <Heading>Subtasks</Heading>
         <SubtasksTable
+          distributedTaskId={detailsData.id}
           data={data}
           totalRecordsCount={totalRecordsCount}
           {...this.props}
@@ -203,22 +92,77 @@ export class PureDistributedTaskDetails extends PureComponent<
     );
   };
 
-  private downloadInput = () => {
-    const { id } = this.props;
+  private renderActionButtons = (): ReactNode => {
+    const { distributedTaskDefinitionId, detailsData } = this.props;
 
-    window.open(
-      `${config.serverUrl}/distributed-tasks/${id}/input-data`,
-      '_blank',
+    if (!detailsData) {
+      return null;
+    }
+
+    const inputDataUrl = `${
+      config.serverUrl
+    }/distributed-tasks/${distributedTaskDefinitionId}/input-data`;
+    const resultsUrl = `${
+      config.serverUrl
+    }/distributed-tasks/${distributedTaskDefinitionId}/result`;
+
+    return (
+      <Pane marginBottom={majorScale(2)}>
+        <BackButton
+          onClick={this.onBackButtonClick}
+          marginRight={minorScale(2)}
+        />
+
+        <Button
+          marginRight={minorScale(2)}
+          iconBefore="trash"
+          intent="danger"
+          onClick={this.onDeleteButtonClick}
+        >
+          Delete
+        </Button>
+
+        <Link route={`/distributed-tasks/${distributedTaskDefinitionId}/edit`}>
+          <Button iconBefore="edit" marginRight={minorScale(2)}>
+            Edit
+          </Button>
+        </Link>
+
+        <a href={inputDataUrl} download={true}>
+          <Button marginRight={minorScale(2)} iconBefore="download">
+            Download input data
+          </Button>
+        </a>
+
+        {detailsData.status === DistributedTaskStatus.Done && (
+          <a href={resultsUrl} download={true}>
+            <Button
+              marginRight={minorScale(2)}
+              iconBefore="download"
+              intent="success"
+            >
+              Download results
+            </Button>
+          </a>
+        )}
+      </Pane>
     );
   };
 
-  private downloadResult = () => {
-    const { id } = this.props;
+  private onDeleteButtonClick = () => {
+    this.props.kitsu
+      .delete('distributed-task', this.props.distributedTaskDefinitionId)
+      .then(() => {
+        toaster.success('The task has been deleted');
+        this.props.router.back();
+      });
+  };
 
-    window.open(`${config.serverUrl}/distributed-tasks/${id}/result`, '_blank');
+  private onBackButtonClick = () => {
+    this.props.router.back();
   };
 }
 
 export const DistributedTaskDetails = withRouter<
-  DistributedTaskDetailsInitialProps & DistributedTaskDetailsProps
+  DistributedTaskDetailsProps & DistributedTaskDetailsProps
 >(withDependencies(dependenciesExtractor)(PureDistributedTaskDetails));
