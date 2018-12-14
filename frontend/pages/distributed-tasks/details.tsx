@@ -1,4 +1,4 @@
-import { Heading, majorScale, Pane, toaster } from 'evergreen-ui';
+import { Heading, majorScale, Pane } from 'evergreen-ui';
 import { GetParams } from 'kitsu';
 import { NextComponentClass } from 'next';
 import { withRouter, WithRouterProps } from 'next/router';
@@ -15,7 +15,7 @@ import {
 
 import {
   DistributedTaskDetails,
-  DistributedTaskDetailsInitialProps,
+  DistributedTaskDetailsProps,
 } from 'features/distributed-tasks/details';
 
 import { transformRequestError } from 'error-handling';
@@ -28,11 +28,11 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
 const kitsu = kitsuFactory();
 
 type GetInitialPropsFn = NextComponentClass<
-  DistributedTaskDetailsInitialProps
+  DistributedTaskDetailsProps
 >['getInitialProps'];
 
 class DetailsPage extends PureComponent<
-  DistributedTaskDetailsInitialProps & WithRouterProps
+  DistributedTaskDetailsProps & WithRouterProps
 > {
   public static getInitialProps: GetInitialPropsFn = ({ query }) => {
     const id = parseInt(query.id as string, 10);
@@ -46,7 +46,7 @@ class DetailsPage extends PureComponent<
       .then((jsonApiResponse) => jsonApiResponse.data as any)
       .then((data) => {
         return {
-          id,
+          distributedTaskDefinitionId: id,
           detailsData: {
             id: data.id,
             name: data.name,
@@ -59,11 +59,12 @@ class DetailsPage extends PureComponent<
           tableData: {
             data: data.subtasks,
             totalRecordsCount: data.subtasks.length,
+            distributedTaskId: data.id,
           },
         };
       })
       .catch((error) => ({
-        id,
+        distributedTaskDefinitionId: id,
         errors: transformRequestError(error),
       }));
   };
@@ -80,28 +81,13 @@ class DetailsPage extends PureComponent<
                 Distributed Task details
               </Heading>
 
-              <DistributedTaskDetails
-                {...this.props}
-                onBackButtonClick={this.onBackButtonClick}
-                onDeleteButtonClick={this.onDeleteButtonClick}
-              />
+              <DistributedTaskDetails {...this.props} />
             </Pane>
           </Layout>
         </BaseDependenciesProvider>
       </>
     );
   }
-
-  private onDeleteButtonClick = () => {
-    kitsu.delete('distributed-task', this.props.id).then(() => {
-      toaster.success('The task has been deleted');
-      this.props.router.back();
-    });
-  };
-
-  private onBackButtonClick = () => {
-    this.props.router.back();
-  };
 }
 
 export default withRouter(DetailsPage);

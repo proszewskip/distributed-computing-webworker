@@ -1,4 +1,4 @@
-import { Heading, majorScale, Pane, toaster } from 'evergreen-ui';
+import { Heading, majorScale, Pane } from 'evergreen-ui';
 import { withRouter, WithRouterProps } from 'next/router';
 import React, { PureComponent } from 'react';
 
@@ -42,28 +42,13 @@ class DetailsPage extends PureComponent<
                 Distributed Task Definition details
               </Heading>
 
-              <DistributedTaskDefinitionDetails
-                {...this.props}
-                onBackButtonClick={this.onBackButtonClick}
-                onDeleteButtonClick={this.onDeleteButtonClick}
-              />
+              <DistributedTaskDefinitionDetails {...this.props} />
             </Pane>
           </Layout>
         </BaseDependenciesProvider>
       </>
     );
   }
-
-  private onDeleteButtonClick = () => {
-    kitsu.delete('distributed-task-definition', this.props.id).then(() => {
-      toaster.success('The task definition has been deleted');
-      this.props.router.back();
-    });
-  };
-
-  private onBackButtonClick = () => {
-    this.props.router.back();
-  };
 }
 
 export default withRouter(DetailsPage);
