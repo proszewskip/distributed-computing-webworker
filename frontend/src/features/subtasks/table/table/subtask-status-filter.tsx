@@ -16,6 +16,7 @@ export const SubtaskStatusFilter: FilterRender = ({ filter, onChange }) => (
     onChange={onChangeFactory(onChange)}
     value={filter ? filter.value : ''}
   >
+    <option value="" />
     <option value={SubtaskStatus.Done}>Done</option>
     <option value={SubtaskStatus.Error}>Error</option>
     <option value={SubtaskStatus.WaitingForExecution}>
