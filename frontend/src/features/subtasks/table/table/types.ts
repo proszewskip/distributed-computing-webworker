@@ -11,6 +11,7 @@ export interface SubtasksTableDependencies {
 }
 
 export interface SubtasksTableOwnProps {
+  distributedTaskId: string;
   data: Subtask[];
   totalRecordsCount: number;
 }

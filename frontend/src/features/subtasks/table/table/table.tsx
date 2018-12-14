@@ -3,6 +3,7 @@ import { List } from 'immutable';
 import React, { Component } from 'react';
 import { Column } from 'react-table';
 
+import { TextCell } from 'components/data-table/cells/text-cell';
 import { DataTable, DataTableProps } from 'components/data-table/data-table';
 import {
   DataTableView,
@@ -30,8 +31,6 @@ import {
 
 import { Subtask } from 'models';
 import { BaseDependencies } from 'product-specific';
-
-const TextCell = (row: { value: any }) => <Text>{row.value}</Text>;
 
 export class PureSubtasksTable extends Component<
   SubtasksTableProps,
@@ -100,7 +99,15 @@ export class PureSubtasksTable extends Component<
   }) => {
     this.setState({ loading: true });
 
-    const { kitsu } = this.props;
+    const { kitsu, distributedTaskId } = this.props;
+
+    if (!this.state.filteringEnabled) {
+      filtered = filtered.slice(0, 0);
+    }
+
+    if (!filtered.find((filter) => filter.id === 'distributed-task-id')) {
+      filtered.push({ id: 'distributed-task-id', value: distributedTaskId });
+    }
 
     const { data, totalRecordsCount } = await getEntities<Subtask>(
       kitsu,
