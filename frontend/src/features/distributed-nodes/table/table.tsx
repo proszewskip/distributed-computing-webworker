@@ -4,6 +4,7 @@ import { List } from 'immutable';
 import React, { Component, MouseEventHandler } from 'react';
 import { Column } from 'react-table';
 
+import { TextCell } from 'components/data-table/cells/text-cell';
 import { DataTable, DataTableProps } from 'components/data-table/data-table';
 import {
   DataTableView,
@@ -32,8 +33,6 @@ import {
 
 import { DistributedNode } from 'models';
 import { BaseDependencies } from 'product-specific';
-
-const TextCell = (row: { value: any }) => <Text>{row.value}</Text>;
 
 const DateCell = (row: { value: any }) => (
   <Tooltip content={new Date(row.value).toLocaleString()}>
@@ -105,7 +104,7 @@ export class PureDistributedNodesTable extends Component<
 
     return (
       <DataTableView
-        header={<Heading size={600}>Distributed nodes</Heading>}
+        header={<Heading size={600}>Distributed Nodes</Heading>}
         renderActionButtons={this.renderActionButtons}
       >
         <DataTable
