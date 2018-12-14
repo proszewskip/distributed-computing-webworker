@@ -7,6 +7,7 @@ import {
   minorScale,
   Pane,
   Text,
+  toaster,
 } from 'evergreen-ui';
 import { withRouter } from 'next/router';
 import React, { PureComponent, ReactNode } from 'react';
@@ -23,7 +24,6 @@ import { BaseDependencies } from 'product-specific';
 import {
   DistributedTaskDefinitionDetailsDependencies,
   DistributedTaskDefinitionDetailsInitialProps,
-  DistributedTaskDefinitionDetailsProps,
   PureDistributedTaskDefinitionDetailsProps,
 } from './types';
 
@@ -57,7 +57,7 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
       <>
         <Pane marginBottom={majorScale(2)}>
           <BackButton
-            onClick={this.props.onBackButtonClick}
+            onClick={this.onBackButtonClick}
             marginRight={minorScale(2)}
           />
 
@@ -65,7 +65,7 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
             marginRight={minorScale(2)}
             iconBefore="trash"
             intent="danger"
-            onClick={this.props.onDeleteButtonClick}
+            onClick={this.onDeleteButtonClick}
           >
             Delete
           </Button>
@@ -147,11 +147,23 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
       </ErrorPage>
     );
   };
+
+  private onDeleteButtonClick = () => {
+    this.props.kitsu
+      .delete('distributed-task-definition', this.props.id)
+      .then(() => {
+        toaster.success('The task definition has been deleted');
+        this.props.router.back();
+      });
+  };
+
+  private onBackButtonClick = () => {
+    this.props.router.back();
+  };
 }
 
 export const DistributedTaskDefinitionDetails = withRouter<
-  DistributedTaskDefinitionDetailsInitialProps &
-    DistributedTaskDefinitionDetailsProps
+  DistributedTaskDefinitionDetailsInitialProps
 >(
   withDependencies(dependenciesExtractor)(PureDistributedTaskDefinitionDetails),
 );

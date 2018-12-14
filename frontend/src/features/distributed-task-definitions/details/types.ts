@@ -10,16 +10,10 @@ export interface DistributedTaskDefinitionDetailsInitialProps {
   error?: RequestError;
 }
 
-export interface DistributedTaskDefinitionDetailsProps {
-  onDeleteButtonClick: () => void;
-  onBackButtonClick: () => void;
-}
-
 export interface DistributedTaskDefinitionDetailsDependencies {
   kitsu: BaseDependencies['kitsu'];
 }
 
 export type PureDistributedTaskDefinitionDetailsProps = DistributedTaskDefinitionDetailsInitialProps &
-  DistributedTaskDefinitionDetailsProps &
   DistributedTaskDefinitionDetailsDependencies &
   WithRouterProps;
