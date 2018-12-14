@@ -21,13 +21,11 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
   <AuthenticatedSidebar />
 );
 
-const kitsu = kitsuFactory();
-
 class DetailsPage extends PureComponent<
   DistributedTaskDefinitionDetailsInitialProps & WithRouterProps
 > {
   public static getInitialProps = getDistributedTaskDefinitionDetailsInitialProps(
-    kitsu,
+    kitsuFactory(),
   );
 
   public render() {
