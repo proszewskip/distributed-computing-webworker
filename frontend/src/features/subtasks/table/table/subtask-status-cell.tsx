@@ -1,15 +1,15 @@
 import { Alert, Text } from 'evergreen-ui';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 import { SubtaskStatus } from 'models';
 
+const statusMapping: { [status: number]: ReactNode } = {
+  [SubtaskStatus.Done]: <Text>Done</Text>,
+  [SubtaskStatus.Executing]: <Text>In progress</Text>,
+  [SubtaskStatus.Error]: <Alert intent="danger">Error</Alert>,
+  [SubtaskStatus.WaitingForExecution]: <Text>Waiting for execution</Text>,
+};
+
 export const SubtaskStatusCell = (row: { value: SubtaskStatus }) => {
-  return (
-    (row.value === SubtaskStatus.Done && <Text>Done</Text>) ||
-    (row.value === SubtaskStatus.Executing && <Text>In progress</Text>) ||
-    (row.value === SubtaskStatus.WaitingForExecution && (
-      <Text>Waiting for execution</Text>
-    )) ||
-    (row.value === SubtaskStatus.Error && <Alert intent="danger">Error</Alert>)
-  );
+  return statusMapping[row.value];
 };
