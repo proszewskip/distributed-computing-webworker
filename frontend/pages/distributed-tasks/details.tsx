@@ -25,8 +25,6 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
   <AuthenticatedSidebar />
 );
 
-const kitsu = kitsuFactory();
-
 type GetInitialPropsFn = NextComponentClass<
   DistributedTaskDetailsProps
 >['getInitialProps'];
@@ -40,6 +38,8 @@ class DetailsPage extends PureComponent<
     const getParams: GetParams = {
       include: 'subtasks',
     };
+
+    const kitsu = kitsuFactory();
 
     return kitsu
       .get<DistributedTask>(`distributed-task/${id}`, getParams)
