@@ -1,19 +1,10 @@
 import { Button, Heading, minorScale, Pane, Text, toaster } from 'evergreen-ui';
-import fetch from 'isomorphic-unfetch';
+import { List, Set } from 'immutable';
 import React, { Component, MouseEventHandler } from 'react';
 import { Column } from 'react-table';
-
-import { List, Set } from 'immutable';
-
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
 
-import { Omit } from 'types/omit';
-
-import {
-  DataTable,
-  DataTableProps,
-  ForceFetchData,
-} from 'components/data-table/data-table';
+import { DataTable, DataTableProps } from 'components/data-table/data-table';
 import {
   DataTableView,
   DataTableViewProps,
@@ -22,6 +13,7 @@ import {
   DeleteActionButton,
   RefreshActionButton,
   ToggleFiltersActionButton,
+  CreateActionButton,
 } from 'components/data-table/data-table-view/action-buttons';
 import { TextFilter } from 'components/data-table/styled-data-table';
 import { TableWithSummaryProps } from 'components/data-table/styled-data-table/table-with-summary';
@@ -29,59 +21,37 @@ import {
   withSelectableRows,
   WithSelectableRowsAdditionalProps,
 } from 'components/data-table/with-selectable-rows';
-import { Layout, LayoutProps } from 'components/layout';
+import {
+  DependenciesExtractor,
+  withDependencies,
+} from 'components/dependency-injection/with-dependencies';
 import { Link } from 'components/link';
 
 import { DistributedTaskDefinition } from 'models';
-import { AuthenticatedSidebar, Head, kitsuFactory } from 'product-specific';
+import { BaseDependencies } from 'product-specific';
+
+import { getEntities } from 'utils/table/get-entities';
+
+import {
+  DistributedTaskDefinitionsTableDependencies,
+  DistributedTaskDefinitionsTableProps,
+  DistributedTaskDefinitionsTableState,
+} from './types';
 
 const SelectDataTable = selectTableHOC(DataTable);
 const Table = withSelectableRows(SelectDataTable);
 
 const TextCell = (row: { value: any }) => <Text>{row.value}</Text>;
 
-const serverIp = 'http://localhost:5000';
-const entityPath = '/distributed-task-definitions';
-const distributedTaskDefinitionsUrl = `${serverIp}${entityPath}`;
-
-interface TableExampleProps {
-  data: DistributedTaskDefinition[];
-  totalRecordsCount: number;
-}
-
-interface TableExampleState extends Omit<TableExampleProps, 'data'> {
-  data: List<DistributedTaskDefinition>;
-  loading: boolean;
-  selectedRowIds: WithSelectableRowsAdditionalProps['selectedRowIds'];
-  filteringEnabled: boolean;
-  forceFetchDataCallback: ForceFetchData;
-}
-
-async function getEntities<T extends { id: string }>(
-  baseUrl: string,
-  urlSearchParams = new URLSearchParams(),
-  page = 1,
-  pageSize = 20,
-) {
-  const paginatedUrl = `${baseUrl}?page[size]=${pageSize}&page[number]=${page}&${urlSearchParams}`;
-
-  const body = await fetch(paginatedUrl).then((res) => res.json());
-  const data = (body.data || []).map((entity: any) => ({
-    ...entity.attributes,
-    id: entity.id,
-  })) as T[];
-  const totalRecordsCount = body.meta['total-records'] as number;
-
-  return {
-    data,
-    totalRecordsCount,
-  };
-}
-
 const preventPropagationHandler: MouseEventHandler = (event) =>
   event.stopPropagation();
 
-class TableExample extends Component<TableExampleProps, TableExampleState> {
+const distributedTaskDefinitionModelName = 'distributed-task-definition';
+
+export class PureDistributedTaskDefinitionsTable extends Component<
+  DistributedTaskDefinitionsTableProps,
+  DistributedTaskDefinitionsTableState
+> {
   private filterableColumnIds = ['name'];
   private columns: Column[] = [
     {
@@ -115,7 +85,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
           <Link
             route={`/distributed-task-definitions/${
               cellProps.original.id
-            }/edit`}
+            }/update`}
           >
             <Button iconBefore="edit" marginRight={minorScale(2)}>
               Edit
@@ -133,7 +103,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
     },
   ];
 
-  constructor(props: TableExampleProps) {
+  constructor(props: DistributedTaskDefinitionsTableProps) {
     super(props);
 
     const { data } = props;
@@ -159,7 +129,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
 
     return (
       <DataTableView
-        header={<Heading size={600}>Distributed Task definitions</Heading>}
+        header={<Heading size={600}>Distributed Task Definitions</Heading>}
         renderActionButtons={this.renderActionButtons}
       >
         <Table
@@ -194,18 +164,16 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
     page,
   }) => {
     const { filteringEnabled } = this.state;
+    const { kitsu } = this.props;
     this.setState({ loading: true });
 
-    const searchParams = new URLSearchParams();
-    if (filtered && filteringEnabled) {
-      filtered.forEach(({ id, value }: any) => {
-        searchParams.set(`filter[${id}]`, `like:${value}`);
-      });
+    if (!filteringEnabled) {
+      filtered = [];
     }
 
     const { data, totalRecordsCount } = await getEntities<
       DistributedTaskDefinition
-    >(distributedTaskDefinitionsUrl, searchParams, page, pageSize);
+    >(kitsu, distributedTaskDefinitionModelName, filtered, page, pageSize);
 
     this.setState({
       data: List(data),
@@ -215,9 +183,7 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
   };
 
   private onDeleteButtonClick = (id: string) => () => {
-    const kitsu = kitsuFactory();
-
-    kitsu.delete('distributed-task-definition', id).then(() => {
+    this.deleteDistributedTaskDefinition(id).then(() => {
       toaster.success('The entity has been deleted');
       this.state.forceFetchDataCallback();
     });
@@ -225,13 +191,16 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
 
   private renderActionButtons: DataTableViewProps['renderActionButtons'] = () => (
     <>
+      <Link route="/distributed-task-definitions/create">
+        <CreateActionButton />
+      </Link>
       <RefreshActionButton
         onClick={this.state.forceFetchDataCallback}
         disabled={this.state.loading}
       />
       <DeleteActionButton
-        onClick={this.onBulkActionExampleClick}
-        disabled={this.state.selectedRowIds.size === 0}
+        onClick={this.onBulkDeleteActionClick}
+        disabled={this.state.selectedRowIds.size === 0 || this.state.loading}
       />
       <ToggleFiltersActionButton
         filtersEnabled={this.state.filteringEnabled}
@@ -240,9 +209,24 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
     </>
   );
 
-  private onBulkActionExampleClick = () => {
-    console.log('Selected ids', this.state.selectedRowIds);
+  private onBulkDeleteActionClick = async () => {
+    this.setState({
+      loading: true,
+    });
+
+    await Promise.all(
+      this.state.selectedRowIds.map(this.deleteDistributedTaskDefinition),
+    );
+
+    this.setState({
+      selectedRowIds: Set(),
+    });
+    toaster.success('The entities have been deleted');
+    this.state.forceFetchDataCallback();
   };
+
+  private deleteDistributedTaskDefinition = (id: string) =>
+    this.props.kitsu.delete(distributedTaskDefinitionModelName, id);
 
   private toggleFilters = () => {
     this.setState(
@@ -266,37 +250,11 @@ class TableExample extends Component<TableExampleProps, TableExampleState> {
   };
 }
 
-const renderSidebar: LayoutProps['renderSidebar'] = () => (
-  <AuthenticatedSidebar />
-);
+const dependenciesExtractor: DependenciesExtractor<
+  BaseDependencies,
+  DistributedTaskDefinitionsTableDependencies
+> = ({ kitsu }) => ({ kitsu });
 
-interface TableExamplePageProps extends Omit<TableExampleProps, 'data'> {
-  data: DistributedTaskDefinition[];
-}
-
-// tslint:disable-next-line:max-classes-per-file
-class TableExamplePage extends Component<TableExamplePageProps> {
-  public static async getInitialProps(): Promise<
-    Partial<TableExamplePageProps>
-  > {
-    return getEntities<DistributedTaskDefinition>(
-      distributedTaskDefinitionsUrl,
-    );
-  }
-
-  public render() {
-    return (
-      <>
-        <Head />
-
-        <Layout renderSidebar={renderSidebar}>
-          <Pane marginX={16}>
-            <TableExample {...this.props} />
-          </Pane>
-        </Layout>
-      </>
-    );
-  }
-}
-
-export default TableExamplePage;
+export const DistributedTaskDefinitionsTable = withDependencies(
+  dependenciesExtractor,
+)(PureDistributedTaskDefinitionsTable);
