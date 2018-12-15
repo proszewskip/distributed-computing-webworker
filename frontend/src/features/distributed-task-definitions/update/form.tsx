@@ -100,9 +100,10 @@ class PureUpdateDistributedTaskDefinitionForm extends Component<
       .catch((errorsResponse: JsonApiErrorResponse) => {
         const errorsDictionary = getErrorsDictionary(errorsResponse);
         setErrors(errorsDictionary);
+      })
+      .then(() => {
+        setSubmitting(false);
       });
-
-    setSubmitting(false);
   };
 }
 

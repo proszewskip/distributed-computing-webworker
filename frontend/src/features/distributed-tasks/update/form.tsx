@@ -122,9 +122,10 @@ class PureUpdateDistributedTaskForm extends Component<
       .catch((response: JsonApiErrorResponse) => {
         const errorsObject = getErrorsDictionary(response);
         setErrors(errorsObject);
+      })
+      .then(() => {
+        setSubmitting(false);
       });
-
-    setSubmitting(false);
   };
 }
 

@@ -15,20 +15,20 @@ import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
 import { getErrorsDictionary } from 'utils/forms/get-errors-dictionary';
 
 import {
-  UpdateDistributedNodeDependencies,
+  UpdateDistributedNodeFormDependencies,
+  UpdateDistributedNodeFormProps,
+  UpdateDistributedNodeFormState,
   UpdateDistributedNodeModel,
-  UpdateDistributedNodeProps,
-  UpdateDistributedNodeState,
 } from './types';
 import { validationSchema } from './validation-schema';
 
 import { BaseDependencies } from 'product-specific';
 
 class PureUpdateDistributedTaskForm extends Component<
-  UpdateDistributedNodeProps,
-  UpdateDistributedNodeState
+  UpdateDistributedNodeFormProps,
+  UpdateDistributedNodeFormState
 > {
-  public state: UpdateDistributedNodeState = {
+  public state: UpdateDistributedNodeFormState = {
     data: {
       id: this.props.data.id,
       'trust-level': this.props.data['trust-level'],
@@ -84,7 +84,7 @@ class PureUpdateDistributedTaskForm extends Component<
   private handleSubmitHandler: FormikConfig<
     UpdateDistributedNodeModel
   >['onSubmit'] = async (values, { setSubmitting, setErrors, resetForm }) => {
-    const { kitsu, closeDialog } = this.props;
+    const { kitsu, onFormComplete } = this.props;
 
     setSubmitting(true);
 
@@ -93,24 +93,25 @@ class PureUpdateDistributedTaskForm extends Component<
       .then(() => {
         toaster.success('Distributed Node updated');
         resetForm(values);
-        closeDialog();
+        onFormComplete();
       })
       .catch((response: JsonApiErrorResponse) => {
         const errorsObject = getErrorsDictionary(response);
         setErrors(errorsObject);
+      })
+      .then(() => {
+        setSubmitting(false);
       });
-
-    setSubmitting(false);
   };
 
   private onCancelClick = () => {
-    this.props.closeDialog();
+    this.props.onFormComplete();
   };
 }
 
 const dependenciesExtractor: DependenciesExtractor<
   BaseDependencies,
-  UpdateDistributedNodeDependencies
+  UpdateDistributedNodeFormDependencies
 > = ({ kitsu }) => ({ kitsu });
 
 export const UpdateDistributedNodeForm = withDependencies(
