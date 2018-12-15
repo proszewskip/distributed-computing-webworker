@@ -5,6 +5,7 @@ import { DistributedTaskDefinition } from 'models';
 
 import { getEntities } from 'utils/table/get-entities';
 
+import { distributedTaskDefinitionModelName } from './common';
 import { DistributedTaskDefinitionsTableOwnProps } from './types';
 
 type GetInitialPropsFn = NextComponentClass<
@@ -16,6 +17,6 @@ export const getDistributedTaskDefinitionsTableInitialProps = (
 ): GetInitialPropsFn => () => {
   return getEntities<DistributedTaskDefinition>(
     kitsu,
-    'distributed-task-definitions',
+    distributedTaskDefinitionModelName,
   );
 };
