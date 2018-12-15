@@ -1,0 +1,118 @@
+import { Button, Pane, toaster } from 'evergreen-ui';
+import { Field, Form, Formik, FormikConfig } from 'formik';
+import { JsonApiErrorResponse } from 'kitsu';
+import React, { Component } from 'react';
+import { ClipLoader } from 'react-spinners';
+
+import {
+  DependenciesExtractor,
+  withDependencies,
+} from 'components/dependency-injection/with-dependencies';
+import { ErrorAlert } from 'components/form/errors/error-alert';
+import { TextInputWithLabel } from 'components/form/text-input';
+import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
+
+import { getErrorsDictionary } from 'utils/forms/get-errors-dictionary';
+
+import {
+  UpdateDistributedNodeDependencies,
+  UpdateDistributedNodeModel,
+  UpdateDistributedNodeProps,
+  UpdateDistributedNodeState,
+} from './types';
+import { validationSchema } from './validation-schema';
+
+import { BaseDependencies } from 'product-specific';
+
+class PureUpdateDistributedTaskForm extends Component<
+  UpdateDistributedNodeProps,
+  UpdateDistributedNodeState
+> {
+  public state: UpdateDistributedNodeState = {
+    data: {
+      id: this.props.data.id,
+      'trust-level': this.props.data['trust-level'],
+    },
+  };
+
+  public render() {
+    return (
+      <Formik
+        initialValues={this.state.data}
+        onSubmit={this.handleSubmitHandler}
+        render={this.renderForm}
+        validationSchema={validationSchema}
+      />
+    );
+  }
+
+  private renderForm: FormikConfig<UpdateDistributedNodeModel>['render'] = ({
+    values,
+    touched,
+    errors,
+    isSubmitting,
+    dirty,
+  }) => {
+    return (
+      <Pane maxWidth={600}>
+        <Form>
+          <ErrorAlert touched={touched} errors={errors} values={values} />
+
+          <Field
+            name="trust-level"
+            label="Trust level"
+            type="number"
+            component={TextInputWithLabel}
+            width="100%"
+          />
+
+          <Button type="button" onClick={this.onCancelClick}>
+            Cancel
+          </Button>
+
+          <Button type="submit" disabled={isSubmitting}>
+            Submit
+          </Button>
+
+          <ClipLoader loading={isSubmitting} />
+        </Form>
+        <WarnOnUnsavedData warn={dirty} />
+      </Pane>
+    );
+  };
+
+  private handleSubmitHandler: FormikConfig<
+    UpdateDistributedNodeModel
+  >['onSubmit'] = async (values, { setSubmitting, setErrors, resetForm }) => {
+    const { kitsu, closeDialog } = this.props;
+
+    setSubmitting(true);
+
+    kitsu
+      .patch('distributed-node', values)
+      .then(() => {
+        toaster.success('Distributed Node updated');
+        resetForm(values);
+        closeDialog();
+      })
+      .catch((response: JsonApiErrorResponse) => {
+        const errorsObject = getErrorsDictionary(response);
+        setErrors(errorsObject);
+      });
+
+    setSubmitting(false);
+  };
+
+  private onCancelClick = () => {
+    this.props.closeDialog();
+  };
+}
+
+const dependenciesExtractor: DependenciesExtractor<
+  BaseDependencies,
+  UpdateDistributedNodeDependencies
+> = ({ kitsu }) => ({ kitsu });
+
+export const UpdateDistributedNodeForm = withDependencies(
+  dependenciesExtractor,
+)(PureUpdateDistributedTaskForm);
