@@ -11,7 +11,7 @@ export const formatDistributedTaskStatus = (
     case DistributedTaskStatus.Error:
       return 'Errors occured';
     case DistributedTaskStatus.InProgress:
-      return ' In progress';
+      return 'In progress';
     default:
       return 'Unknown status';
   }
