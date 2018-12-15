@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using JsonApiDotNetCore.Services;
 using Microsoft.EntityFrameworkCore;
+using Server.Exceptions;
 using Server.Models;
 
 namespace Server.Services.Api
@@ -161,7 +162,7 @@ namespace Server.Services.Api
                 finishedDistributedTask.Result =
                     problemPluginFacade.JoinSubtaskResults(subtaskResults);
             }
-            catch (Exception exception)
+            catch (SubtaskResultsJoiningException exception)
             {
                 finishedDistributedTask.Status = DistributedTaskStatus.Error;
                 finishedDistributedTask.Errors = finishedDistributedTask.Errors.Append(exception.ToString()).ToArray();
