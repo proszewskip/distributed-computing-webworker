@@ -10,10 +10,10 @@ import {
   DataTableViewProps,
 } from 'components/data-table/data-table-view';
 import {
+  CreateActionButton,
   DeleteActionButton,
   RefreshActionButton,
   ToggleFiltersActionButton,
-  CreateActionButton,
 } from 'components/data-table/data-table-view/action-buttons';
 import { TextFilter } from 'components/data-table/styled-data-table';
 import { TableWithSummaryProps } from 'components/data-table/styled-data-table/table-with-summary';
@@ -32,6 +32,7 @@ import { BaseDependencies } from 'product-specific';
 
 import { getEntities } from 'utils/table/get-entities';
 
+import { distributedTaskDefinitionModelName } from './common';
 import {
   DistributedTaskDefinitionsTableDependencies,
   DistributedTaskDefinitionsTableProps,
@@ -45,8 +46,6 @@ const TextCell = (row: { value: any }) => <Text>{row.value}</Text>;
 
 const preventPropagationHandler: MouseEventHandler = (event) =>
   event.stopPropagation();
-
-const distributedTaskDefinitionModelName = 'distributed-task-definition';
 
 export class PureDistributedTaskDefinitionsTable extends Component<
   DistributedTaskDefinitionsTableProps,
@@ -183,10 +182,22 @@ export class PureDistributedTaskDefinitionsTable extends Component<
   };
 
   private onDeleteButtonClick = (id: string) => () => {
-    this.deleteDistributedTaskDefinition(id).then(() => {
-      toaster.success('The entity has been deleted');
-      this.state.forceFetchDataCallback();
+    this.setState({
+      loading: true,
     });
+
+    this.deleteDistributedTaskDefinition(id)
+      .then(() => {
+        toaster.success('The entity has been deleted');
+        this.state.forceFetchDataCallback();
+      })
+      .catch(() => {
+        toaster.danger('An error occurred while trying to delete the entity');
+
+        this.setState({
+          loading: false,
+        });
+      });
   };
 
   private renderActionButtons: DataTableViewProps['renderActionButtons'] = () => (
@@ -214,14 +225,19 @@ export class PureDistributedTaskDefinitionsTable extends Component<
       loading: true,
     });
 
-    await Promise.all(
-      this.state.selectedRowIds.map(this.deleteDistributedTaskDefinition),
-    );
+    try {
+      await Promise.all(
+        this.state.selectedRowIds.map(this.deleteDistributedTaskDefinition),
+      );
 
-    this.setState({
-      selectedRowIds: Set(),
-    });
-    toaster.success('The entities have been deleted');
+      this.setState({
+        selectedRowIds: Set(),
+      });
+      toaster.success('The entities have been deleted');
+    } catch (error) {
+      toaster.danger('An error occurred while deleting the entites');
+    }
+
     this.state.forceFetchDataCallback();
   };
 
