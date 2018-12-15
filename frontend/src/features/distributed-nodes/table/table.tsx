@@ -1,5 +1,5 @@
 import { distanceInWordsToNow } from 'date-fns';
-import { Heading, Text, Tooltip } from 'evergreen-ui';
+import { Heading, Pane, Text, Tooltip } from 'evergreen-ui';
 import { List } from 'immutable';
 import React, { Component } from 'react';
 import { Column } from 'react-table';
@@ -22,8 +22,9 @@ import {
 } from 'components/dependency-injection/with-dependencies';
 
 import { getEntities } from 'utils/table/get-entities';
+import { preventPropagationHandler } from 'utils/table/prevent-propagation-handler';
 
-import { EditNodeCell } from './edit-node-cell';
+import { EditNodeButton } from './edit-node-cell';
 import {
   DistributedNodesTableDependencies,
   DistributedNodesTableProps,
@@ -69,10 +70,12 @@ export class PureDistributedNodesTable extends Component<
       id: 'action',
       Header: <Text>Action</Text>,
       Cell: (cellProps) => (
-        <EditNodeCell
-          forceFetchData={this.state.forceFetchDataCallback}
-          cellInfo={cellProps}
-        />
+        <Pane onClick={preventPropagationHandler}>
+          <EditNodeButton
+            forceFetchData={this.state.forceFetchDataCallback}
+            cellInfo={cellProps}
+          />
+        </Pane>
       ),
       minWidth: 150,
     },
