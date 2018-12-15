@@ -12,6 +12,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Server.Services
 {
+    /// <summary>
+    /// Allows using JSON API serialization from actions that are not the default
+    /// JSON API actions.
+    /// </summary>
     public interface IJsonApiResponseFactory
     {
         Task<IActionResult> CreateResponseAsync<T>(HttpResponse response, T entity) where T : class, IIdentifiable<int>;
@@ -21,7 +25,7 @@ namespace Server.Services
         /// Sets up the internal Json Api structures. This has to be used when trying to return a Json Api response
         /// from a controller that does not extend any Json Api controllers.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">Model</typeparam>
         /// <param name="controller"></param>
         void ApplyFakeContext<T>(Controller controller) where T : class, IIdentifiable;
     }

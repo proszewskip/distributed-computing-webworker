@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Http;
 
 namespace Server.Services
 {
+    /// <summary>
+    /// Enables interaction with the file system.
+    /// </summary>
     public interface IFileStorage
     {
         Task<string> SaveFileAsync(string directoryPath, IFormFile file);

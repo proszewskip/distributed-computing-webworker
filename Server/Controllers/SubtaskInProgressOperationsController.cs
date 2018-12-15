@@ -10,6 +10,9 @@ using Server.Validation;
 
 namespace Server.Controllers
 {
+    /// <summary>
+    /// Controller responsible for managing subtasks in progress
+    /// </summary>
     [Route("subtasks-in-progress")]
     [ServiceFilter(typeof(FormatErrorActionFilter))]
     public class SubtaskInProgressOperationsController : Controller

@@ -22,8 +22,6 @@ namespace Server.Services
             InitializePaths();
         }
 
-        public string MonoPackagerPath { get; private set; }
-
         public string CompiledTasksDefinitionsDirectoryPath { get; private set; }
 
         private string TaskDefinitionsDirectoryPath { get; set; }
@@ -46,14 +44,6 @@ namespace Server.Services
         private void InitializePaths()
         {
             bool invalidEnvironmentConfiguration = false;
-
-            MonoPackagerPath = GetFullPath(_serverConfig.MonoPackagerPath);
-            if (!File.Exists(MonoPackagerPath))
-            {
-                _logger.LogError($"The \"{nameof(_serverConfig.MonoPackagerPath)}\" option " +
-                                 "points to a non-existing file");
-                invalidEnvironmentConfiguration = true;
-            }
 
             TaskDefinitionsDirectoryPath = GetFullPath(_serverConfig.TaskDefinitionsDirectoryPath);
             if (!Directory.Exists(TaskDefinitionsDirectoryPath))

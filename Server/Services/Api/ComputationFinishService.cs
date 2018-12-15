@@ -9,10 +9,30 @@ using Server.Models;
 
 namespace Server.Services.Api
 {
+    /// <summary>
+    /// Service used for synchronizing completing the computation of subtasks.
+    /// </summary>
     public interface IFinishComputationService
     {
+        /// <summary>
+        /// Marks a given SubtaskInProgress as complete, possibly also marking
+        /// the Subtask as complete and DistributedTask as complete.
+        ///
+        /// Hierarchical marking as complete is done when all the siblings
+        /// are also completed.
+        /// </summary>
+        /// <param name="subtaskInProgressId"></param>
+        /// <param name="subtaskInProgressResult"></param>
+        /// <returns></returns>
         Task CompleteSubtaskInProgressAsync(int subtaskInProgressId, Stream subtaskInProgressResult);
 
+        /// <summary>
+        /// Marks a given SubtaskInProgress as failed, also marking the Subtask
+        /// and DistributedTask as failed.
+        /// </summary>
+        /// <param name="subtaskInProgressId"></param>
+        /// <param name="computationErrors"></param>
+        /// <returns></returns>
         Task FailSubtaskInProgressAsync(int subtaskInProgressId, string[] computationErrors);
     }
 
