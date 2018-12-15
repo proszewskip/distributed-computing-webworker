@@ -33,6 +33,12 @@ namespace Server.Filters
                         "Request data error", "An unknown error occurred."));
                     break;
 
+                case OkResult _:
+                    break;
+
+                case CreatedResult _:
+                    break;
+
                 case StatusCodeResult result:
                     context.Result = _jsonApiActionResultFactory.Error(new Error(result.StatusCode, "Unknown error"));
                     break;
