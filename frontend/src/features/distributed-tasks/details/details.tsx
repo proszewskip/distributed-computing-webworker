@@ -146,7 +146,11 @@ export class PureDistributedTaskDetails extends PureComponent<
         </Pane>
 
         <Pane marginRight={minorScale(2)} display="inline">
-          <a href={resultsUrl} download={true} className="without-underline">
+          <a
+            href={taskDone ? resultsUrl : undefined}
+            download={true}
+            className="without-underline"
+          >
             <Button iconBefore="download" intent="success" disabled={!taskDone}>
               Download results
             </Button>
