@@ -3,7 +3,7 @@ import React, { ReactNode } from 'react';
 
 import { SubtaskStatus } from 'models';
 
-const statusMapping: { [status: number]: ReactNode } = {
+const statusMapping: { [status in SubtaskStatus]: ReactNode } = {
   [SubtaskStatus.Done]: <Text>Done</Text>,
   [SubtaskStatus.Executing]: <Text>In progress</Text>,
   [SubtaskStatus.Error]: <Alert intent="danger">Error</Alert>,
