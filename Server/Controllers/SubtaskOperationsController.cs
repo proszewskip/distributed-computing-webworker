@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using JsonApiDotNetCore.Models;
 using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,21 +20,17 @@ namespace Server.Controllers
         private readonly DistributedComputingDbContext _dbContext;
         private readonly IResourceService<DistributedNode, Guid> _distributedNodeResourceService;
         private readonly IResourceService<SubtaskInProgress> _subtaskInProgressResourceService;
-        private readonly IResourceService<Subtask> _subtaskResourceService;
         private readonly IJsonApiResponseFactory _jsonApiResponseFactory;
 
         public SubtaskOperationsController(
             IResourceService<DistributedNode, Guid> distributedNodeResourceService,
             IResourceService<SubtaskInProgress> subtaskInProgressResourceService,
-            IResourceService<Subtask> subtaskResourceService,
             DistributedComputingDbContext dbContext,
-            IJsonApiResponseFactory jsonApiResponseFactory,
-            IJsonApiContext jsonApiContext
+            IJsonApiResponseFactory jsonApiResponseFactory
         )
         {
             _distributedNodeResourceService = distributedNodeResourceService;
             _subtaskInProgressResourceService = subtaskInProgressResourceService;
-            _subtaskResourceService = subtaskResourceService;
             _dbContext = dbContext;
             _jsonApiResponseFactory = jsonApiResponseFactory;
         }
@@ -64,8 +61,9 @@ namespace Server.Controllers
 
             var createdSubtaskInProgress = await _subtaskInProgressResourceService.CreateAsync(subtaskInProgress);
 
-            await _subtaskResourceService.UpdateAsync(subtaskInProgress.SubtaskId,
-                new Subtask { Status = SubtaskStatus.Executing });
+            nextSubtask.Status = SubtaskStatus.Executing;
+            _dbContext.Subtasks.Update(nextSubtask);
+            await _dbContext.SaveChangesAsync();
 
             _jsonApiResponseFactory.ApplyFakeContext<SubtaskInProgress>(this);
             return await _jsonApiResponseFactory.CreateResponseAsync(HttpContext.Response, createdSubtaskInProgress);
