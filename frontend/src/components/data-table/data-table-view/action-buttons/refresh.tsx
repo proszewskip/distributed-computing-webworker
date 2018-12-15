@@ -2,7 +2,7 @@ import { IconButton, minorScale } from 'evergreen-ui';
 import React, { StatelessComponent } from 'react';
 
 export interface RefreshActionButtonProps {
-  disabled: boolean;
+  disabled?: boolean;
   onClick?: () => any;
 }
 
