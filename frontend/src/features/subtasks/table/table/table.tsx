@@ -102,7 +102,7 @@ export class PureSubtasksTable extends Component<
     const { kitsu, distributedTaskId } = this.props;
 
     if (!this.state.filteringEnabled) {
-      filtered = filtered.slice(0, 0);
+      filtered = [];
     }
 
     if (!filtered.find((filter) => filter.id === 'distributed-task-id')) {
