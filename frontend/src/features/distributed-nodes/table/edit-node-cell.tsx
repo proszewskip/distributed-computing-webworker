@@ -1,10 +1,8 @@
-import { Button, Dialog, minorScale, Pane } from 'evergreen-ui';
+import { Button, Dialog, minorScale } from 'evergreen-ui';
 import React, { PureComponent } from 'react';
 import { CellInfo } from 'react-table';
 
 import { UpdateDistributedNodeForm } from '../update';
-
-import { preventPropagationHandler } from 'utils/table/prevent-propagation-handler';
 
 export interface EditNodeCellState {
   dialogVisible: boolean;
@@ -15,7 +13,7 @@ export interface EditNodeCellProps {
   cellInfo: CellInfo;
 }
 
-export class EditNodeCell extends PureComponent<
+export class EditNodeButton extends PureComponent<
   EditNodeCellProps,
   EditNodeCellState
 > {
@@ -30,7 +28,7 @@ export class EditNodeCell extends PureComponent<
     const { original } = cellInfo;
 
     return (
-      <Pane onClick={preventPropagationHandler}>
+      <>
         <Button
           iconBefore="edit"
           marginRight={minorScale(2)}
@@ -40,23 +38,23 @@ export class EditNodeCell extends PureComponent<
         </Button>
         <Dialog
           isShown={dialogVisible}
-          title={`Update node ${original.id}`}
+          title="Update Distributed Node"
           onCloseComplete={this.onCloseComplete}
           hasFooter={false}
         >
           {({ close }: any) => (
             <UpdateDistributedNodeForm
               data={original}
-              closeDialog={this.onDialogClose.bind(this, close)}
+              onFormComplete={this.onFormSaved(close)}
             />
           )}
         </Dialog>
-      </Pane>
+      </>
     );
   }
 
-  private onDialogClose = (internalDialogClose: any) => {
-    internalDialogClose();
+  private onFormSaved = (closeDialog: () => void) => () => {
+    closeDialog();
     this.props.forceFetchData();
   };
 
