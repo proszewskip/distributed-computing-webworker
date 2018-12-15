@@ -8,7 +8,7 @@ import {
   DistributedTaskDefinitionDetails,
   getDistributedTaskDefinitionDetailsInitialProps,
 } from 'features/distributed-task-definitions';
-import { DistributedTaskDefinitionDetailsInitialProps } from 'features/distributed-task-definitions/details/types';
+import { DistributedTaskDefinitionDetailsOwnProps } from 'features/distributed-task-definitions/details/types';
 
 import {
   AuthenticatedSidebar,
@@ -22,7 +22,7 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
 );
 
 class DetailsPage extends PureComponent<
-  DistributedTaskDefinitionDetailsInitialProps & WithRouterProps
+  DistributedTaskDefinitionDetailsOwnProps & WithRouterProps
 > {
   public static getInitialProps = getDistributedTaskDefinitionDetailsInitialProps(
     kitsuFactory(),
