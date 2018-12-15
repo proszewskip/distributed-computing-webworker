@@ -4,10 +4,10 @@ import { NextComponentClass } from 'next';
 import { transformRequestError } from 'error-handling';
 import { DistributedTaskDefinition } from 'models';
 
-import { DistributedTaskDefinitionDetailsInitialProps } from './types';
+import { DistributedTaskDefinitionDetailsOwnProps } from './types';
 
 type GetInitialPropsFn = NextComponentClass<
-  DistributedTaskDefinitionDetailsInitialProps
+  DistributedTaskDefinitionDetailsOwnProps
 >['getInitialProps'];
 
 export const getDistributedTaskDefinitionDetailsInitialProps = (
@@ -22,7 +22,7 @@ export const getDistributedTaskDefinitionDetailsInitialProps = (
       data: result.data as DistributedTaskDefinition,
     }))
     .catch(
-      (error): DistributedTaskDefinitionDetailsInitialProps => ({
+      (error): DistributedTaskDefinitionDetailsOwnProps => ({
         id,
         error: transformRequestError(error),
       }),

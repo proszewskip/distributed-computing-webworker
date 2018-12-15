@@ -7,6 +7,7 @@ import {
   minorScale,
   Pane,
   Text,
+  toaster,
 } from 'evergreen-ui';
 import { withRouter } from 'next/router';
 import React, { PureComponent, ReactNode } from 'react';
@@ -22,8 +23,8 @@ import { BaseDependencies } from 'product-specific';
 
 import {
   DistributedTaskDefinitionDetailsDependencies,
-  DistributedTaskDefinitionDetailsInitialProps,
-  DistributedTaskDefinitionDetailsProps,
+  DistributedTaskDefinitionDetailsOwnProps,
+  DistributedTaskDefinitionDetailsState,
   PureDistributedTaskDefinitionDetailsProps,
 } from './types';
 
@@ -33,8 +34,13 @@ const dependenciesExtractor: DependenciesExtractor<
 > = ({ kitsu }) => ({ kitsu });
 
 export class PureDistributedTaskDefinitionDetails extends PureComponent<
-  PureDistributedTaskDefinitionDetailsProps
+  PureDistributedTaskDefinitionDetailsProps,
+  DistributedTaskDefinitionDetailsState
 > {
+  public state = {
+    deleteRequestPending: false,
+  };
+
   public render() {
     return (
       <>
@@ -51,13 +57,15 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
       return null;
     }
 
+    const { deleteRequestPending } = this.state;
+
     const problemPluginInfo = data['problem-plugin-info'];
 
     return (
       <>
         <Pane marginBottom={majorScale(2)}>
           <BackButton
-            onClick={this.props.onBackButtonClick}
+            onClick={this.onBackButtonClick}
             marginRight={minorScale(2)}
           />
 
@@ -65,7 +73,8 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
             marginRight={minorScale(2)}
             iconBefore="trash"
             intent="danger"
-            onClick={this.props.onDeleteButtonClick}
+            disabled={deleteRequestPending}
+            onClick={this.onDeleteButtonClick}
           >
             Delete
           </Button>
@@ -147,11 +156,31 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
       </ErrorPage>
     );
   };
+
+  private onDeleteButtonClick = () => {
+    this.setState({ deleteRequestPending: true });
+
+    this.props.kitsu
+      .delete('distributed-task-definition', this.props.id)
+      .then(() => {
+        toaster.success('The task definition has been deleted');
+        this.props.router.back();
+      })
+      .catch(() => {
+        toaster.danger('Failed to delete the task definition');
+      })
+      .then(() => {
+        this.setState({ deleteRequestPending: false });
+      });
+  };
+
+  private onBackButtonClick = () => {
+    this.props.router.back();
+  };
 }
 
 export const DistributedTaskDefinitionDetails = withRouter<
-  DistributedTaskDefinitionDetailsInitialProps &
-    DistributedTaskDefinitionDetailsProps
+  DistributedTaskDefinitionDetailsOwnProps
 >(
   withDependencies(dependenciesExtractor)(PureDistributedTaskDefinitionDetails),
 );
