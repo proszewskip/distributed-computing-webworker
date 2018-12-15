@@ -20,3 +20,7 @@ export interface DistributedTaskDetailsDependencies {
 export type PureDistributedTaskDetailsProps = DistributedTaskDetailsProps &
   DistributedTaskDetailsDependencies &
   WithRouterProps;
+
+export interface DistributedTaskDetailsState {
+  deleteRequestPending: boolean;
+}
