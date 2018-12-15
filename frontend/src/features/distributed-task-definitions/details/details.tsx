@@ -70,7 +70,7 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
             Delete
           </Button>
 
-          <Link route={`/distributed-task-definitions/${id}/edit`}>
+          <Link route={`/distributed-task-definitions/${id}/update`}>
             <Button iconBefore="edit">Edit</Button>
           </Link>
         </Pane>
