@@ -1,10 +1,16 @@
 import { Alert, Card, majorScale, minorScale, Pane, Text } from 'evergreen-ui';
 import { DistributedTask } from 'models';
-import React, { ReactNode } from 'react';
+import React, { StatelessComponent } from 'react';
 
 import { formatDistributedTaskStatus } from './format-distributed-task-status';
 
-export function getDetailsGrid(details: DistributedTask): ReactNode {
+export interface DetailsGridProps {
+  details: DistributedTask;
+}
+
+export const DetailsGrid: StatelessComponent<DetailsGridProps> = ({
+  details,
+}) => {
   return (
     <Card
       background="tint2"
@@ -64,8 +70,8 @@ export function getDetailsGrid(details: DistributedTask): ReactNode {
           </Pane>
           <Pane>
             <Text>
-              {details.errors.map((error) => (
-                <Alert title={error} intent="danger" />
+              {details.errors.map((error, index) => (
+                <Alert title={error} key={index} intent="danger" />
               ))}
             </Text>
           </Pane>
@@ -73,4 +79,4 @@ export function getDetailsGrid(details: DistributedTask): ReactNode {
       )}
     </Card>
   );
-}
+};
