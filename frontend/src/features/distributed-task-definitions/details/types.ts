@@ -4,7 +4,7 @@ import { RequestError } from 'error-handling';
 import { DistributedTaskDefinition } from 'models';
 import { BaseDependencies } from 'product-specific';
 
-export interface DistributedTaskDefinitionDetailsInitialProps {
+export interface DistributedTaskDefinitionDetailsOwnProps {
   id: number;
   data?: DistributedTaskDefinition;
   error?: RequestError;
@@ -14,6 +14,10 @@ export interface DistributedTaskDefinitionDetailsDependencies {
   kitsu: BaseDependencies['kitsu'];
 }
 
-export type PureDistributedTaskDefinitionDetailsProps = DistributedTaskDefinitionDetailsInitialProps &
+export type PureDistributedTaskDefinitionDetailsProps = DistributedTaskDefinitionDetailsOwnProps &
   DistributedTaskDefinitionDetailsDependencies &
   WithRouterProps;
+
+export interface DistributedTaskDefinitionDetailsState {
+  deleteButtonDisabled: boolean;
+}

@@ -23,7 +23,8 @@ import { BaseDependencies } from 'product-specific';
 
 import {
   DistributedTaskDefinitionDetailsDependencies,
-  DistributedTaskDefinitionDetailsInitialProps,
+  DistributedTaskDefinitionDetailsOwnProps,
+  DistributedTaskDefinitionDetailsState,
   PureDistributedTaskDefinitionDetailsProps,
 } from './types';
 
@@ -33,8 +34,13 @@ const dependenciesExtractor: DependenciesExtractor<
 > = ({ kitsu }) => ({ kitsu });
 
 export class PureDistributedTaskDefinitionDetails extends PureComponent<
-  PureDistributedTaskDefinitionDetailsProps
+  PureDistributedTaskDefinitionDetailsProps,
+  DistributedTaskDefinitionDetailsState
 > {
+  public state = {
+    deleteButtonDisabled: false,
+  };
+
   public render() {
     return (
       <>
@@ -51,6 +57,8 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
       return null;
     }
 
+    const { deleteButtonDisabled } = this.state;
+
     const problemPluginInfo = data['problem-plugin-info'];
 
     return (
@@ -65,6 +73,7 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
             marginRight={minorScale(2)}
             iconBefore="trash"
             intent="danger"
+            disabled={deleteButtonDisabled}
             onClick={this.onDeleteButtonClick}
           >
             Delete
@@ -149,11 +158,18 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
   };
 
   private onDeleteButtonClick = () => {
+    this.setState({ deleteButtonDisabled: true });
+
     this.props.kitsu
       .delete('distributed-task-definition', this.props.id)
       .then(() => {
         toaster.success('The task definition has been deleted');
+        this.setState({ deleteButtonDisabled: false });
         this.props.router.back();
+      })
+      .catch(() => {
+        toaster.danger('Failed to delete the task definition');
+        this.setState({ deleteButtonDisabled: false });
       });
   };
 
@@ -163,7 +179,7 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
 }
 
 export const DistributedTaskDefinitionDetails = withRouter<
-  DistributedTaskDefinitionDetailsInitialProps
+  DistributedTaskDefinitionDetailsOwnProps
 >(
   withDependencies(dependenciesExtractor)(PureDistributedTaskDefinitionDetails),
 );
