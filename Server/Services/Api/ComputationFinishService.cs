@@ -161,6 +161,7 @@ namespace Server.Services.Api
             {
                 finishedDistributedTask.Result =
                     problemPluginFacade.JoinSubtaskResults(subtaskResults);
+                finishedDistributedTask.Status = DistributedTaskStatus.Done;
             }
             catch (SubtaskResultsJoiningException exception)
             {
