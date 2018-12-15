@@ -32,7 +32,7 @@ class PureUpdateDistributedTaskDefinitionForm extends Component<
   public state: UpdateDistributedTaskDefinitionState = {
     data: {
       name: this.props.data.name,
-      description: this.props.data.name,
+      description: this.props.data.description,
       id: this.props.data.id,
     },
   };
