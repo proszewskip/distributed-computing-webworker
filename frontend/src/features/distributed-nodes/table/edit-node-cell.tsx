@@ -4,18 +4,18 @@ import { CellInfo } from 'react-table';
 
 import { UpdateDistributedNodeForm } from '../update';
 
-export interface EditNodeCellState {
+export interface EditNodeButtonState {
   dialogVisible: boolean;
 }
 
-export interface EditNodeCellProps {
+export interface EditNodeButtonProps {
   forceFetchData: () => void;
   cellInfo: CellInfo;
 }
 
 export class EditNodeButton extends PureComponent<
-  EditNodeCellProps,
-  EditNodeCellState
+  EditNodeButtonProps,
+  EditNodeButtonState
 > {
   public state = {
     dialogVisible: false,
