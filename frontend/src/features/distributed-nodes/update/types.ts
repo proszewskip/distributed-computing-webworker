@@ -5,18 +5,18 @@ export interface UpdateDistributedNodeModel extends Entity {
   'trust-level': number;
 }
 
-export interface UpdateDistributedNodeDependencies {
+export interface UpdateDistributedNodeFormDependencies {
   kitsu: BaseDependencies['kitsu'];
 }
 
-export interface UpdateDistributedNodeOwnProps {
+export interface UpdateDistributedNodeFormOwnProps {
   data: UpdateDistributedNodeModel;
-  closeDialog: () => void;
+  onFormComplete: () => void;
 }
 
-export type UpdateDistributedNodeProps = UpdateDistributedNodeOwnProps &
-  UpdateDistributedNodeDependencies;
+export type UpdateDistributedNodeFormProps = UpdateDistributedNodeFormOwnProps &
+  UpdateDistributedNodeFormDependencies;
 
-export interface UpdateDistributedNodeState {
+export interface UpdateDistributedNodeFormState {
   data: UpdateDistributedNodeModel;
 }

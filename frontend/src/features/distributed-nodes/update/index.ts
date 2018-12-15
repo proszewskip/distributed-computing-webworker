@@ -1,5 +1,5 @@
 export { UpdateDistributedNodeForm } from './form';
 export {
-  UpdateDistributedNodeDependencies,
+  UpdateDistributedNodeFormDependencies,
   UpdateDistributedNodeModel,
 } from './types';
