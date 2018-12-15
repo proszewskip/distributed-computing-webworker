@@ -4,22 +4,18 @@ import React, { Component, MouseEventHandler } from 'react';
 import { Column } from 'react-table';
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
 
-
 import { TextCell } from 'components/data-table/cells/text-cell';
-import {
-  DataTable,
-  DataTableProps,
-} from 'components/data-table/data-table';
+import { DataTable, DataTableProps } from 'components/data-table/data-table';
 import {
   DataTableView,
   DataTableViewProps,
 } from 'components/data-table/data-table-view';
 import {
+  CreateActionButton,
   DeleteActionButton,
   RefreshActionButton,
   ToggleFiltersActionButton,
 } from 'components/data-table/data-table-view/action-buttons';
-import { CreateActionButton } from 'components/data-table/data-table-view/action-buttons/create';
 import { TextFilter } from 'components/data-table/styled-data-table';
 import { TableWithSummaryProps } from 'components/data-table/styled-data-table/table-with-summary';
 import {
@@ -43,7 +39,6 @@ import {
   DistributedTaskDefinitionsTableProps,
   DistributedTaskDefinitionsTableState,
 } from './types';
-
 
 const SelectDataTable = selectTableHOC(DataTable);
 const Table = withSelectableRows(SelectDataTable);
