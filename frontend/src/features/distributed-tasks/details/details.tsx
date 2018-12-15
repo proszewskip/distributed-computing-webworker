@@ -22,7 +22,7 @@ import { Link } from 'components/link';
 import { DistributedTaskStatus } from 'models';
 import { BaseDependencies, config } from 'product-specific';
 
-import { getDetailsGrid } from './get-details-grid';
+import { DetailsGrid } from './get-details-grid';
 import {
   DistributedTaskDetailsDependencies,
   DistributedTaskDetailsProps,
@@ -39,6 +39,10 @@ const dependenciesExtractor: DependenciesExtractor<
 export class PureDistributedTaskDetails extends PureComponent<
   PureDistributedTaskDetailsProps
 > {
+  public state = {
+    deleteButtonDisabled: false,
+  };
+
   public render() {
     return (
       <>
@@ -61,7 +65,7 @@ export class PureDistributedTaskDetails extends PureComponent<
       <>
         {this.renderActionButtons()}
 
-        {getDetailsGrid(detailsData)}
+        <DetailsGrid details={detailsData} />
 
         <Heading>Subtasks</Heading>
         <SubtasksTable
@@ -95,6 +99,8 @@ export class PureDistributedTaskDetails extends PureComponent<
   private renderActionButtons = (): ReactNode => {
     const { distributedTaskDefinitionId, detailsData } = this.props;
 
+    const { deleteButtonDisabled } = this.state;
+
     if (!detailsData) {
       return null;
     }
@@ -105,6 +111,8 @@ export class PureDistributedTaskDetails extends PureComponent<
     const resultsUrl = `${
       config.serverUrl
     }/distributed-tasks/${distributedTaskDefinitionId}/result`;
+
+    const resultsCalculated = detailsData.status === DistributedTaskStatus.Done;
 
     return (
       <Pane marginBottom={majorScale(2)}>
@@ -118,6 +126,7 @@ export class PureDistributedTaskDetails extends PureComponent<
           iconBefore="trash"
           intent="danger"
           onClick={this.onDeleteButtonClick}
+          disabled={deleteButtonDisabled}
         >
           Delete
         </Button>
@@ -128,33 +137,40 @@ export class PureDistributedTaskDetails extends PureComponent<
           </Button>
         </Link>
 
-        <a href={inputDataUrl} download={true}>
-          <Button marginRight={minorScale(2)} iconBefore="download">
-            Download input data
-          </Button>
-        </a>
+        <Pane marginRight={minorScale(2)} display="inline">
+          <a href={inputDataUrl} download={true} className="without-underline">
+            <Button iconBefore="download">Download input data</Button>
+          </a>
+        </Pane>
 
-        {detailsData.status === DistributedTaskStatus.Done && (
-          <a href={resultsUrl} download={true}>
+        <Pane marginRight={minorScale(2)} display="inline">
+          <a href={resultsUrl} download={true} className="without-underline">
             <Button
-              marginRight={minorScale(2)}
               iconBefore="download"
               intent="success"
+              disabled={!resultsCalculated}
             >
               Download results
             </Button>
           </a>
-        )}
+        </Pane>
       </Pane>
     );
   };
 
   private onDeleteButtonClick = () => {
+    this.setState({ deleteButtonDisabled: true });
+
     this.props.kitsu
       .delete('distributed-task', this.props.distributedTaskDefinitionId)
       .then(() => {
         toaster.success('The task has been deleted');
+        this.setState({ deleteButtonDisabled: false });
         this.props.router.back();
+      })
+      .catch(() => {
+        toaster.danger('Failed to delete the task');
+        this.setState({ deleteButtonDisabled: false });
       });
   };
 

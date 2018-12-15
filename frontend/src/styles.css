@@ -5,3 +5,7 @@ body,
 #__next {
   height: 100%;
 }
+
+a.without-underline {
+  text-decoration: none;
+}
