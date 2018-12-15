@@ -15,7 +15,7 @@ export async function getEntities<Model extends Entity>(
   const filtersDictionary: Dictionary<string> = {};
 
   filters.forEach(({ id, value }) => {
-    filtersDictionary[id] = value;
+    filtersDictionary[id] = `like:${value}`;
   });
 
   const getParams: GetParams = {
