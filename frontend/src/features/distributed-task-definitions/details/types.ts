@@ -19,5 +19,5 @@ export type PureDistributedTaskDefinitionDetailsProps = DistributedTaskDefinitio
   WithRouterProps;
 
 export interface DistributedTaskDefinitionDetailsState {
-  deleteButtonDisabled: boolean;
+  deleteRequestPending: boolean;
 }

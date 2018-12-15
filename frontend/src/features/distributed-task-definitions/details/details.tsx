@@ -38,7 +38,7 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
   DistributedTaskDefinitionDetailsState
 > {
   public state = {
-    deleteButtonDisabled: false,
+    deleteRequestPending: false,
   };
 
   public render() {
@@ -57,7 +57,7 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
       return null;
     }
 
-    const { deleteButtonDisabled } = this.state;
+    const { deleteRequestPending } = this.state;
 
     const problemPluginInfo = data['problem-plugin-info'];
 
@@ -73,7 +73,7 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
             marginRight={minorScale(2)}
             iconBefore="trash"
             intent="danger"
-            disabled={deleteButtonDisabled}
+            disabled={deleteRequestPending}
             onClick={this.onDeleteButtonClick}
           >
             Delete
@@ -158,18 +158,19 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
   };
 
   private onDeleteButtonClick = () => {
-    this.setState({ deleteButtonDisabled: true });
+    this.setState({ deleteRequestPending: true });
 
     this.props.kitsu
       .delete('distributed-task-definition', this.props.id)
       .then(() => {
         toaster.success('The task definition has been deleted');
-        this.setState({ deleteButtonDisabled: false });
         this.props.router.back();
       })
       .catch(() => {
         toaster.danger('Failed to delete the task definition');
-        this.setState({ deleteButtonDisabled: false });
+      })
+      .then(() => {
+        this.setState({ deleteRequestPending: false });
       });
   };
 

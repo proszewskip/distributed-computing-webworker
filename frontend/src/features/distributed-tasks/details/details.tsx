@@ -26,6 +26,7 @@ import { DetailsGrid } from './get-details-grid';
 import {
   DistributedTaskDetailsDependencies,
   DistributedTaskDetailsProps,
+  DistributedTaskDetailsState,
   PureDistributedTaskDetailsProps,
 } from './types';
 
@@ -37,10 +38,11 @@ const dependenciesExtractor: DependenciesExtractor<
 > = ({ kitsu }) => ({ kitsu });
 
 export class PureDistributedTaskDetails extends PureComponent<
-  PureDistributedTaskDetailsProps
+  PureDistributedTaskDetailsProps,
+  DistributedTaskDetailsState
 > {
   public state = {
-    deleteButtonDisabled: false,
+    deleteRequestPending: false,
   };
 
   public render() {
@@ -99,7 +101,7 @@ export class PureDistributedTaskDetails extends PureComponent<
   private renderActionButtons = (): ReactNode => {
     const { distributedTaskDefinitionId, detailsData } = this.props;
 
-    const { deleteButtonDisabled } = this.state;
+    const { deleteRequestPending } = this.state;
 
     if (!detailsData) {
       return null;
@@ -112,7 +114,7 @@ export class PureDistributedTaskDetails extends PureComponent<
       config.serverUrl
     }/distributed-tasks/${distributedTaskDefinitionId}/result`;
 
-    const resultsCalculated = detailsData.status === DistributedTaskStatus.Done;
+    const taskDone = detailsData.status === DistributedTaskStatus.Done;
 
     return (
       <Pane marginBottom={majorScale(2)}>
@@ -126,7 +128,7 @@ export class PureDistributedTaskDetails extends PureComponent<
           iconBefore="trash"
           intent="danger"
           onClick={this.onDeleteButtonClick}
-          disabled={deleteButtonDisabled}
+          disabled={deleteRequestPending}
         >
           Delete
         </Button>
@@ -145,11 +147,7 @@ export class PureDistributedTaskDetails extends PureComponent<
 
         <Pane marginRight={minorScale(2)} display="inline">
           <a href={resultsUrl} download={true} className="without-underline">
-            <Button
-              iconBefore="download"
-              intent="success"
-              disabled={!resultsCalculated}
-            >
+            <Button iconBefore="download" intent="success" disabled={!taskDone}>
               Download results
             </Button>
           </a>
@@ -159,18 +157,19 @@ export class PureDistributedTaskDetails extends PureComponent<
   };
 
   private onDeleteButtonClick = () => {
-    this.setState({ deleteButtonDisabled: true });
+    this.setState({ deleteRequestPending: true });
 
     this.props.kitsu
       .delete('distributed-task', this.props.distributedTaskDefinitionId)
       .then(() => {
         toaster.success('The task has been deleted');
-        this.setState({ deleteButtonDisabled: false });
         this.props.router.back();
       })
       .catch(() => {
         toaster.danger('Failed to delete the task');
-        this.setState({ deleteButtonDisabled: false });
+      })
+      .then(() => {
+        this.setState({ deleteRequestPending: false });
       });
   };
 
