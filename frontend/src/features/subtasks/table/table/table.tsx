@@ -1,7 +1,6 @@
-import { distanceInWordsToNow } from 'date-fns';
-import { Button, Heading, minorScale, Pane, Text, Tooltip } from 'evergreen-ui';
+import { Heading, Text } from 'evergreen-ui';
 import { List } from 'immutable';
-import React, { Component, MouseEventHandler } from 'react';
+import React, { Component } from 'react';
 import { Column } from 'react-table';
 
 import { TextCell } from 'components/data-table/cells/text-cell';
@@ -14,78 +13,48 @@ import {
   RefreshActionButton,
   ToggleFiltersActionButton,
 } from 'components/data-table/data-table-view/action-buttons';
-import { TextFilter } from 'components/data-table/styled-data-table';
 
 import {
   DependenciesExtractor,
   withDependencies,
 } from 'components/dependency-injection/with-dependencies';
 
-import { Link } from 'components/link';
-
 import { getEntities } from 'utils/table/get-entities';
 
+import { SubtaskStatusCell } from './subtask-status-cell';
+import { SubtaskStatusFilter } from './subtask-status-filter';
 import {
-  DistributedNodesTableDependencies,
-  DistributedNodesTableProps,
-  DistributedNodesTableState,
+  SubtasksTableDependencies,
+  SubtasksTableProps,
+  SubtasksTableState,
 } from './types';
 
-import { DistributedNode } from 'models';
+import { Subtask } from 'models';
 import { BaseDependencies } from 'product-specific';
 
-const DateCell = (row: { value: any }) => (
-  <Tooltip content={new Date(row.value).toLocaleString()}>
-    <Text>{distanceInWordsToNow(row.value)}</Text>
-  </Tooltip>
-);
-
-const preventPropagationHandler: MouseEventHandler = (event) =>
-  event.stopPropagation();
-
-export class PureDistributedNodesTable extends Component<
-  DistributedNodesTableProps,
-  DistributedNodesTableState
+export class PureSubtasksTable extends Component<
+  SubtasksTableProps,
+  SubtasksTableState
 > {
-  private filterableColumnIds = ['id'];
+  private filterableColumnIds = ['subtask-status'];
   private columns: Column[] = [
     {
-      id: 'id',
-      accessor: 'id',
-      Header: <Text>Name</Text>,
-      Cell: TextCell,
-      Filter: TextFilter,
-      minWidth: 150,
-    },
-    {
-      accessor: 'last-keep-alive-time',
-      Header: <Text>Last alive</Text>,
-      Cell: DateCell,
-      minWidth: 150,
-    },
-    {
-      accessor: 'trust-level',
-      Header: <Text>Trust level</Text>,
+      accessor: 'sequence-number',
+      Header: <Text>Sequence number</Text>,
       Cell: TextCell,
       minWidth: 100,
     },
     {
-      id: 'action',
-      Header: <Text>Action</Text>,
-      Cell: (cellProps) => (
-        <Pane onClick={preventPropagationHandler}>
-          <Link route={`/distributed-nodes/${cellProps.original.id}/edit`}>
-            <Button iconBefore="edit" marginRight={minorScale(2)}>
-              Edit
-            </Button>
-          </Link>
-        </Pane>
-      ),
-      minWidth: 150,
+      id: 'subtask-status',
+      accessor: 'subtask-status',
+      Header: <Text>Status</Text>,
+      Filter: SubtaskStatusFilter,
+      Cell: SubtaskStatusCell,
+      minWidth: 200,
     },
   ];
 
-  constructor(props: DistributedNodesTableProps) {
+  constructor(props: SubtasksTableProps) {
     super(props);
 
     const { data } = props;
@@ -104,7 +73,7 @@ export class PureDistributedNodesTable extends Component<
 
     return (
       <DataTableView
-        header={<Heading size={600}>Distributed Nodes</Heading>}
+        header={<Heading size={600}>Distributed subtasks</Heading>}
         renderActionButtons={this.renderActionButtons}
       >
         <DataTable
@@ -130,11 +99,19 @@ export class PureDistributedNodesTable extends Component<
   }) => {
     this.setState({ loading: true });
 
-    const { kitsu } = this.props;
+    const { kitsu, distributedTaskId } = this.props;
 
-    const { data, totalRecordsCount } = await getEntities<DistributedNode>(
+    if (!this.state.filteringEnabled) {
+      filtered = [];
+    }
+
+    if (!filtered.find((filter) => filter.id === 'distributed-task-id')) {
+      filtered.push({ id: 'distributed-task-id', value: distributedTaskId });
+    }
+
+    const { data, totalRecordsCount } = await getEntities<Subtask>(
       kitsu,
-      'distributed-node',
+      'subtask',
       filtered,
       page,
       pageSize,
@@ -180,9 +157,9 @@ export class PureDistributedNodesTable extends Component<
 
 const dependenciesExtractor: DependenciesExtractor<
   BaseDependencies,
-  DistributedNodesTableDependencies
+  SubtasksTableDependencies
 > = ({ kitsu }) => ({ kitsu });
 
-export const DistributedNodesTable = withDependencies(dependenciesExtractor)(
-  PureDistributedNodesTable,
+export const SubtasksTable = withDependencies(dependenciesExtractor)(
+  PureSubtasksTable,
 );

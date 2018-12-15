@@ -4,6 +4,7 @@ import React, { Component, MouseEventHandler } from 'react';
 import { Column } from 'react-table';
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
 
+import { TextCell } from 'components/data-table/cells/text-cell';
 import { DataTable, DataTableProps } from 'components/data-table/data-table';
 import {
   DataTableView,
@@ -41,8 +42,6 @@ import {
 
 const SelectDataTable = selectTableHOC(DataTable);
 const Table = withSelectableRows(SelectDataTable);
-
-const TextCell = (row: { value: any }) => <Text>{row.value}</Text>;
 
 const preventPropagationHandler: MouseEventHandler = (event) =>
   event.stopPropagation();

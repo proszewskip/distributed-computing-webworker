@@ -10,6 +10,7 @@ namespace Server.Models
         [Attr("sequence-number", isImmutable: true)]
         public int SequenceNumber { get; set; }
 
+        [Attr("distributed-task-id", isImmutable: true)]
         public int DistributedTaskId { get; set; }
 
         [Required]
