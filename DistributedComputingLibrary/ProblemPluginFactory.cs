@@ -4,6 +4,12 @@ using System.Reflection;
 
 namespace DistributedComputing
 {
+    /// <summary>
+    /// Static factory used for instantiating a class that implements IProblemPlugin.
+    ///
+    /// This class is required to create an instance of IProblemPlugin in the browser
+    /// of distributed nodes in WebAssembly.
+    /// </summary>
     public static class ProblemPluginFactory
     {
         public static IProblemPlugin<TTask, TTaskResult, TSubtask, TSubtaskResult> CreateProblemPlugin<TTask, TTaskResult, TSubtask, TSubtaskResult>(string assemblyName, string className)

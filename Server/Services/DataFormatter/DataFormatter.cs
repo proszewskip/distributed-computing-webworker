@@ -5,6 +5,10 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Server.Services
 {
+    /// <summary>
+    /// Used for data serialization and deserialization.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public interface IDataFormatter<T> 
     {
         T Deserialize(byte[] data);

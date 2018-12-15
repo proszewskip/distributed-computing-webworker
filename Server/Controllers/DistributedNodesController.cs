@@ -8,6 +8,9 @@ using Server.Models;
 
 namespace Server.Controllers
 {
+    /// <summary>
+    /// Controller responsible for managing distributed nodes.
+    /// </summary>
     [ServiceFilter(typeof(FormatErrorActionFilter))]
     public class DistributedNodesController : BaseJsonApiController<DistributedNode, Guid>
     {

@@ -8,6 +8,12 @@ using Server.Models;
 
 namespace Server.Services
 {
+    /// <summary>
+    /// A facade for IProblemPlugin that simplifies interacting with the plugin
+    /// from the server's point of view.
+    ///
+    /// It also hides away the generic type parameters of IProblemPlugin.
+    /// </summary>
     public interface IProblemPluginFacade
     {
         IEnumerable<byte[]> GetSubtasksFromData(byte[] taskData);
