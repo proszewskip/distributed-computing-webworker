@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using JsonApiDotNetCore.Controllers;
 using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -14,12 +15,27 @@ namespace Server.Controllers
     [ServiceFilter(typeof(FormatErrorActionFilter))]
     public class SubtasksController : JsonApiController<Subtask>
     {
+        private readonly IResourceService<Subtask> _subtaskResourceService;
+
         public SubtasksController(
             IJsonApiContext jsonApiContext,
-            IResourceService<Subtask> resourceService,
+            IResourceService<Subtask> subtaskResourceService,
             ILoggerFactory loggerFactory
-        ) : base(jsonApiContext, resourceService, loggerFactory)
+        ) : base(jsonApiContext, subtaskResourceService, loggerFactory)
         {
+            _subtaskResourceService = subtaskResourceService;
+        }
+
+
+        [HttpGet("{id}/input-data")]
+        public async Task<IActionResult> DownloadInputData(int id)
+        {
+            var subtask = await _subtaskResourceService.GetAsync(id);
+
+            if (subtask == null)
+                return NotFound();
+
+            return File(subtask.InputData, "application/octet-stream", $"{subtask.Id}-input-data");
         }
     }
 }
