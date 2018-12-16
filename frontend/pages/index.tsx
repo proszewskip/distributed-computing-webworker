@@ -3,6 +3,8 @@ import React from 'react';
 
 import { Layout, LayoutProps } from 'components/layout';
 
+import { Worker } from 'features/worker-node';
+
 import { AuthenticatedSidebar, Head } from 'product-specific';
 
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
@@ -18,6 +20,8 @@ const Index = () => (
         <Card padding={80} border="default" background="tint2">
           Info here
         </Card>
+
+        <Worker message="Hello" />
       </Pane>
     </Layout>
   </>
