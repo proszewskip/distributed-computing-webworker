@@ -5,7 +5,7 @@
   "main": "pages/index.tsx",
   "scripts": {
     "dev": "ts-node server.ts",
-    "build": "next build",
+    "build": "cross-env NODE_ENV=production next build",
     "start": "cross-env NODE_ENV=production ts-node server.ts",
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "test": "jest",
