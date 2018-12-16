@@ -4,9 +4,12 @@ import { RequestError } from 'error-handling';
 import { DistributedTaskDefinition } from 'models';
 import { BaseDependencies } from 'product-specific';
 
+import { DistributedTasksTableOwnProps } from 'features/distributed-tasks';
+
 export interface DistributedTaskDefinitionDetailsOwnProps {
   id: number;
-  data?: DistributedTaskDefinition;
+  detailsData?: DistributedTaskDefinition;
+  tableData?: DistributedTasksTableOwnProps;
   error?: RequestError;
 }
 

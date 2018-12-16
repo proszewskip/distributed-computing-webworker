@@ -4,6 +4,8 @@ import { NextComponentClass } from 'next';
 import { transformRequestError } from 'error-handling';
 import { DistributedTaskDefinition } from 'models';
 
+import { fetchDistributedTasksWithDefinitions } from 'features/distributed-tasks';
+
 import { DistributedTaskDefinitionDetailsOwnProps } from './types';
 
 type GetInitialPropsFn = NextComponentClass<
@@ -13,17 +15,31 @@ type GetInitialPropsFn = NextComponentClass<
 export const getDistributedTaskDefinitionDetailsInitialProps = (
   kitsu: Kitsu,
 ): GetInitialPropsFn => ({ query }) => {
-  const id = parseInt(query.id as string, 10);
+  const distributedTaskDefinitionId = parseInt(query.id as string, 10);
 
-  return kitsu
-    .get<DistributedTaskDefinition>(`distributed-task-definition/${id}`)
-    .then((result) => ({
-      id,
-      data: result.data as DistributedTaskDefinition,
+  const tableDataPromise = fetchDistributedTasksWithDefinitions(
+    kitsu,
+    distributedTaskDefinitionId,
+  );
+  const detailsDataPromise = kitsu
+    .get<DistributedTaskDefinition>(
+      `distributed-task-definition/${distributedTaskDefinitionId}`,
+    )
+    .then(
+      (result): DistributedTaskDefinitionDetailsOwnProps => ({
+        id: distributedTaskDefinitionId,
+        detailsData: result.data as DistributedTaskDefinition,
+      }),
+    );
+
+  return Promise.all([tableDataPromise, detailsDataPromise])
+    .then(([tableData, detailsData]) => ({
+      ...detailsData,
+      tableData,
     }))
     .catch(
       (error): DistributedTaskDefinitionDetailsOwnProps => ({
-        id,
+        id: distributedTaskDefinitionId,
         error: transformRequestError(error),
       }),
     );

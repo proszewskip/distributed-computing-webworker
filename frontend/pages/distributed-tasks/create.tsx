@@ -24,7 +24,9 @@ type GetInitialPropsFn = NextComponentClass<CreatePageProps>['getInitialProps'];
 
 export default class CreatePage extends PureComponent<CreatePageProps> {
   public static getInitialProps: GetInitialPropsFn = ({ query }) => {
-    return { distributedTaskDefinitionId: query.id as string };
+    return {
+      distributedTaskDefinitionId: query.distributedTaskDefinitionId as string,
+    };
   };
 
   public render() {
@@ -40,7 +42,9 @@ export default class CreatePage extends PureComponent<CreatePageProps> {
               <Heading size={700} marginBottom={majorScale(1)}>
                 Create Distributed Task
               </Heading>
-              <CreateDistributedTaskForm id={distributedTaskDefinitionId} />
+              <CreateDistributedTaskForm
+                distributedTaskDefinitionId={distributedTaskDefinitionId}
+              />
             </Pane>
           </Layout>
         </BaseDependenciesProvider>

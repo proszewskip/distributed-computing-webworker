@@ -22,7 +22,7 @@ routes.add(
 
 routes.add(
   'create-distributed-task',
-  '/distributed-tasks/create',
+  '/distributed-tasks/create/:distributedTaskDefinitionId',
   'distributed-tasks/create',
 );
 
