@@ -6,7 +6,7 @@ import { BaseDependencies } from 'product-specific';
 
 export interface DistributedTaskDefinitionDetailsOwnProps {
   id: number;
-  data?: DistributedTaskDefinition;
+  detailsData?: DistributedTaskDefinition;
   error?: RequestError;
 }
 

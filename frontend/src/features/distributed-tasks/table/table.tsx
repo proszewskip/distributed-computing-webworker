@@ -17,7 +17,7 @@ import {
   RefreshActionButton,
   ToggleFiltersActionButton,
 } from 'components/data-table/data-table-view/action-buttons';
-import { TextFilter } from 'components/data-table/styled-data-table';
+import { NumberFilter, TextFilter } from 'components/data-table/filters';
 import { TableWithSummaryProps } from 'components/data-table/styled-data-table/table-with-summary';
 import {
   withSelectableRows,
@@ -35,6 +35,8 @@ import { getEntities } from 'utils/table/get-entities';
 import { preventPropagationHandler } from 'utils/table/prevent-propagation-handler';
 
 import { distributedTaskModelName } from './common';
+import { DistributedTaskStatusCell } from './distributed-task-status-cell';
+import { DistributedTaskStatusFilter } from './status-filter';
 import {
   DistributedTasksTableDependencies,
   DistributedTasksTableProps,
@@ -54,7 +56,7 @@ export class PureDistributedTasksTable extends Component<
   DistributedTasksTableProps,
   DistributedTasksTableState
 > {
-  private filterableColumnIds = ['name'];
+  private filterableColumnIds = ['name', 'priority', 'status'];
   private columns = filter(isNotNil, [
     {
       id: 'name',
@@ -65,7 +67,7 @@ export class PureDistributedTasksTable extends Component<
       minWidth: 150,
     },
 
-    this.props.bindDistributedTaskDefinitionId && {
+    this.props.bindDistributedTaskDefinitionId === undefined && {
       id: 'distributed-task-definition-name',
       accessor: (distributedTask) =>
         distributedTask['distributed-task-definition'].name,
@@ -76,10 +78,11 @@ export class PureDistributedTasksTable extends Component<
     },
 
     {
+      id: 'priority',
       accessor: 'priority',
       Header: <Text>Priority</Text>,
       Cell: TextCell,
-      Filter: TextFilter,
+      Filter: NumberFilter,
       minWidth: 100,
     },
     {
@@ -89,10 +92,11 @@ export class PureDistributedTasksTable extends Component<
       minWidth: 150,
     },
     {
+      id: 'status',
       accessor: 'status',
       Header: <Text>Status</Text>,
-      Cell: TextCell,
-      Filter: TextFilter,
+      Cell: DistributedTaskStatusCell,
+      Filter: DistributedTaskStatusFilter,
       minWidth: 100,
     },
     {
