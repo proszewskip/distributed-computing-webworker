@@ -3,6 +3,9 @@ using System.Reflection;
 
 namespace Server.Services
 {
+    /// <summary>
+    /// Loads assemblies from the file system.
+    /// </summary>
     public interface IAssemblyLoader
     {
         // TODO: consider using a stream instead of a direct file path

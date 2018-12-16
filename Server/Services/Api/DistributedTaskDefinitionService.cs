@@ -11,6 +11,13 @@ using Server.Models;
 
 namespace Server.Services.Api
 {
+    /// <summary>
+    /// Customized EntityResourceService for DistributedTaskDefinitions
+    /// that ensures name uniqueness before the resources are saved
+    /// in the database.
+    ///
+    /// This is done to achieve better error reporting.
+    /// </summary>
     public class DistributedTaskDefinitionService : EntityResourceService<DistributedTaskDefinition>
     {
         private readonly DistributedComputingDbContext _dbContext;

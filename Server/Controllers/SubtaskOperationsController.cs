@@ -13,6 +13,9 @@ using Server.Validation;
 
 namespace Server.Controllers
 {
+    /// <summary>
+    /// Controller responsible for assigning subtasks to distributed nodes.
+    /// </summary>
     [Route("subtasks")]
     [ServiceFilter(typeof(FormatErrorActionFilter))]
     public class SubtaskOperationsController : Controller

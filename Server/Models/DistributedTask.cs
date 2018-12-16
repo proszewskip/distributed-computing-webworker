@@ -6,6 +6,9 @@ namespace Server.Models
 {
     public class DistributedTask : Identifiable
     {
+        /// <summary>
+        /// The name of the task. Has to be unique.
+        /// </summary>
         [Required]
         [Attr("name")]
         public string Name { get; set; }
@@ -13,10 +16,20 @@ namespace Server.Models
         [Attr("description")]
         public string Description { get; set; } = "";
 
+        /// <summary>
+        /// Task with the highest priority will be assigned to distributed nodes first.
+        /// </summary>
         [Required]
         [Attr("priority")]
         public int Priority { get; set; }
 
+        /// <summary>
+        /// Required trust level to complete each subtask in a task.
+        ///
+        /// Whenever a node completes its subtask, the trust level of nodes
+        /// that calculated that subtask is summed up. If it exceeds `TrustLevelToComplete`,
+        /// the subtask is marked as done.
+        /// </summary>
         [Required]
         [Attr("trust-level-to-complete")]
         public double TrustLevelToComplete { get; set; }
@@ -27,14 +40,29 @@ namespace Server.Models
         [HasOne("distributed-task-definition")]
         public virtual DistributedTaskDefinition DistributedTaskDefinition { get; set; }
 
+        /// <summary>
+        /// Input data for the whole task.
+        ///
+        /// These are raw bytes read from the file received from the user while
+        /// creating the task.
+        /// </summary>
         [Required]
         public byte[] InputData { get; set; }
 
         [Attr("status", isImmutable: true)]
         public DistributedTaskStatus Status { get; set; } = DistributedTaskStatus.InProgress;
 
+        /// <summary>
+        /// The task result.
+        ///
+        /// Raw bytes, as returned by the TaskResultDataFormatter.Serialize.
+        /// Available only after the task's status is Done.
+        /// </summary>
         public byte[] Result { get; set; }
 
+        /// <summary>
+        /// Array of errors that have appeared during splitting or combining the result.
+        /// </summary>
         [Attr("errors")]
         public string[] Errors { get; set; } = { };
 

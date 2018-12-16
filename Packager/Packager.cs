@@ -9,8 +9,16 @@ using System.Linq;
 using System.Text;
 using Mono.Cecil;
 
+/// <summary>
+/// Transforms C# DLLs into WebAssembly.
+/// </summary>
 public interface IPackager
 {
+    /// <summary>
+    /// Runs the pacakger with given input command-line-like arguments.
+    /// </summary>
+    /// <param name="args"></param>
+    /// <returns></returns>
     string Run(string[] args);
 }
 
