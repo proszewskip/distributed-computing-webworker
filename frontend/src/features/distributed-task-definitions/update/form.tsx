@@ -93,11 +93,14 @@ class PureUpdateDistributedTaskDefinitionForm extends Component<
   >['onSubmit'] = async (values, { setSubmitting, setErrors, resetForm }) => {
     setSubmitting(true);
 
+    const { router } = this.props;
+
     this.props.kitsu
       .patch('distributed-task-definition', values)
       .then(() => {
         toaster.success('Distributed Task Definition updated');
-        resetForm(values);
+        resetForm();
+        router.push('/distributed-task-definitions');
       })
       .catch((errorsResponse: JsonApiErrorResponse) => {
         const errorsDictionary = getErrorsDictionary(errorsResponse);

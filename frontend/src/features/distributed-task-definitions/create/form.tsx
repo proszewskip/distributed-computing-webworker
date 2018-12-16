@@ -106,6 +106,8 @@ export class PureCreateDistributedTaskDefinitionForm extends Component<
   >['onSubmit'] = async (values, { setSubmitting, setErrors, resetForm }) => {
     setSubmitting(true);
 
+    const { router } = this.props;
+
     const formData = getFormData(values);
 
     const response = await fetch(urlToFetch, {
@@ -121,7 +123,8 @@ export class PureCreateDistributedTaskDefinitionForm extends Component<
       setErrors(errorsDictionary);
     } else {
       toaster.success('Distributed Task Definition added');
-      resetForm(values);
+      resetForm();
+      router.push('/distributed-task-definitions');
     }
     setSubmitting(false);
   };

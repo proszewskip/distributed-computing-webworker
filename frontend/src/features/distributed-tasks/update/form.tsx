@@ -114,13 +114,15 @@ class PureUpdateDistributedTaskForm extends Component<
     UpdateDistributedTaskModel
   >['onSubmit'] = async (values, { setSubmitting, setErrors, resetForm }) => {
     setSubmitting(true);
-    const { kitsu } = this.props;
+
+    const { kitsu, router } = this.props;
 
     kitsu
       .patch('distributed-task', values)
       .then(() => {
         toaster.success('Distributed Task updated');
-        resetForm(values);
+        resetForm();
+        router.push('/distributed-tasks');
       })
       .catch((response: JsonApiErrorResponse) => {
         const errorsObject = getErrorsDictionary(response);
