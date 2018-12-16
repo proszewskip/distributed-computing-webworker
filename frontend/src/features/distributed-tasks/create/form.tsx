@@ -121,6 +121,8 @@ export class PureCreateDistributedTaskForm extends Component<
   >['onSubmit'] = async (values, { setSubmitting, setErrors, resetForm }) => {
     setSubmitting(true);
 
+    const { router } = this.props;
+
     const formData = getFormData(values);
 
     const response = await fetch(urlToFetch, {
@@ -136,7 +138,8 @@ export class PureCreateDistributedTaskForm extends Component<
       setErrors(errorsDictionary);
     } else {
       toaster.success('Distributed Task added');
-      resetForm(values);
+      resetForm();
+      router.push('/distributed-tasks');
     }
     setSubmitting(false);
   };
