@@ -34,6 +34,12 @@ namespace Server.Models
         [Attr("trust-level-to-complete")]
         public double TrustLevelToComplete { get; set; }
 
+        /// <summary>
+        /// The ID of the definition for this task.
+        ///
+        /// Exposed to allow for server-side filtering.
+        /// </summary>
+        [Attr("distributed-task-definition-id", isImmutable: true)]
         public int DistributedTaskDefinitionId { get; set; }
 
         [Required]
