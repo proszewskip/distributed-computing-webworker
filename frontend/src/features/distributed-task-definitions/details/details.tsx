@@ -2,7 +2,6 @@ import {
   BackButton,
   Button,
   Card,
-  Heading,
   majorScale,
   minorScale,
   Pane,
@@ -20,6 +19,8 @@ import { ErrorPage, RequestErrorInfo } from 'components/errors';
 import { Link } from 'components/link';
 
 import { BaseDependencies } from 'product-specific';
+
+import { DistributedTasksTable } from 'features/distributed-tasks';
 
 import {
   DistributedTaskDefinitionDetailsDependencies,
@@ -133,8 +134,9 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
           </Pane>
         </Card>
 
-        <Heading>Distributed Tasks</Heading>
-        <Text>In progress...</Text>
+        {this.props.tableData && (
+          <DistributedTasksTable {...this.props.tableData} />
+        )}
       </>
     );
   };
