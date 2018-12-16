@@ -147,9 +147,9 @@ export class PureCreateDistributedTaskForm extends Component<
   };
 
   private onCancelClick = () => {
-    const { router, id } = this.props;
+    const { router, distributedTaskDefinitionId } = this.props;
 
-    router.push(`/distributed-task-definitions/${id}`);
+    router.push(`/distributed-task-definitions/${distributedTaskDefinitionId}`);
   };
 }
 
