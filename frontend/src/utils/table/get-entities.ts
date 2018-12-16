@@ -1,9 +1,11 @@
 import Kitsu, { GetParams } from 'kitsu';
-
-import { StyledDataTableProps } from 'components/data-table/styled-data-table';
 import { Dictionary } from 'ramda';
 
+import { StyledDataTableProps } from 'components/data-table/styled-data-table';
+
 import { Entity } from 'models';
+
+import { extractDataAndRecordsCount } from './extract-data-and-records-count';
 
 export async function getEntities<Model extends Entity>(
   kitsu: Kitsu,
@@ -28,18 +30,5 @@ export async function getEntities<Model extends Entity>(
 
   const response = await kitsu.get<Model>(modelName, getParams);
 
-  if (!Array.isArray(response.data)) {
-    throw new Error('Invalid response from the server.');
-  }
-
-  let totalRecordsCount = response.data.length;
-
-  if (response.meta && response.meta['total-records']) {
-    totalRecordsCount = response.meta['total-records'];
-  }
-
-  return {
-    data: response.data,
-    totalRecordsCount,
-  };
+  return extractDataAndRecordsCount(response);
 }
