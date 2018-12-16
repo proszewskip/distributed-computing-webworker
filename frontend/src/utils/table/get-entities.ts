@@ -13,6 +13,7 @@ export async function getEntities<Model extends Entity>(
   filters: StyledDataTableProps['filtered'] = [],
   page = 1,
   pageSize = 20,
+  relationshipsToInclude?: string,
 ) {
   const filtersDictionary: Dictionary<string> = {};
 
@@ -27,6 +28,10 @@ export async function getEntities<Model extends Entity>(
       number: page,
     },
   };
+
+  if (relationshipsToInclude) {
+    getParams.include = relationshipsToInclude;
+  }
 
   const response = await kitsu.get<Model>(modelName, getParams);
 

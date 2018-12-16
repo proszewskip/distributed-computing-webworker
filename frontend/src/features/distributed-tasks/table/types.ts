@@ -2,13 +2,17 @@ import { List } from 'immutable';
 import Kitsu from 'kitsu';
 import { Omit } from 'lodash';
 
-import { DistributedTask } from 'models';
+import { DistributedTask, DistributedTaskDefinition } from 'models';
 
 import { ForceFetchData } from 'components/data-table/data-table';
 import { WithSelectableRowsAdditionalProps } from 'components/data-table/with-selectable-rows';
 
+export interface DistributedTaskWithDefinition extends DistributedTask {
+  'distributed-task-definition': DistributedTaskDefinition;
+}
+
 export interface DistributedTasksTableOwnProps {
-  data: DistributedTask[];
+  data: DistributedTaskWithDefinition[];
   totalRecordsCount: number;
 
   /**
@@ -29,7 +33,7 @@ export interface DistributedTasksTableState
       DistributedTasksTableOwnProps,
       'data' | 'bindDistributedTaskDefinitionId'
     > {
-  data: List<DistributedTask>;
+  data: List<DistributedTaskWithDefinition>;
   loading: boolean;
   selectedRowIds: WithSelectableRowsAdditionalProps['selectedRowIds'];
   filteringEnabled: boolean;
