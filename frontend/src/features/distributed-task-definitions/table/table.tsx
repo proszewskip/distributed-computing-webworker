@@ -16,7 +16,7 @@ import {
   RefreshActionButton,
   ToggleFiltersActionButton,
 } from 'components/data-table/data-table-view/action-buttons';
-import { TextFilter } from 'components/data-table/styled-data-table';
+import { TextFilter } from 'components/data-table/filters';
 import { TableWithSummaryProps } from 'components/data-table/styled-data-table/table-with-summary';
 import {
   withSelectableRows,

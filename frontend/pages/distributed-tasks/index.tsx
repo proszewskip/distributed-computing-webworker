@@ -14,7 +14,7 @@ import {
 import {
   DistributedTasksTable,
   DistributedTasksTableOwnProps,
-  fetchDistributedTasks,
+  fetchDistributedTasksWithDefinitions,
 } from 'features/distributed-tasks';
 
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
@@ -28,7 +28,8 @@ class DistributedTasksTablePage extends Component<
 > {
   public static getInitialProps: NextComponentType<
     DistributedTasksTablePageProps
-  >['getInitialProps'] = () => fetchDistributedTasks(kitsuFactory());
+  >['getInitialProps'] = () =>
+    fetchDistributedTasksWithDefinitions(kitsuFactory());
 
   public render() {
     return (
