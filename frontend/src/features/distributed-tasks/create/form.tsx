@@ -121,6 +121,8 @@ export class PureCreateDistributedTaskForm extends Component<
   >['onSubmit'] = async (values, { setSubmitting, setErrors, resetForm }) => {
     setSubmitting(true);
 
+    const { router } = this.props;
+
     const formData = getFormData(values);
 
     const response = await fetch(urlToFetch, {
@@ -128,21 +130,26 @@ export class PureCreateDistributedTaskForm extends Component<
       body: formData,
     });
 
-    if (!response.ok) {
-      const responseBody = await response.json();
+    const responseBody = await response.json();
 
+    if (!response.ok) {
       const errorsDictionary = getErrorsDictionary(responseBody);
 
       setErrors(errorsDictionary);
     } else {
+      const createdEntityId = responseBody.data.id;
+
       toaster.success('Distributed Task added');
-      resetForm(values);
+      resetForm();
+      router.push(`/distributed-tasks/${createdEntityId}`);
     }
     setSubmitting(false);
   };
 
   private onCancelClick = () => {
-    this.props.router.back();
+    const { router, id } = this.props;
+
+    router.push(`/distributed-task-definitions/${id}`);
   };
 }
 
