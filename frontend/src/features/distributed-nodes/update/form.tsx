@@ -1,4 +1,4 @@
-import { Button, Pane } from 'evergreen-ui';
+import { Button, Pane, toaster } from 'evergreen-ui';
 import { Field, Form, Formik, FormikConfig } from 'formik';
 import { JsonApiErrorResponse } from 'kitsu';
 import React, { Component } from 'react';
@@ -10,32 +10,28 @@ import {
 } from 'components/dependency-injection/with-dependencies';
 import { ErrorAlert } from 'components/form/errors/error-alert';
 import { TextInputWithLabel } from 'components/form/text-input';
-import { Textarea } from 'components/form/textarea';
 import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
 
 import { getErrorsDictionary } from 'utils/forms/get-errors-dictionary';
 
 import {
-  UpdateDistributedTaskDependencies,
-  UpdateDistributedTaskModel,
-  UpdateDistributedTaskProps,
-  UpdateDistributedTaskState,
+  UpdateDistributedNodeFormDependencies,
+  UpdateDistributedNodeFormProps,
+  UpdateDistributedNodeFormState,
+  UpdateDistributedNodeModel,
 } from './types';
-
-import { BaseDependencies } from 'product-specific';
 import { validationSchema } from './validation-schema';
 
+import { BaseDependencies } from 'product-specific';
+
 class PureUpdateDistributedTaskForm extends Component<
-  UpdateDistributedTaskProps,
-  UpdateDistributedTaskState
+  UpdateDistributedNodeFormProps,
+  UpdateDistributedNodeFormState
 > {
-  public state: UpdateDistributedTaskState = {
+  public state: UpdateDistributedNodeFormState = {
     data: {
       id: this.props.data.id,
-      name: this.props.data.name,
-      description: this.props.data.description,
-      'trust-level-to-complete': this.props.data['trust-level-to-complete'],
-      priority: this.props.data.priority,
+      'trust-level': this.props.data['trust-level'],
     },
   };
 
@@ -50,7 +46,7 @@ class PureUpdateDistributedTaskForm extends Component<
     );
   }
 
-  private renderForm: FormikConfig<UpdateDistributedTaskModel>['render'] = ({
+  private renderForm: FormikConfig<UpdateDistributedNodeModel>['render'] = ({
     values,
     touched,
     errors,
@@ -63,37 +59,14 @@ class PureUpdateDistributedTaskForm extends Component<
           <ErrorAlert touched={touched} errors={errors} values={values} />
 
           <Field
-            name="name"
-            label="Name"
-            component={TextInputWithLabel}
-            width="100%"
-          />
-
-          <Field
-            name="description"
-            label="Description"
-            component={Textarea}
-            width="100%"
-            height="6rem"
-          />
-
-          <Field
-            name="priority"
-            label="Priority"
+            name="trust-level"
+            label="Trust level"
             type="number"
             component={TextInputWithLabel}
             width="100%"
           />
 
-          <Field
-            name="trust-level-to-complete"
-            label="Trust level to complete"
-            type="number"
-            component={TextInputWithLabel}
-            width="100%"
-          />
-
-          <Button type="button" onClick={() => alert('Cancel')}>
+          <Button type="button" onClick={this.onCancelClick}>
             Cancel
           </Button>
 
@@ -109,15 +82,18 @@ class PureUpdateDistributedTaskForm extends Component<
   };
 
   private handleSubmitHandler: FormikConfig<
-    UpdateDistributedTaskModel
+    UpdateDistributedNodeModel
   >['onSubmit'] = async (values, { setSubmitting, setErrors, resetForm }) => {
+    const { kitsu, onFormComplete } = this.props;
+
     setSubmitting(true);
 
-    this.props.kitsu
-      .patch('distributed-task', values)
+    kitsu
+      .patch('distributed-node', values)
       .then(() => {
-        alert('Distributed Task updated');
+        toaster.success('Distributed Node updated');
         resetForm(values);
+        onFormComplete();
       })
       .catch((response: JsonApiErrorResponse) => {
         const errorsObject = getErrorsDictionary(response);
@@ -127,13 +103,17 @@ class PureUpdateDistributedTaskForm extends Component<
         setSubmitting(false);
       });
   };
+
+  private onCancelClick = () => {
+    this.props.onFormComplete();
+  };
 }
 
 const dependenciesExtractor: DependenciesExtractor<
   BaseDependencies,
-  UpdateDistributedTaskDependencies
+  UpdateDistributedNodeFormDependencies
 > = ({ kitsu }) => ({ kitsu });
 
-export const UpdateDistributedTaskForm = withDependencies(
+export const UpdateDistributedNodeForm = withDependencies(
   dependenciesExtractor,
 )(PureUpdateDistributedTaskForm);

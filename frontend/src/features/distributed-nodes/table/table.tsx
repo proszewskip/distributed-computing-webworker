@@ -1,7 +1,7 @@
 import { distanceInWordsToNow } from 'date-fns';
-import { Button, Heading, minorScale, Pane, Text, Tooltip } from 'evergreen-ui';
+import { Heading, Pane, Text, Tooltip } from 'evergreen-ui';
 import { List } from 'immutable';
-import React, { Component, MouseEventHandler } from 'react';
+import React, { Component } from 'react';
 import { Column } from 'react-table';
 
 import { TextCell } from 'components/data-table/cells/text-cell';
@@ -21,10 +21,10 @@ import {
   withDependencies,
 } from 'components/dependency-injection/with-dependencies';
 
-import { Link } from 'components/link';
-
 import { getEntities } from 'utils/table/get-entities';
+import { preventPropagationHandler } from 'utils/table/prevent-propagation-handler';
 
+import { EditNodeButton } from './edit-node-cell';
 import {
   DistributedNodesTableDependencies,
   DistributedNodesTableProps,
@@ -39,9 +39,6 @@ const DateCell = (row: { value: any }) => (
     <Text>{distanceInWordsToNow(row.value)}</Text>
   </Tooltip>
 );
-
-const preventPropagationHandler: MouseEventHandler = (event) =>
-  event.stopPropagation();
 
 export class PureDistributedNodesTable extends Component<
   DistributedNodesTableProps,
@@ -74,11 +71,10 @@ export class PureDistributedNodesTable extends Component<
       Header: <Text>Action</Text>,
       Cell: (cellProps) => (
         <Pane onClick={preventPropagationHandler}>
-          <Link route={`/distributed-nodes/${cellProps.original.id}/edit`}>
-            <Button iconBefore="edit" marginRight={minorScale(2)}>
-              Edit
-            </Button>
-          </Link>
+          <EditNodeButton
+            forceFetchData={this.state.forceFetchDataCallback}
+            cellInfo={cellProps}
+          />
         </Pane>
       ),
       minWidth: 150,

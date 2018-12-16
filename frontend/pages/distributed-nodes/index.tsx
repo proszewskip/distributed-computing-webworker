@@ -1,6 +1,5 @@
 import { Pane } from 'evergreen-ui';
 import { NextComponentClass } from 'next';
-import Head from 'next/head';
 import React, { Component } from 'react';
 
 import { Layout, LayoutProps } from 'components/layout';
@@ -16,6 +15,7 @@ import { DistributedNode } from 'models';
 import {
   AuthenticatedSidebar,
   BaseDependenciesProvider,
+  Head,
   kitsuFactory,
 } from 'product-specific';
 
