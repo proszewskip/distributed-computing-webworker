@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Server.Services
 {
+    /// <summary>
+    /// Exposes internal JSON API action results for returning errors.
+    /// </summary>
     public interface IJsonApiActionResultFactory
     {
         IActionResult Error(Error error);

@@ -13,6 +13,13 @@ using Server.Models;
 
 namespace Server.Services.Api
 {
+    /// <summary>
+    /// Customized EntityResourceService for DistributedTasks.
+    ///
+    /// Ensures task name uniqueness and creates subtasks when the task
+    /// is created.
+    /// 
+    /// </summary>
     public class DistributedTaskService : EntityResourceService<DistributedTask>
     {
         private readonly DistributedComputingDbContext _dbContext;

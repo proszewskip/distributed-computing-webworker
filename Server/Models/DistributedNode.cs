@@ -15,10 +15,20 @@ namespace Server.Models
         [Attr("id")]
         public string ModelId => Id.ToString();
 
+        /// <summary>
+        /// The last time the node communicated with the server.
+        ///
+        /// After some time passes during which there was no communication
+        /// with the node, the node is removed.
+        /// </summary>
         [Required]
         [Attr("last-keep-alive-time")]
         public DateTime LastKeepAliveTime { get; set; }
 
+        /// <summary>
+        /// Node's level of trust. The higher, the more trusted this node's results
+        /// will be.
+        /// </summary>
         [Required]
         [Attr("trust-level")]
         public double TrustLevel { get; set; } = DefaultTrustLevel;

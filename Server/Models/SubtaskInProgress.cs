@@ -15,6 +15,9 @@ namespace Server.Models
         [HasOne("subtask")]
         public virtual Subtask Subtask { get; set; }
 
+        /// <summary>
+        /// The ID of the distributed node that computes this subtask.
+        /// </summary>
         public Guid NodeId { get; set; }
 
         [Required]
@@ -25,8 +28,14 @@ namespace Server.Models
         [Attr("status", isImmutable: true)]
         public SubtaskStatus Status { get; set; } = SubtaskStatus.Executing;
 
+        /// <summary>
+        /// Computation results
+        /// </summary>
         public byte[] Result { get; set; }
 
+        /// <summary>
+        /// Possible errors that occurred during computation
+        /// </summary>
         public string[] Errors { get; set; } = { };
     }
 }

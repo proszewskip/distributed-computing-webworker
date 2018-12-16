@@ -7,6 +7,9 @@ using Server.Models;
 
 namespace Server.Controllers
 {
+    /// <summary>
+    /// Controller responsible for managing subtasks.
+    /// </summary>
     [HttpReadOnly]
     [ServiceFilter(typeof(FormatErrorActionFilter))]
     public class SubtasksController : JsonApiController<Subtask>

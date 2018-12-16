@@ -14,6 +14,9 @@ using Server.Validation;
 
 namespace Server.Controllers
 {
+    /// <summary>
+    /// Controller responsible for managing distributed tasks
+    /// </summary>
     [ServiceFilter(typeof(FormatErrorActionFilter))]
     public class DistributedTasksController : JsonApiController<DistributedTask>
     {
