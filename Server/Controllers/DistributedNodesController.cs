@@ -27,6 +27,10 @@ namespace Server.Controllers
         [HttpGet]
         public override Task<IActionResult> GetAsync() => base.GetAsync();
 
+        [HttpPatch("{id}")]
+        public override Task<IActionResult> PatchAsync(Guid id, DistributedNode entity) =>
+            base.PatchAsync(id, entity);
+        
 
         [HttpPost("register")]
         public Task<IActionResult> Register()

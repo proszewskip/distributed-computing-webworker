@@ -1,6 +1,6 @@
 import { Button, Heading, minorScale, Pane, Text, toaster } from 'evergreen-ui';
 import { List, Set } from 'immutable';
-import React, { Component, MouseEventHandler } from 'react';
+import React, { Component } from 'react';
 import { Column } from 'react-table';
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
 
@@ -32,6 +32,7 @@ import { DistributedTaskDefinition } from 'models';
 import { BaseDependencies } from 'product-specific';
 
 import { getEntities } from 'utils/table/get-entities';
+import { preventPropagationHandler } from 'utils/table/prevent-propagation-handler';
 
 import { distributedTaskDefinitionModelName } from './common';
 import {
@@ -42,9 +43,6 @@ import {
 
 const SelectDataTable = selectTableHOC(DataTable);
 const Table = withSelectableRows(SelectDataTable);
-
-const preventPropagationHandler: MouseEventHandler = (event) =>
-  event.stopPropagation();
 
 export class PureDistributedTaskDefinitionsTable extends Component<
   DistributedTaskDefinitionsTableProps,
