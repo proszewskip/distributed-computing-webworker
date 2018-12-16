@@ -133,7 +133,7 @@ export class PureDistributedTaskDetails extends PureComponent<
           Delete
         </Button>
 
-        <Link route={`/distributed-tasks/${distributedTaskDefinitionId}/edit`}>
+        <Link route={`/distributed-tasks/${detailsData.id}/update`}>
           <Button iconBefore="edit" marginRight={minorScale(2)}>
             Edit
           </Button>
