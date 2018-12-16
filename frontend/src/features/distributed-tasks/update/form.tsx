@@ -1,6 +1,7 @@
-import { Button, Pane } from 'evergreen-ui';
+import { Button, Pane, toaster } from 'evergreen-ui';
 import { Field, Form, Formik, FormikConfig } from 'formik';
 import { JsonApiErrorResponse } from 'kitsu';
+import { withRouter } from 'next/router';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
 
@@ -18,6 +19,7 @@ import { getErrorsDictionary } from 'utils/forms/get-errors-dictionary';
 import {
   UpdateDistributedTaskDependencies,
   UpdateDistributedTaskModel,
+  UpdateDistributedTaskOwnProps,
   UpdateDistributedTaskProps,
   UpdateDistributedTaskState,
 } from './types';
@@ -93,7 +95,7 @@ class PureUpdateDistributedTaskForm extends Component<
             width="100%"
           />
 
-          <Button type="button" onClick={() => alert('Cancel')}>
+          <Button type="button" onClick={this.onCancelClick}>
             Cancel
           </Button>
 
@@ -112,11 +114,12 @@ class PureUpdateDistributedTaskForm extends Component<
     UpdateDistributedTaskModel
   >['onSubmit'] = async (values, { setSubmitting, setErrors, resetForm }) => {
     setSubmitting(true);
+    const { kitsu } = this.props;
 
-    this.props.kitsu
+    kitsu
       .patch('distributed-task', values)
       .then(() => {
-        alert('Distributed Task updated');
+        toaster.success('Distributed Task updated');
         resetForm(values);
       })
       .catch((response: JsonApiErrorResponse) => {
@@ -126,6 +129,10 @@ class PureUpdateDistributedTaskForm extends Component<
 
     setSubmitting(false);
   };
+
+  private onCancelClick = () => {
+    this.props.router.back();
+  };
 }
 
 const dependenciesExtractor: DependenciesExtractor<
@@ -133,6 +140,6 @@ const dependenciesExtractor: DependenciesExtractor<
   UpdateDistributedTaskDependencies
 > = ({ kitsu }) => ({ kitsu });
 
-export const UpdateDistributedTaskForm = withDependencies(
-  dependenciesExtractor,
-)(PureUpdateDistributedTaskForm);
+export const UpdateDistributedTaskForm = withRouter<
+  UpdateDistributedTaskOwnProps
+>(withDependencies(dependenciesExtractor)(PureUpdateDistributedTaskForm));

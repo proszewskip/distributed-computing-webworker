@@ -1,3 +1,5 @@
+import { WithRouterProps } from 'next/router';
+
 export interface CreateDistributedTaskModel {
   DistributedTaskDefinitionId: string;
   Name: string;
@@ -7,9 +9,12 @@ export interface CreateDistributedTaskModel {
   InputData: File | null;
 }
 
-export interface CreateDistributedTaskProps {
+export interface CreateDistributedTaskOwnProps {
   id: string;
 }
+
+export type CreateDistributedTaskProps = CreateDistributedTaskOwnProps &
+  WithRouterProps;
 
 export interface CreateDistributedTaskState {
   data: CreateDistributedTaskModel;

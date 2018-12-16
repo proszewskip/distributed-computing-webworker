@@ -1,6 +1,7 @@
-import { Button, Pane } from 'evergreen-ui';
+import { Button, Pane, toaster } from 'evergreen-ui';
 import { Field, Form, Formik, FormikConfig } from 'formik';
 import fetch from 'isomorphic-unfetch';
+import { withRouter, WithRouterProps } from 'next/router';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
 
@@ -23,8 +24,8 @@ import { config } from 'product-specific';
 
 const urlToFetch = `${config.serverUrl}/distributed-task-definitions/add`;
 
-export class CreateDistributedTaskDefinitionForm extends Component<
-  {},
+export class PureCreateDistributedTaskDefinitionForm extends Component<
+  WithRouterProps,
   CreateDistributedTaskDefinitionState
 > {
   public state: CreateDistributedTaskDefinitionState = {
@@ -85,7 +86,7 @@ export class CreateDistributedTaskDefinitionForm extends Component<
             multiple={true}
           />
 
-          <Button type="button" onClick={() => alert('Cancel')}>
+          <Button type="button" onClick={this.onCancelClick}>
             Cancel
           </Button>
 
@@ -119,9 +120,17 @@ export class CreateDistributedTaskDefinitionForm extends Component<
 
       setErrors(errorsDictionary);
     } else {
-      alert('Distributed Task Definition added');
+      toaster.success('Distributed Task Definition added');
       resetForm(values);
     }
     setSubmitting(false);
   };
+
+  private onCancelClick = () => {
+    this.props.router.back();
+  };
 }
+
+export const CreateDistributedTaskDefinitionForm = withRouter<{}>(
+  PureCreateDistributedTaskDefinitionForm,
+);

@@ -1,6 +1,7 @@
-import { Button, Pane } from 'evergreen-ui';
+import { Button, Pane, toaster } from 'evergreen-ui';
 import { Field, Form, Formik, FormikConfig } from 'formik';
 import { JsonApiErrorResponse } from 'kitsu';
+import { withRouter } from 'next/router';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
 
@@ -20,6 +21,7 @@ import { BaseDependencies } from 'product-specific';
 import {
   UpdateDistributedTaskDefinitionDependencies,
   UpdateDistributedTaskDefinitionModel,
+  UpdateDistributedTaskDefinitionOwnProps,
   UpdateDistributedTaskDefinitionProps,
   UpdateDistributedTaskDefinitionState,
 } from './types';
@@ -71,7 +73,7 @@ class PureUpdateDistributedTaskDefinitionForm extends Component<
             height="6rem"
           />
 
-          <Button type="button" onClick={() => alert('Cancel')}>
+          <Button type="button" onClick={this.onCancelClick}>
             Cancel
           </Button>
 
@@ -94,7 +96,7 @@ class PureUpdateDistributedTaskDefinitionForm extends Component<
     this.props.kitsu
       .patch('distributed-task-definition', values)
       .then(() => {
-        alert('Distributed Task Definition updated');
+        toaster.success('Distributed Task Definition updated');
         resetForm(values);
       })
       .catch((errorsResponse: JsonApiErrorResponse) => {
@@ -104,6 +106,10 @@ class PureUpdateDistributedTaskDefinitionForm extends Component<
 
     setSubmitting(false);
   };
+
+  private onCancelClick = () => {
+    this.props.router.back();
+  };
 }
 
 const dependenciesExtractor: DependenciesExtractor<
@@ -111,6 +117,10 @@ const dependenciesExtractor: DependenciesExtractor<
   UpdateDistributedTaskDefinitionDependencies
 > = ({ kitsu }) => ({ kitsu });
 
-export const UpdateDistributedTaskDefinitionForm = withDependencies(
-  dependenciesExtractor,
-)(PureUpdateDistributedTaskDefinitionForm);
+export const UpdateDistributedTaskDefinitionForm = withRouter<
+  UpdateDistributedTaskDefinitionOwnProps
+>(
+  withDependencies(dependenciesExtractor)(
+    PureUpdateDistributedTaskDefinitionForm,
+  ),
+);
