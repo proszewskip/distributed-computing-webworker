@@ -1,6 +1,7 @@
-import { Button, Pane } from 'evergreen-ui';
+import { Button, Pane, toaster } from 'evergreen-ui';
 import { Field, Form, Formik, FormikConfig } from 'formik';
 import fetch from 'isomorphic-unfetch';
+import { withRouter } from 'next/router';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
 
@@ -15,6 +16,7 @@ import { getFormData } from 'utils/forms/get-form-data';
 
 import {
   CreateDistributedTaskModel,
+  CreateDistributedTaskOwnProps,
   CreateDistributedTaskProps,
   CreateDistributedTaskState,
 } from './types';
@@ -24,7 +26,7 @@ import { config } from 'product-specific';
 
 const urlToFetch = `${config.serverUrl}/distributed-tasks/add`;
 
-export class CreateDistributedTaskForm extends Component<
+export class PureCreateDistributedTaskForm extends Component<
   CreateDistributedTaskProps,
   CreateDistributedTaskState
 > {
@@ -99,7 +101,7 @@ export class CreateDistributedTaskForm extends Component<
             component={FilePickerWithLabel}
           />
 
-          <Button type="button" onClick={() => alert('Cancel')}>
+          <Button type="button" onClick={this.onCancelClick}>
             Cancel
           </Button>
 
@@ -133,9 +135,17 @@ export class CreateDistributedTaskForm extends Component<
 
       setErrors(errorsDictionary);
     } else {
-      alert('Distributed Task added');
+      toaster.success('Distributed Task added');
       resetForm(values);
     }
     setSubmitting(false);
   };
+
+  private onCancelClick = () => {
+    this.props.router.back();
+  };
 }
+
+export const CreateDistributedTaskForm = withRouter<
+  CreateDistributedTaskOwnProps
+>(PureCreateDistributedTaskForm);
