@@ -1,3 +1,5 @@
+import { WithRouterProps } from 'next/router';
+
 import { BaseDependencies } from 'product-specific';
 
 export interface UpdateDistributedTaskModel {
@@ -17,7 +19,8 @@ export interface UpdateDistributedTaskOwnProps {
 }
 
 export type UpdateDistributedTaskProps = UpdateDistributedTaskOwnProps &
-  UpdateDistributedTaskDependencies;
+  UpdateDistributedTaskDependencies &
+  WithRouterProps;
 
 export interface UpdateDistributedTaskState {
   data: UpdateDistributedTaskModel;
