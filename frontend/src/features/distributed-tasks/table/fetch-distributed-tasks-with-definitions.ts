@@ -28,6 +28,10 @@ function prepareGetParams(distributedTaskDefinitionId?: number) {
 
   if (distributedTaskDefinitionId === undefined) {
     getParams.include = 'distributed-task-definition';
+  } else {
+    getParams.filter = {
+      'distributed-task-definition-id': distributedTaskDefinitionId.toString(),
+    };
   }
 
   return getParams;
