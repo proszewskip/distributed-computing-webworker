@@ -1,31 +1,51 @@
-import { Card, Pane } from 'evergreen-ui';
-import React from 'react';
+import { majorScale, Pane } from 'evergreen-ui';
+import { NextComponentType } from 'next';
+import React, { Component } from 'react';
 
 import { Layout, LayoutProps } from 'components/layout';
 
-import { AuthenticatedSidebar, Head } from 'product-specific';
+import {
+  AuthenticatedSidebar,
+  BaseDependenciesProvider,
+  Head,
+  kitsuFactory,
+} from 'product-specific';
 
-import { routes } from '../../routes';
-
-const { Link } = routes;
+import {
+  DistributedTasksTable,
+  DistributedTasksTableOwnProps,
+  fetchDistributedTasksWithDefinitions,
+} from 'features/distributed-tasks';
 
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
   <AuthenticatedSidebar />
 );
 
-export default () => (
-  <>
-    <Head />
+type DistributedTasksTablePageProps = DistributedTasksTableOwnProps;
 
-    <Layout renderSidebar={renderSidebar}>
-      <Pane display="flex" justifyContent="center" marginTop="2em">
-        <Card padding={80} border="default" background="tint2">
-          Distributed tasks
-          <Link route="/distributed-tasks/1">
-            <a>See details</a>
-          </Link>
-        </Card>
-      </Pane>
-    </Layout>
-  </>
-);
+class DistributedTasksTablePage extends Component<
+  DistributedTasksTablePageProps
+> {
+  public static getInitialProps: NextComponentType<
+    DistributedTasksTablePageProps
+  >['getInitialProps'] = () =>
+    fetchDistributedTasksWithDefinitions(kitsuFactory());
+
+  public render() {
+    return (
+      <>
+        <Head />
+
+        <BaseDependenciesProvider>
+          <Layout renderSidebar={renderSidebar}>
+            <Pane margin={majorScale(1)}>
+              <DistributedTasksTable {...this.props} />
+            </Pane>
+          </Layout>
+        </BaseDependenciesProvider>
+      </>
+    );
+  }
+}
+
+export default DistributedTasksTablePage;

@@ -1,5 +1,6 @@
 import { Button, Heading, minorScale, Pane, Text, toaster } from 'evergreen-ui';
 import { List, Set } from 'immutable';
+import { compose, filter, isNil, not } from 'ramda';
 import React, { Component } from 'react';
 import { Column } from 'react-table';
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
@@ -16,7 +17,7 @@ import {
   RefreshActionButton,
   ToggleFiltersActionButton,
 } from 'components/data-table/data-table-view/action-buttons';
-import { TextFilter } from 'components/data-table/filters';
+import { NumberFilter, TextFilter } from 'components/data-table/filters';
 import { TableWithSummaryProps } from 'components/data-table/styled-data-table/table-with-summary';
 import {
   withSelectableRows,
@@ -28,28 +29,35 @@ import {
 } from 'components/dependency-injection/with-dependencies';
 import { Link } from 'components/link';
 
-import { DistributedTaskDefinition } from 'models';
 import { BaseDependencies } from 'product-specific';
 
 import { getEntities } from 'utils/table/get-entities';
 import { preventPropagationHandler } from 'utils/table/prevent-propagation-handler';
 
-import { distributedTaskDefinitionModelName } from './common';
+import { distributedTaskModelName } from './common';
+import { DistributedTaskStatusCell } from './distributed-task-status-cell';
+import { DistributedTaskStatusFilter } from './status-filter';
 import {
-  DistributedTaskDefinitionsTableDependencies,
-  DistributedTaskDefinitionsTableProps,
-  DistributedTaskDefinitionsTableState,
+  DistributedTasksTableDependencies,
+  DistributedTasksTableProps,
+  DistributedTasksTableState,
+  DistributedTaskWithDefinition,
 } from './types';
 
 const SelectDataTable = selectTableHOC(DataTable);
 const Table = withSelectableRows(SelectDataTable);
 
-export class PureDistributedTaskDefinitionsTable extends Component<
-  DistributedTaskDefinitionsTableProps,
-  DistributedTaskDefinitionsTableState
+const isNotNil = compose(
+  not,
+  isNil,
+);
+
+export class PureDistributedTasksTable extends Component<
+  DistributedTasksTableProps,
+  DistributedTasksTableState
 > {
-  private filterableColumnIds = ['name'];
-  private columns: Column[] = [
+  private filterableColumnIds = ['name', 'priority', 'status'];
+  private columns = filter(isNotNil, [
     {
       id: 'name',
       accessor: 'name',
@@ -58,11 +66,38 @@ export class PureDistributedTaskDefinitionsTable extends Component<
       Filter: TextFilter,
       minWidth: 150,
     },
+
+    this.props.bindDistributedTaskDefinitionId === undefined && {
+      id: 'distributed-task-definition-name',
+      accessor: (distributedTask) =>
+        distributedTask['distributed-task-definition'].name,
+      Header: <Text>Distributed Task Definition</Text>,
+      Cell: TextCell,
+      Filter: TextFilter,
+      minWidth: 150,
+    },
+
     {
-      accessor: 'main-dll-name',
-      Header: <Text>Main DLL name</Text>,
+      id: 'priority',
+      accessor: 'priority',
+      Header: <Text>Priority</Text>,
+      Cell: TextCell,
+      Filter: NumberFilter,
+      minWidth: 100,
+    },
+    {
+      accessor: 'trust-level-to-complete',
+      Header: <Text>Required trust level</Text>,
       Cell: TextCell,
       minWidth: 150,
+    },
+    {
+      id: 'status',
+      accessor: 'status',
+      Header: <Text>Status</Text>,
+      Cell: DistributedTaskStatusCell,
+      Filter: DistributedTaskStatusFilter,
+      minWidth: 100,
     },
     {
       id: 'action',
@@ -78,28 +113,24 @@ export class PureDistributedTaskDefinitionsTable extends Component<
             Delete
           </Button>
 
-          <Link
-            route={`/distributed-task-definitions/${
-              cellProps.original.id
-            }/update`}
-          >
+          <Link route={`/distributed-tasks/${cellProps.original.id}/update`}>
             <Button iconBefore="edit" marginRight={minorScale(2)}>
               Edit
             </Button>
           </Link>
 
-          <Link
-            route={`/distributed-task-definitions/${cellProps.original.id}`}
-          >
+          <Link route={`/distributed-tasks/${cellProps.original.id}`}>
             <Button iconBefore="chevron-right">See details</Button>
           </Link>
         </Pane>
       ),
       minWidth: 290,
     },
-  ];
+  ] as Array<Column<DistributedTaskWithDefinition> | undefined>) as Array<
+    Column<DistributedTaskWithDefinition>
+  >;
 
-  constructor(props: DistributedTaskDefinitionsTableProps) {
+  constructor(props: DistributedTasksTableProps) {
     super(props);
 
     const { data } = props;
@@ -125,7 +156,7 @@ export class PureDistributedTaskDefinitionsTable extends Component<
 
     return (
       <DataTableView
-        header={<Heading size={600}>Distributed Task Definitions</Heading>}
+        header={<Heading size={600}>Distributed Tasks</Heading>}
         renderActionButtons={this.renderActionButtons}
       >
         <Table
@@ -168,8 +199,15 @@ export class PureDistributedTaskDefinitionsTable extends Component<
     }
 
     const { data, totalRecordsCount } = await getEntities<
-      DistributedTaskDefinition
-    >(kitsu, distributedTaskDefinitionModelName, filtered, page, pageSize);
+      DistributedTaskWithDefinition
+    >(
+      kitsu,
+      distributedTaskModelName,
+      filtered,
+      page,
+      pageSize,
+      'distributed-task-definition',
+    );
 
     this.setState({
       data: List(data),
@@ -183,7 +221,7 @@ export class PureDistributedTaskDefinitionsTable extends Component<
       loading: true,
     });
 
-    this.deleteDistributedTaskDefinition(id)
+    this.deleteDistributedTask(id)
       .then(() => {
         toaster.success('The entity has been deleted');
         this.state.forceFetchDataCallback();
@@ -199,9 +237,15 @@ export class PureDistributedTaskDefinitionsTable extends Component<
 
   private renderActionButtons: DataTableViewProps['renderActionButtons'] = () => (
     <>
-      <Link route="/distributed-task-definitions/create">
-        <CreateActionButton />
-      </Link>
+      {this.props.bindDistributedTaskDefinitionId && (
+        <Link
+          route={`/distributed-tasks/create/${
+            this.props.bindDistributedTaskDefinitionId
+          }`}
+        >
+          <CreateActionButton />
+        </Link>
+      )}
       <RefreshActionButton
         onClick={this.state.forceFetchDataCallback}
         disabled={this.state.loading}
@@ -224,7 +268,7 @@ export class PureDistributedTaskDefinitionsTable extends Component<
 
     try {
       await Promise.all(
-        this.state.selectedRowIds.map(this.deleteDistributedTaskDefinition),
+        this.state.selectedRowIds.map(this.deleteDistributedTask),
       );
 
       this.setState({
@@ -238,8 +282,8 @@ export class PureDistributedTaskDefinitionsTable extends Component<
     this.state.forceFetchDataCallback();
   };
 
-  private deleteDistributedTaskDefinition = (id: string) =>
-    this.props.kitsu.delete(distributedTaskDefinitionModelName, id);
+  private deleteDistributedTask = (id: string) =>
+    this.props.kitsu.delete(distributedTaskModelName, id);
 
   private toggleFilters = () => {
     this.setState(
@@ -265,9 +309,9 @@ export class PureDistributedTaskDefinitionsTable extends Component<
 
 const dependenciesExtractor: DependenciesExtractor<
   BaseDependencies,
-  DistributedTaskDefinitionsTableDependencies
+  DistributedTasksTableDependencies
 > = ({ kitsu }) => ({ kitsu });
 
-export const DistributedTaskDefinitionsTable = withDependencies(
-  dependenciesExtractor,
-)(PureDistributedTaskDefinitionsTable);
+export const DistributedTasksTable = withDependencies(dependenciesExtractor)(
+  PureDistributedTasksTable,
+);

@@ -1,6 +1,6 @@
 import { WithRouterProps } from 'next/router';
 
-import { SubtasksTableOwnProps } from 'features/subtasks/table/table';
+import { SubtasksTableOwnProps } from 'features/subtasks/table';
 
 import { RequestError } from 'error-handling';
 import { DistributedTask } from 'models';
