@@ -21,6 +21,18 @@ routes.add(
 );
 
 routes.add(
+  'create-distributed-task',
+  '/distributed-tasks/create',
+  'distributed-tasks/create',
+);
+
+routes.add(
+  'update-distributed-task',
+  '/distributed-tasks/:id/update',
+  'distributed-tasks/update',
+);
+
+routes.add(
   'distributed-tasks-details',
   '/distributed-tasks/:id',
   'distributed-tasks/details',
