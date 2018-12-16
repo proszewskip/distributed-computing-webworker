@@ -24,18 +24,21 @@ namespace Server.Controllers
         private readonly IResourceService<DistributedNode, Guid> _distributedNodeResourceService;
         private readonly IResourceService<SubtaskInProgress> _subtaskInProgressResourceService;
         private readonly IJsonApiResponseFactory _jsonApiResponseFactory;
+        private readonly IPathsProvider _pathsProvider;
 
         public SubtaskOperationsController(
             IResourceService<DistributedNode, Guid> distributedNodeResourceService,
             IResourceService<SubtaskInProgress> subtaskInProgressResourceService,
             DistributedComputingDbContext dbContext,
-            IJsonApiResponseFactory jsonApiResponseFactory
+            IJsonApiResponseFactory jsonApiResponseFactory,
+            IPathsProvider pathsProvider
         )
         {
             _distributedNodeResourceService = distributedNodeResourceService;
             _subtaskInProgressResourceService = subtaskInProgressResourceService;
             _dbContext = dbContext;
             _jsonApiResponseFactory = jsonApiResponseFactory;
+            _pathsProvider = pathsProvider;
         }
 
         [HttpPost("assign-next")]
@@ -68,8 +71,19 @@ namespace Server.Controllers
             _dbContext.Subtasks.Update(nextSubtask);
             await _dbContext.SaveChangesAsync();
 
-            _jsonApiResponseFactory.ApplyFakeContext<SubtaskInProgress>(this);
-            return await _jsonApiResponseFactory.CreateResponseAsync(HttpContext.Response, createdSubtaskInProgress);
+            var distributedTaskDefinition = await GetSubtasksDistributedTaskDefinition(nextSubtask);
+
+            var response = new AssignNextSubtaskResultDTO()
+            {
+                // TODO: fix URL. Currently the full filesystem path is provided
+                CompiledTaskDefinitionURL =
+                    _pathsProvider.GetCompiledTaskDefinitionDirectoryPath(distributedTaskDefinition.DefinitionGuid),
+                SubtaskId = nextSubtask.StringId,
+                ProblemPluginInfo = distributedTaskDefinition.ProblemPluginInfo,
+                SubtaskInProgressId = createdSubtaskInProgress.StringId
+            };
+
+            return Created($"/subtasks-in-progress/{createdSubtaskInProgress.Id}", response);
         }
 
         private Task<Subtask> GetNextSubtaskAsync()
@@ -84,6 +98,14 @@ namespace Server.Controllers
                       .Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel)
                    < subtask.DistributedTask.TrustLevelToComplete)
             );
+        }
+
+        private Task<DistributedTaskDefinition> GetSubtasksDistributedTaskDefinition(Subtask subtask)
+        {
+            return _dbContext.Subtasks.Where(otherSubtask => otherSubtask.Id == subtask.Id)
+                .Select(otherSubtask => otherSubtask.DistributedTask.DistributedTaskDefinition)
+                .Include(definition => definition.ProblemPluginInfo)
+                .SingleAsync();
         }
     }
 }
