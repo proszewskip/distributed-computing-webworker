@@ -10,7 +10,7 @@ export interface CreateDistributedTaskModel {
 }
 
 export interface CreateDistributedTaskOwnProps {
-  id: string;
+  distributedTaskDefinitionId: string;
 }
 
 export type CreateDistributedTaskProps = CreateDistributedTaskOwnProps &
