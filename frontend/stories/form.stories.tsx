@@ -86,7 +86,7 @@ export class ExampleForm extends Component<ExampleFormProps, ExampleFormState> {
             height="6rem"
           />
 
-          <Button type="button" onClick={() => alert('Cancel')}>
+          <Button type="button" onClick={onCancelClick}>
             Cancel
           </Button>
 
@@ -102,6 +102,10 @@ export class ExampleForm extends Component<ExampleFormProps, ExampleFormState> {
       </Pane>
     );
   };
+}
+
+function onCancelClick() {
+  alert('Cancel');
 }
 
 function failedSubmit(
