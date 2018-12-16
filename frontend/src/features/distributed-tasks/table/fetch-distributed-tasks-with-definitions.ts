@@ -7,7 +7,7 @@ import {
 
 import { extractDataAndRecordsCount } from 'utils/table/extract-data-and-records-count';
 
-export const fetchDistributedTasks = (
+export const fetchDistributedTasksWithDefinitions = (
   kitsu: Kitsu,
   distributedTaskDefinitionId?: number,
 ): Promise<DistributedTasksTableOwnProps> => {
@@ -26,7 +26,7 @@ export const fetchDistributedTasks = (
 function prepareGetParams(distributedTaskDefinitionId?: number) {
   const getParams: GetParams = {};
 
-  if (distributedTaskDefinitionId !== undefined) {
+  if (distributedTaskDefinitionId === undefined) {
     getParams.include = 'distributed-task-definition';
   }
 

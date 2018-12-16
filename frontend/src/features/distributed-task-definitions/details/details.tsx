@@ -51,7 +51,7 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
   }
 
   private renderDetails = (): ReactNode => {
-    const { data, id } = this.props;
+    const { detailsData: data, id } = this.props;
 
     if (!data) {
       return null;
