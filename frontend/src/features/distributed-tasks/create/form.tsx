@@ -130,22 +130,26 @@ export class PureCreateDistributedTaskForm extends Component<
       body: formData,
     });
 
-    if (!response.ok) {
-      const responseBody = await response.json();
+    const responseBody = await response.json();
 
+    if (!response.ok) {
       const errorsDictionary = getErrorsDictionary(responseBody);
 
       setErrors(errorsDictionary);
     } else {
+      const createdEntityId = responseBody.data.id;
+
       toaster.success('Distributed Task added');
       resetForm();
-      router.push('/distributed-tasks');
+      router.push(`/distributed-tasks/${createdEntityId}`);
     }
     setSubmitting(false);
   };
 
   private onCancelClick = () => {
-    this.props.router.back();
+    const { router } = this.props;
+
+    router.push('/distributed-tasks');
   };
 }
 
