@@ -1,8 +1,10 @@
 import Kitsu, { GetParams } from 'kitsu';
 
-import { DistributedTasksTableOwnProps } from './types';
+import {
+  DistributedTasksTableOwnProps,
+  DistributedTaskWithDefinition,
+} from './types';
 
-import { DistributedTask } from 'models';
 import { extractDataAndRecordsCount } from 'utils/table/extract-data-and-records-count';
 
 export const fetchDistributedTasks = (
@@ -11,12 +13,14 @@ export const fetchDistributedTasks = (
 ): Promise<DistributedTasksTableOwnProps> => {
   const getParams = prepareGetParams(distributedTaskDefinitionId);
 
-  return kitsu.get<DistributedTask>('distributed-task', getParams).then(
-    (response): DistributedTasksTableOwnProps => ({
-      bindDistributedTaskDefinitionId: distributedTaskDefinitionId,
-      ...extractDataAndRecordsCount(response),
-    }),
-  );
+  return kitsu
+    .get<DistributedTaskWithDefinition>('distributed-task', getParams)
+    .then(
+      (response): DistributedTasksTableOwnProps => ({
+        bindDistributedTaskDefinitionId: distributedTaskDefinitionId,
+        ...extractDataAndRecordsCount(response),
+      }),
+    );
 };
 
 function prepareGetParams(distributedTaskDefinitionId?: number) {
