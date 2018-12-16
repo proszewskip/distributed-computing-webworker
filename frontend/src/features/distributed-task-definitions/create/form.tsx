@@ -106,6 +106,8 @@ export class PureCreateDistributedTaskDefinitionForm extends Component<
   >['onSubmit'] = async (values, { setSubmitting, setErrors, resetForm }) => {
     setSubmitting(true);
 
+    const { router } = this.props;
+
     const formData = getFormData(values);
 
     const response = await fetch(urlToFetch, {
@@ -113,21 +115,23 @@ export class PureCreateDistributedTaskDefinitionForm extends Component<
       body: formData,
     });
 
+    const responseBody = await response.json();
     if (!response.ok) {
-      const responseBody = await response.json();
-
       const errorsDictionary = getErrorsDictionary(responseBody);
 
       setErrors(errorsDictionary);
     } else {
+      const createdEntityId = responseBody.data.id;
+
       toaster.success('Distributed Task Definition added');
-      resetForm(values);
+      resetForm();
+      router.push(`/distributed-task-definitions/${createdEntityId}`);
     }
     setSubmitting(false);
   };
 
   private onCancelClick = () => {
-    this.props.router.back();
+    this.props.router.push('/distributed-task-definitions');
   };
 }
 
