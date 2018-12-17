@@ -67,6 +67,10 @@ export class WorkerThread extends PureComponent<WorkerThreadProps> {
 
     this.worker = new DistributedNodeWorker();
     this.worker.addEventListener('message', this.onWorkerMessage);
+
+    if (this.props.onWorkerCreated) {
+      this.props.onWorkerCreated();
+    }
   };
 
   private destroyWorker = () => {
@@ -89,8 +93,9 @@ export class WorkerThread extends PureComponent<WorkerThreadProps> {
     const message: BeginComputationMessage = {
       type: 'BEGIN_COMPUTATION',
       payload: {
-        compiledTaskDefinitionURL:
-          assignNextResponse['compiled-task-definition-url'],
+        compiledTaskDefinitionURL: `${config.serverUrl}${
+          assignNextResponse['compiled-task-definition-url']
+        }`,
         inputDataURL: `${config.serverUrl}/subtasks/${
           assignNextResponse['subtask-id']
         }/input-data`,

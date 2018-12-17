@@ -34,6 +34,7 @@ export interface WorkerThreadProps {
    */
   assignNextResponse: AssignNextResponse;
 
+  onWorkerCreated?: () => void;
   onComputationSuccess?: (resultData: ArrayBuffer) => void;
   onComputationError?: (errors: string[]) => void;
   onStatusChange?: (status: WorkerThreadStatus) => void;
