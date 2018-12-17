@@ -4,14 +4,15 @@ import { config } from 'product-specific';
 
 import DistributedNodeWorker from './worker/distributed-node.worker.ts';
 
+import { formatWorkerThreadStatus } from './format-status';
 import { WorkerThreadProps, WorkerThreadState } from './types';
 import {
   BeginComputationMessage,
   ComputationErrorMessage,
   ComputationSuccessMessage,
-  DistributedNodeWorkerStatus,
   DistributedWorkerMessage,
   StatusReportMessage,
+  WorkerThreadStatus,
 } from './worker';
 
 export class WorkerThread extends PureComponent<
@@ -21,7 +22,7 @@ export class WorkerThread extends PureComponent<
   public worker: DistributedNodeWorker | null = null;
 
   public state: WorkerThreadState = {
-    workerStatus: DistributedNodeWorkerStatus.WaitingForTask,
+    workerStatus: WorkerThreadStatus.WaitingForTask,
   };
 
   public componentDidMount() {
@@ -45,7 +46,9 @@ export class WorkerThread extends PureComponent<
   }
 
   public render() {
-    return <div>Worker status: {this.state.workerStatus}</div>;
+    return (
+      <div>Status: {formatWorkerThreadStatus(this.state.workerStatus)}</div>
+    );
   }
 
   private onWorkerMessage = (event: MessageEvent) => {
