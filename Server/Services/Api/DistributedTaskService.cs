@@ -86,11 +86,10 @@ namespace Server.Services.Api
             return await base.UpdateAsync(id, resource);
         }
 
-        private async Task EnsureUniqueName(string name, int id = -1)
+        private async Task EnsureUniqueName(string name, int? id = null)
         {
             var taskExists = await _dbContext.DistributedTasks
-                .AnyAsync(task => task.Name == name && task.Id != id
-                );
+                .AnyAsync(task => task.Name == name && (id == null || task.Id != id));
 
             if (taskExists) throw new JsonApiException(400, $"A task with the name {name} already exists");
         }
