@@ -1,4 +1,5 @@
-import { WithRouterProps } from 'next/router';
+import { WithRouterProps } from 'components/router';
+
 import { BaseDependencies } from 'product-specific';
 
 export interface UpdateDistributedTaskDefinitionModel {

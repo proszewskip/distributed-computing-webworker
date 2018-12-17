@@ -1,7 +1,6 @@
 import { Button, Pane, toaster } from 'evergreen-ui';
 import { Field, Form, Formik, FormikConfig } from 'formik';
 import fetch from 'isomorphic-unfetch';
-import { withRouter } from 'next/router';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
 
@@ -11,12 +10,13 @@ import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
 import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
 
+import { withRouter } from 'components/router';
+
 import { getErrorsDictionary } from 'utils/forms/get-errors-dictionary';
 import { getFormData } from 'utils/forms/get-form-data';
 
 import {
   CreateDistributedTaskModel,
-  CreateDistributedTaskOwnProps,
   CreateDistributedTaskProps,
   CreateDistributedTaskState,
 } from './types';
@@ -153,6 +153,6 @@ export class PureCreateDistributedTaskForm extends Component<
   };
 }
 
-export const CreateDistributedTaskForm = withRouter<
-  CreateDistributedTaskOwnProps
->(PureCreateDistributedTaskForm);
+export const CreateDistributedTaskForm = withRouter(
+  PureCreateDistributedTaskForm,
+);

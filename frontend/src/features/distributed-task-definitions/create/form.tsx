@@ -1,7 +1,6 @@
 import { Button, Pane, toaster } from 'evergreen-ui';
 import { Field, Form, Formik, FormikConfig } from 'formik';
 import fetch from 'isomorphic-unfetch';
-import { withRouter, WithRouterProps } from 'next/router';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
 
@@ -10,6 +9,8 @@ import { FilePickerWithLabel } from 'components/form/file-picker';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
 import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
+
+import { withRouter, WithRouterProps } from 'components/router';
 
 import { getErrorsDictionary } from 'utils/forms/get-errors-dictionary';
 import { getFormData } from 'utils/forms/get-form-data';
@@ -135,6 +136,6 @@ export class PureCreateDistributedTaskDefinitionForm extends Component<
   };
 }
 
-export const CreateDistributedTaskDefinitionForm = withRouter<{}>(
+export const CreateDistributedTaskDefinitionForm = withRouter(
   PureCreateDistributedTaskDefinitionForm,
 );

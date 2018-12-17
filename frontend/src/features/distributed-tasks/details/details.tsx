@@ -7,7 +7,7 @@ import {
   Pane,
   toaster,
 } from 'evergreen-ui';
-import { withRouter } from 'next/router';
+
 import React, { PureComponent, ReactNode } from 'react';
 
 import {
@@ -16,8 +16,8 @@ import {
 } from 'components/dependency-injection/with-dependencies';
 
 import { ErrorPage, RequestErrorInfo } from 'components/errors';
-
 import { Link } from 'components/link';
+import { withRouter } from 'components/router';
 
 import { DistributedTaskStatus } from 'models';
 import { BaseDependencies, config } from 'product-specific';
@@ -25,7 +25,6 @@ import { BaseDependencies, config } from 'product-specific';
 import { DetailsGrid } from './get-details-grid';
 import {
   DistributedTaskDetailsDependencies,
-  DistributedTaskDetailsProps,
   DistributedTaskDetailsState,
   PureDistributedTaskDetailsProps,
 } from './types';
@@ -182,6 +181,6 @@ export class PureDistributedTaskDetails extends PureComponent<
   };
 }
 
-export const DistributedTaskDetails = withRouter<
-  DistributedTaskDetailsProps & DistributedTaskDetailsProps
->(withDependencies(dependenciesExtractor)(PureDistributedTaskDetails));
+export const DistributedTaskDetails = withRouter(
+  withDependencies(dependenciesExtractor)(PureDistributedTaskDetails),
+);
