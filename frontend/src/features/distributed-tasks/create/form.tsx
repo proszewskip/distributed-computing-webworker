@@ -36,8 +36,8 @@ export class PureCreateDistributedTaskForm extends Component<
       Description: '',
       DistributedTaskDefinitionId: this.props.distributedTaskDefinitionId,
       InputData: null,
-      TrustLevelToComplete: NaN,
-      Priority: NaN,
+      TrustLevelToComplete: 1,
+      Priority: 1,
     },
   };
 
