@@ -16,7 +16,7 @@ const Index: StatelessComponent = () => {
     'subtask-in-progress-id': '1',
     'subtask-id': '1',
     'compiled-task-definition-url':
-      'http://localhost:5000/public/task-definitions/0c87d875-1bfc-4335-9349-3dfce5c80339',
+      'http://localhost:5000/public/task-definitions/772e06b0-dad1-49eb-955f-d8726238a61a',
     'problem-plugin-info': {
       'assembly-name': 'FactorialTask',
       namespace: 'FactorialTask',
