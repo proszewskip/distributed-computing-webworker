@@ -38,6 +38,9 @@ export interface DistributedNodeProps {
    * Response from the subtask assignment. Determines the subtask that the worker will compute.
    */
   assignNextResponse: AssignNextResponse;
+
+  onComputationSuccess?: (resultData: ArrayBuffer) => void;
+  onComputationError?: (errors: string[]) => void;
 }
 
 export interface DistributedNodeState {
