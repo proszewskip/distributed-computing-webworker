@@ -87,7 +87,6 @@ namespace Server
             services
                 .AddScoped<IAssemblyLoader, AssemblyLoader>()
                 .AddScoped<IPackager, Packager>()
-                .AddScoped<IDataFormatterFactory, DataFormatterFactory>()
                 .AddScoped<IProblemPluginFacadeFactory, ProblemPluginFacadeFactory>()
                 .AddScoped<IFileStorage, FileStorage>()
                 .AddScoped<IResourceService<DistributedTaskDefinition>, DistributedTaskDefinitionService>()
