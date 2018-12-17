@@ -3,7 +3,10 @@ import React, { StatelessComponent } from 'react';
 
 import { Layout, LayoutProps } from 'components/layout';
 
-import { AssignNextResponse, DistributedNode } from 'features/worker-node';
+import {
+  AssignNextResponse,
+  WorkerThread,
+} from 'features/worker-node/worker-thread';
 
 import { AuthenticatedSidebar, Head } from 'product-specific';
 
@@ -35,10 +38,7 @@ const Index: StatelessComponent = () => {
             Info here
           </Card>
 
-          <DistributedNode
-            distributedNodeId={distributedNodeId}
-            assignNextResponse={assignNextResponse}
-          />
+          <WorkerThread assignNextResponse={assignNextResponse} />
         </Pane>
       </Layout>
     </>
