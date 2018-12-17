@@ -126,13 +126,13 @@ export class PureCreateDistributedTaskDefinitionForm extends Component<
 
       toaster.success('Distributed Task Definition added');
       resetForm();
-      router.push(`/distributed-task-definitions/${createdEntityId}`);
+      router.pushRoute(`/distributed-task-definitions/${createdEntityId}`);
     }
     setSubmitting(false);
   };
 
   private onCancelClick = () => {
-    this.props.router.push('/distributed-task-definitions');
+    this.props.router.pushRoute('/distributed-task-definitions');
   };
 }
 

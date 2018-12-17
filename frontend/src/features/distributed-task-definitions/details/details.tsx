@@ -166,7 +166,7 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
       .delete('distributed-task-definition', this.props.id)
       .then(() => {
         toaster.success('The task definition has been deleted');
-        this.props.router.push('/distributed-task-definitions');
+        this.props.router.pushRoute('/distributed-task-definitions');
       })
       .catch(() => {
         toaster.danger('Failed to delete the task definition');
@@ -177,7 +177,7 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
   };
 
   private onBackButtonClick = () => {
-    this.props.router.push('/distributed-task-definitions');
+    this.props.router.pushRoute('/distributed-task-definitions');
   };
 }
 

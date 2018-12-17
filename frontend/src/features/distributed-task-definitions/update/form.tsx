@@ -100,7 +100,7 @@ class PureUpdateDistributedTaskDefinitionForm extends Component<
       .then(() => {
         toaster.success('Distributed Task Definition updated');
         resetForm();
-        router.push(`/distributed-task-definitions/${values.id}`);
+        router.pushRoute(`/distributed-task-definitions/${values.id}`);
       })
       .catch((errorsResponse: JsonApiErrorResponse) => {
         const errorsDictionary = getErrorsDictionary(errorsResponse);
@@ -115,7 +115,7 @@ class PureUpdateDistributedTaskDefinitionForm extends Component<
     const { router } = this.props;
     const { data } = this.state;
 
-    router.push(`/distributed-task-definitions/${data.id}`);
+    router.pushRoute(`/distributed-task-definitions/${data.id}`);
   };
 }
 
