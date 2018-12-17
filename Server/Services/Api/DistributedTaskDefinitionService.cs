@@ -43,16 +43,16 @@ namespace Server.Services.Api
         {
             if (resource.Name != null)
             {
-                await EnsureUniqueName(resource.Name);
+                await EnsureUniqueName(resource.Name,id);
             }
 
             return await base.UpdateAsync(id, resource);
         }
 
-        private async Task EnsureUniqueName(string name)
+        private async Task EnsureUniqueName(string name, int id=-1)
         {
             var taskDefinitionExists = await _dbContext.DistributedTaskDefinitions
-                .AnyAsync(taskDefinition => taskDefinition.Name == name);
+                .AnyAsync(taskDefinition => taskDefinition.Name == name && taskDefinition.Id!= id);
 
             if (taskDefinitionExists)
             {
