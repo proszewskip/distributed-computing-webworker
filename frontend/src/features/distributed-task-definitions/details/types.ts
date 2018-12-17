@@ -1,4 +1,4 @@
-import { WithRouterProps } from 'next/router';
+import { WithRouterProps } from 'components/router';
 
 import { RequestError } from 'error-handling';
 import { DistributedTaskDefinition } from 'models';

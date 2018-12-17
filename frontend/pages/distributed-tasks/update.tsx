@@ -1,10 +1,10 @@
 import { Heading, Link, majorScale, Pane } from 'evergreen-ui';
 import { NextComponentClass } from 'next';
-import { withRouter, WithRouterProps } from 'next/router';
 import React, { PureComponent, ReactNode } from 'react';
 
 import { ErrorPage, RequestErrorInfo } from 'components/errors';
 import { Layout, LayoutProps } from 'components/layout';
+import { withRouter, WithRouterProps } from 'components/router';
 
 import { RequestError, transformRequestError } from 'error-handling';
 

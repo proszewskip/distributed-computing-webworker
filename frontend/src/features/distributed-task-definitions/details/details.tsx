@@ -8,15 +8,16 @@ import {
   Text,
   toaster,
 } from 'evergreen-ui';
-import { withRouter } from 'next/router';
 import React, { PureComponent, ReactNode } from 'react';
 
 import {
   DependenciesExtractor,
   withDependencies,
 } from 'components/dependency-injection/with-dependencies';
+
 import { ErrorPage, RequestErrorInfo } from 'components/errors';
 import { Link } from 'components/link';
+import { withRouter } from 'components/router';
 
 import { BaseDependencies } from 'product-specific';
 
@@ -24,7 +25,6 @@ import { DistributedTasksTable } from 'features/distributed-tasks';
 
 import {
   DistributedTaskDefinitionDetailsDependencies,
-  DistributedTaskDefinitionDetailsOwnProps,
   DistributedTaskDefinitionDetailsState,
   PureDistributedTaskDefinitionDetailsProps,
 } from './types';
@@ -181,8 +181,6 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
   };
 }
 
-export const DistributedTaskDefinitionDetails = withRouter<
-  DistributedTaskDefinitionDetailsOwnProps
->(
+export const DistributedTaskDefinitionDetails = withRouter(
   withDependencies(dependenciesExtractor)(PureDistributedTaskDefinitionDetails),
 );

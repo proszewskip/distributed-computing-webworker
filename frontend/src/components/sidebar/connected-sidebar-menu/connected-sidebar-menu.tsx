@@ -1,5 +1,6 @@
-import { withRouter, WithRouterProps } from 'next/router';
 import React, { PureComponent } from 'react';
+
+import { withRouter, WithRouterProps } from 'components/router';
 
 import { urlMatchesRoute } from 'utils/url-matches-route';
 
@@ -49,6 +50,4 @@ export class PureConnectedSidebarMenu extends PureComponent<
   };
 }
 
-export const ConnectedSidebarMenu = withRouter<ConnectedSidebarMenuProps>(
-  PureConnectedSidebarMenu,
-);
+export const ConnectedSidebarMenu = withRouter(PureConnectedSidebarMenu);
