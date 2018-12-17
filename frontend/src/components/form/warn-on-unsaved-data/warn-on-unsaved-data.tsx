@@ -1,5 +1,6 @@
-import { withRouter, WithRouterProps } from 'next/router';
 import { Component } from 'react';
+
+import { withRouter, WithRouterProps } from 'components/router';
 
 export interface WarnOnUnsavedDataProps {
   warn: boolean;
@@ -62,6 +63,4 @@ class PureWarnOnUnsavedData extends Component<
   };
 }
 
-export const WarnOnUnsavedData = withRouter<WarnOnUnsavedDataProps>(
-  PureWarnOnUnsavedData,
-);
+export const WarnOnUnsavedData = withRouter(PureWarnOnUnsavedData);

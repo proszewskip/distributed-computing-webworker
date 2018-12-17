@@ -8,15 +8,16 @@ import {
   Text,
   toaster,
 } from 'evergreen-ui';
-import { withRouter } from 'next/router';
 import React, { PureComponent, ReactNode } from 'react';
 
 import {
   DependenciesExtractor,
   withDependencies,
 } from 'components/dependency-injection/with-dependencies';
+
 import { ErrorPage, RequestErrorInfo } from 'components/errors';
 import { Link } from 'components/link';
+import { withRouter } from 'components/router';
 
 import { BaseDependencies } from 'product-specific';
 
@@ -24,7 +25,6 @@ import { DistributedTasksTable } from 'features/distributed-tasks';
 
 import {
   DistributedTaskDefinitionDetailsDependencies,
-  DistributedTaskDefinitionDetailsOwnProps,
   DistributedTaskDefinitionDetailsState,
   PureDistributedTaskDefinitionDetailsProps,
 } from './types';
@@ -166,7 +166,7 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
       .delete('distributed-task-definition', this.props.id)
       .then(() => {
         toaster.success('The task definition has been deleted');
-        this.props.router.push('/distributed-task-definitions');
+        this.props.router.pushRoute('/distributed-task-definitions');
       })
       .catch(() => {
         toaster.danger('Failed to delete the task definition');
@@ -177,12 +177,10 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
   };
 
   private onBackButtonClick = () => {
-    this.props.router.push('/distributed-task-definitions');
+    this.props.router.pushRoute('/distributed-task-definitions');
   };
 }
 
-export const DistributedTaskDefinitionDetails = withRouter<
-  DistributedTaskDefinitionDetailsOwnProps
->(
+export const DistributedTaskDefinitionDetails = withRouter(
   withDependencies(dependenciesExtractor)(PureDistributedTaskDefinitionDetails),
 );

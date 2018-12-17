@@ -1,8 +1,8 @@
 import { Heading, majorScale, Pane } from 'evergreen-ui';
-import { withRouter, WithRouterProps } from 'next/router';
 import React, { PureComponent } from 'react';
 
 import { Layout, LayoutProps } from 'components/layout';
+import { withRouter, WithRouterProps } from 'components/router';
 
 import {
   DistributedTaskDefinitionDetails,

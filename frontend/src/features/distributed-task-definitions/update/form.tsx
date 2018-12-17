@@ -1,7 +1,6 @@
 import { Button, Pane, toaster } from 'evergreen-ui';
 import { Field, Form, Formik, FormikConfig } from 'formik';
 import { JsonApiErrorResponse } from 'kitsu';
-import { withRouter } from 'next/router';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
 
@@ -14,6 +13,8 @@ import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
 import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
 
+import { withRouter } from 'components/router';
+
 import { getErrorsDictionary } from 'utils/forms/get-errors-dictionary';
 
 import { BaseDependencies } from 'product-specific';
@@ -21,7 +22,6 @@ import { BaseDependencies } from 'product-specific';
 import {
   UpdateDistributedTaskDefinitionDependencies,
   UpdateDistributedTaskDefinitionModel,
-  UpdateDistributedTaskDefinitionOwnProps,
   UpdateDistributedTaskDefinitionProps,
   UpdateDistributedTaskDefinitionState,
 } from './types';
@@ -100,7 +100,7 @@ class PureUpdateDistributedTaskDefinitionForm extends Component<
       .then(() => {
         toaster.success('Distributed Task Definition updated');
         resetForm();
-        router.push(`/distributed-task-definitions/${values.id}`);
+        router.pushRoute(`/distributed-task-definitions/${values.id}`);
       })
       .catch((errorsResponse: JsonApiErrorResponse) => {
         const errorsDictionary = getErrorsDictionary(errorsResponse);
@@ -115,7 +115,7 @@ class PureUpdateDistributedTaskDefinitionForm extends Component<
     const { router } = this.props;
     const { data } = this.state;
 
-    router.push(`/distributed-task-definitions/${data.id}`);
+    router.pushRoute(`/distributed-task-definitions/${data.id}`);
   };
 }
 
@@ -124,9 +124,7 @@ const dependenciesExtractor: DependenciesExtractor<
   UpdateDistributedTaskDefinitionDependencies
 > = ({ kitsu }) => ({ kitsu });
 
-export const UpdateDistributedTaskDefinitionForm = withRouter<
-  UpdateDistributedTaskDefinitionOwnProps
->(
+export const UpdateDistributedTaskDefinitionForm = withRouter(
   withDependencies(dependenciesExtractor)(
     PureUpdateDistributedTaskDefinitionForm,
   ),

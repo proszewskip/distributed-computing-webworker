@@ -1,4 +1,4 @@
-import { WithRouterProps } from 'next/router';
+import { WithRouterProps } from 'components/router';
 
 import { SubtasksTableOwnProps } from 'features/subtasks/table';
 

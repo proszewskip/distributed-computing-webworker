@@ -1,7 +1,6 @@
 import { Button, Pane, toaster } from 'evergreen-ui';
 import { Field, Form, Formik, FormikConfig } from 'formik';
 import fetch from 'isomorphic-unfetch';
-import { withRouter } from 'next/router';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
 
@@ -11,12 +10,13 @@ import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
 import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
 
+import { withRouter } from 'components/router';
+
 import { getErrorsDictionary } from 'utils/forms/get-errors-dictionary';
 import { getFormData } from 'utils/forms/get-form-data';
 
 import {
   CreateDistributedTaskModel,
-  CreateDistributedTaskOwnProps,
   CreateDistributedTaskProps,
   CreateDistributedTaskState,
 } from './types';
@@ -36,8 +36,8 @@ export class PureCreateDistributedTaskForm extends Component<
       Description: '',
       DistributedTaskDefinitionId: this.props.distributedTaskDefinitionId,
       InputData: null,
-      TrustLevelToComplete: NaN,
-      Priority: NaN,
+      TrustLevelToComplete: 1,
+      Priority: 1,
     },
   };
 
@@ -141,7 +141,7 @@ export class PureCreateDistributedTaskForm extends Component<
 
       toaster.success('Distributed Task added');
       resetForm();
-      router.push(`/distributed-tasks/${createdEntityId}`);
+      router.pushRoute(`/distributed-tasks/${createdEntityId}`);
     }
     setSubmitting(false);
   };
@@ -149,10 +149,12 @@ export class PureCreateDistributedTaskForm extends Component<
   private onCancelClick = () => {
     const { router, distributedTaskDefinitionId } = this.props;
 
-    router.push(`/distributed-task-definitions/${distributedTaskDefinitionId}`);
+    router.pushRoute(
+      `/distributed-task-definitions/${distributedTaskDefinitionId}`,
+    );
   };
 }
 
-export const CreateDistributedTaskForm = withRouter<
-  CreateDistributedTaskOwnProps
->(PureCreateDistributedTaskForm);
+export const CreateDistributedTaskForm = withRouter(
+  PureCreateDistributedTaskForm,
+);

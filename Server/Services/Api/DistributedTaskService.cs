@@ -14,17 +14,15 @@ using Server.Models;
 namespace Server.Services.Api
 {
     /// <summary>
-    /// Customized EntityResourceService for DistributedTasks.
-    ///
-    /// Ensures task name uniqueness and creates subtasks when the task
-    /// is created.
-    /// 
+    ///     Customized EntityResourceService for DistributedTasks.
+    ///     Ensures task name uniqueness and creates subtasks when the task
+    ///     is created.
     /// </summary>
     public class DistributedTaskService : EntityResourceService<DistributedTask>
     {
+        private readonly IAssemblyLoader _assemblyLoader;
         private readonly DistributedComputingDbContext _dbContext;
         private readonly IPathsProvider _pathsProvider;
-        private readonly IAssemblyLoader _assemblyLoader;
         private readonly IProblemPluginFacadeFactory _problemPluginFacadeFactory;
 
         public DistributedTaskService(
@@ -83,40 +81,32 @@ namespace Server.Services.Api
 
         public override async Task<DistributedTask> UpdateAsync(int id, DistributedTask resource)
         {
-            if (resource.Name != null)
-            {
-                //TODO: Move logic from this function to the controller.
-                await EnsureUniqueName(resource.Name);
-            }
+            if (resource.Name != null) await EnsureUniqueName(resource.Name, id);
 
             return await base.UpdateAsync(id, resource);
         }
 
-        private async Task EnsureUniqueName(string name)
+        private async Task EnsureUniqueName(string name, int? id = null)
         {
             var taskExists = await _dbContext.DistributedTasks
-                .AnyAsync(task => task.Name == name);
+                .AnyAsync(task => task.Name == name && (id == null || task.Id != id));
 
-            if (taskExists)
-            {
-                throw new JsonApiException(400, $"A task with the name {name} already exists");
-            }
+            if (taskExists) throw new JsonApiException(400, $"A task with the name {name} already exists");
         }
 
         private async Task<DistributedTaskDefinition> GetTaskDefinitionById(int taskDefinitionId)
         {
             var taskDefinition =
-                await _dbContext.DistributedTaskDefinitions.FirstOrDefaultAsync(definition => definition.Id == taskDefinitionId);
+                await _dbContext.DistributedTaskDefinitions.FirstOrDefaultAsync(definition =>
+                    definition.Id == taskDefinitionId);
 
-            if (taskDefinition == null)
-            {
-                throw new JsonApiException(400, "The task definition does not exist");
-            }
+            if (taskDefinition == null) throw new JsonApiException(400, "The task definition does not exist");
 
             return taskDefinition;
         }
 
-        private IEnumerable<Subtask> CreateSubtasks(DistributedTaskDefinition taskDefinition, DistributedTask distributedTask)
+        private IEnumerable<Subtask> CreateSubtasks(DistributedTaskDefinition taskDefinition,
+            DistributedTask distributedTask)
         {
             var distributedTaskDllPath = Path.Combine(
                 _pathsProvider.GetTaskDefinitionDirectoryPath(taskDefinition.DefinitionGuid),
@@ -133,7 +123,7 @@ namespace Server.Services.Api
                 DistributedTaskId = distributedTask.Id,
                 InputData = subtaskData,
                 SequenceNumber = index,
-                Status = SubtaskStatus.WaitingForExecution,
+                Status = SubtaskStatus.WaitingForExecution
             });
         }
     }
