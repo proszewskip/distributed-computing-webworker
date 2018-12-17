@@ -7,6 +7,7 @@ import {
 } from './types';
 
 // tslint:disable:no-console
+
 // NOTE: missing type definitons
 declare const importScripts: (...urls: string[]) => void;
 // NOTE: Provided when loading mono.js and runtime.js
@@ -32,30 +33,35 @@ context.addEventListener('message', (event) => {
 console.log('Worker started, waiting for a task');
 reportStatus(DistributedNodeWorkerStatus.WaitingForTask);
 
-(context as any).App = {
+const App: { init(): void } = {
   init() {
-    console.log('a');
+    console.error(
+      'App.init is not overridden and therefore, the computation may not continue',
+    );
   },
 };
+
+(context as any).App = App;
 
 async function beginComputation(payload: BeginComputationPayload) {
   reportStatus(DistributedNodeWorkerStatus.DownloadingTaskDefinition);
 
-  importScripts(
-    `${payload.compiledTaskDefinitionURL}/runtime.js`,
-    `${payload.compiledTaskDefinitionURL}/mono.js`,
-  );
+  /**
+   * Provide a way to locate wasm files (i.e. mono.wasm) on the server
+   * https://github.com/Gelio/distributed-computing-webworker-poc/blob/master/mono-wasm-sdk/debug/mono.js#L1516
+   */
+  (context as any).getDeployPrefix = (pathSuffix: string) =>
+    `${payload.compiledTaskDefinitionURL}/${pathSuffix}`;
 
-  reportStatus(DistributedNodeWorkerStatus.DownloadingInputData);
-  const response = await fetch(payload.inputDataURL);
-  const data = await response.arrayBuffer();
+  importScripts(`${payload.compiledTaskDefinitionURL}/runtime.js`);
 
-  reportStatus(DistributedNodeWorkerStatus.Computing);
+  Module.locateFile = (fileName: string) =>
+    `${payload.compiledTaskDefinitionURL}/${fileName}`;
 
-  {
-    const { problemPluginInfo } = payload;
+  const { problemPluginInfo } = payload;
+
+  App.init = () => {
     // NOTE: This needs to run after the worker is initialized
-    debugger;
     BINDING.bindings_lazy_init();
     const loadedAssembly = BINDING.assembly_load(
       problemPluginInfo['assembly-name'],
@@ -71,7 +77,7 @@ async function beginComputation(payload: BeginComputationPayload) {
     const computeMethod = BINDING.find_method(taskClass, 'Compute', -1);
 
     const createTaskInstance = Module.mono_bind_static_method(
-      '[DistributedComputingLibrary] DistributedComputing.ProblemPluginFactory:CreateProblemPlugin',
+      '[DistributedComputing] DistributedComputing.ProblemPluginFactory:CreateProblemPlugin',
     );
 
     const problemPluginInstanceJSObj = createTaskInstance(
@@ -82,8 +88,6 @@ async function beginComputation(payload: BeginComputationPayload) {
       problemPluginInstanceJSObj,
     );
 
-    debugger;
-
     const result = BINDING.call_method(
       computeMethod,
       problemPluginInstance,
@@ -92,13 +96,19 @@ async function beginComputation(payload: BeginComputationPayload) {
     );
 
     console.log(result);
-  }
+  };
+
+  importScripts(`${payload.compiledTaskDefinitionURL}/mono.js`);
+
+  reportStatus(DistributedNodeWorkerStatus.DownloadingInputData);
+  const response = await fetch(payload.inputDataURL);
+  const data = await response.arrayBuffer();
+
+  reportStatus(DistributedNodeWorkerStatus.Computing);
 
   reportStatus(DistributedNodeWorkerStatus.Computed);
   sendComputationResults(null);
 }
-
-function foo() {}
 
 function postMessage(message: DistributedWorkerMessage) {
   context.postMessage(message);
