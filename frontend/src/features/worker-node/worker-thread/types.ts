@@ -1,6 +1,6 @@
 import { ProblemPluginInfo } from 'models';
 
-import { DistributedNodeWorkerStatus } from './worker';
+import { WorkerThreadStatus } from './worker';
 
 export interface AssignNextResponse {
   /**
@@ -39,5 +39,5 @@ export interface WorkerThreadProps {
 }
 
 export interface WorkerThreadState {
-  workerStatus: DistributedNodeWorkerStatus;
+  workerStatus: WorkerThreadStatus;
 }

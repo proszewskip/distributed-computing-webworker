@@ -1,11 +1,11 @@
-import { DistributedNodeWorkerStatus, DistributedWorkerMessage } from './types';
+import { DistributedWorkerMessage, WorkerThreadStatus } from './types';
 import { workerContext } from './worker-context';
 
 export function postMessage(message: DistributedWorkerMessage) {
   workerContext.postMessage(message);
 }
 
-export function reportStatus(status: DistributedNodeWorkerStatus) {
+export function reportStatus(status: WorkerThreadStatus) {
   postMessage({
     type: 'STATUS_REPORT',
     payload: status,

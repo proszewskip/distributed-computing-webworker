@@ -1,7 +1,7 @@
 import {
   BeginComputationPayload,
-  DistributedNodeWorkerStatus,
   DistributedWorkerMessage,
+  WorkerThreadStatus,
 } from './types';
 
 import { appInitFactory } from './app-init-factory';
@@ -27,11 +27,11 @@ workerContext.addEventListener('message', (event) => {
 workerContext.addEventListener('error', (event) => {
   console.error('Unknown WebWorker error', event.error);
 
-  reportStatus(DistributedNodeWorkerStatus.Error);
+  reportStatus(WorkerThreadStatus.Error);
   sendComputationError(['Unknown error', `${event.error}`]);
 });
 
-reportStatus(DistributedNodeWorkerStatus.WaitingForTask);
+reportStatus(WorkerThreadStatus.WaitingForTask);
 
 workerContext.App = {
   init() {
@@ -42,7 +42,7 @@ workerContext.App = {
 };
 
 async function beginComputation(payload: BeginComputationPayload) {
-  reportStatus(DistributedNodeWorkerStatus.DownloadingTaskDefinition);
+  reportStatus(WorkerThreadStatus.DownloadingTaskDefinition);
 
   try {
     workerContext.importScripts(
@@ -52,7 +52,7 @@ async function beginComputation(payload: BeginComputationPayload) {
       `${payload.compiledTaskDefinitionURL}/runtime.js`,
     );
   } catch (error) {
-    reportStatus(DistributedNodeWorkerStatus.Error);
+    reportStatus(WorkerThreadStatus.Error);
     sendComputationError([
       'Cannot load task definition data',
       error.toString(),
@@ -69,7 +69,7 @@ async function beginComputation(payload: BeginComputationPayload) {
   try {
     workerContext.importScripts(`${payload.compiledTaskDefinitionURL}/mono.js`);
   } catch (error) {
-    reportStatus(DistributedNodeWorkerStatus.Error);
+    reportStatus(WorkerThreadStatus.Error);
     sendComputationError([
       'Cannot load task definition data',
       error.toString(),

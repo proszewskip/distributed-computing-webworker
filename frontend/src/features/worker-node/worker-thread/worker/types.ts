@@ -16,7 +16,7 @@ export type BeginComputationMessage = BaseWorkerMessage<
   BeginComputationPayload
 >;
 
-export enum DistributedNodeWorkerStatus {
+export enum WorkerThreadStatus {
   WaitingForTask,
   DownloadingTaskDefinition,
   DownloadingInputData,
@@ -27,7 +27,7 @@ export enum DistributedNodeWorkerStatus {
 
 export type StatusReportMessage = BaseWorkerMessage<
   'STATUS_REPORT',
-  DistributedNodeWorkerStatus
+  WorkerThreadStatus
 >;
 
 export type ComputationSuccessMessage = BaseWorkerMessage<

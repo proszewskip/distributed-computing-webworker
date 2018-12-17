@@ -4,7 +4,7 @@ import {
   sendComputationSuccess,
 } from './communication-utils';
 import { computeTask } from './compute-task';
-import { BeginComputationPayload, DistributedNodeWorkerStatus } from './types';
+import { BeginComputationPayload, WorkerThreadStatus } from './types';
 import { workerContext } from './worker-context';
 
 export const appInitFactory = (
@@ -14,31 +14,31 @@ export const appInitFactory = (
     // NOTE: This needs to run after the worker is initialized
     workerContext.BINDING.bindings_lazy_init();
   } catch (error) {
-    reportStatus(DistributedNodeWorkerStatus.Error);
+    reportStatus(WorkerThreadStatus.Error);
     sendComputationError(['Cannot initialize wasm bindings']);
   }
 
-  reportStatus(DistributedNodeWorkerStatus.DownloadingInputData);
+  reportStatus(WorkerThreadStatus.DownloadingInputData);
   let inputData: ArrayBuffer;
   try {
     inputData = await downloadInputData(payload);
   } catch (error) {
-    reportStatus(DistributedNodeWorkerStatus.Error);
+    reportStatus(WorkerThreadStatus.Error);
     sendComputationError(['Cannot download input data', error.toString()]);
     return;
   }
 
-  reportStatus(DistributedNodeWorkerStatus.Computing);
+  reportStatus(WorkerThreadStatus.Computing);
   let result: ArrayBuffer;
   try {
     result = computeTask(payload.problemPluginInfo, inputData);
   } catch (error) {
-    reportStatus(DistributedNodeWorkerStatus.Error);
+    reportStatus(WorkerThreadStatus.Error);
     sendComputationError(['Computation error', error.toString()]);
     return;
   }
 
-  reportStatus(DistributedNodeWorkerStatus.Computed);
+  reportStatus(WorkerThreadStatus.Computed);
   sendComputationSuccess(result);
 };
 
