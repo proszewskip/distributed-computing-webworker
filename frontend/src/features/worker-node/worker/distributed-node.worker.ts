@@ -1,23 +1,16 @@
-// import fetch from 'node-fetch';
-
 import {
   BeginComputationPayload,
   DistributedNodeWorkerStatus,
   DistributedWorkerMessage,
 } from './types';
 
+import { appInitFactory } from './app-init-factory';
+import { reportStatus, sendComputationError } from './communication-utils';
+import { workerContext } from './worker-context';
+
 // tslint:disable:no-console
 
-// NOTE: missing type definitons
-declare const importScripts: (...urls: string[]) => void;
-// NOTE: Provided when loading mono.js, mono-config.js and runtime.js
-declare const BINDING: any;
-declare const Module: any;
-declare const config: any;
-
-const context: Worker = self as any;
-
-context.addEventListener('message', (event) => {
+workerContext.addEventListener('message', (event) => {
   const message: DistributedWorkerMessage = event.data;
 
   switch (message.type) {
@@ -31,10 +24,16 @@ context.addEventListener('message', (event) => {
   }
 });
 
-console.log('Worker started, waiting for a task');
+workerContext.addEventListener('error', (event) => {
+  console.error('Unknown WebWorker error', event.error);
+
+  reportStatus(DistributedNodeWorkerStatus.Error);
+  sendComputationError(['Unknown error', `${event.error}`]);
+});
+
 reportStatus(DistributedNodeWorkerStatus.WaitingForTask);
 
-const App: { init(): void } = {
+workerContext.App = {
   init() {
     console.error(
       'App.init is not overridden and therefore, the computation may not continue',
@@ -42,89 +41,38 @@ const App: { init(): void } = {
   },
 };
 
-(context as any).App = App;
-
 async function beginComputation(payload: BeginComputationPayload) {
   reportStatus(DistributedNodeWorkerStatus.DownloadingTaskDefinition);
 
-  importScripts(`${payload.compiledTaskDefinitionURL}/mono-config.js`);
+  try {
+    workerContext.importScripts(
+      `${payload.compiledTaskDefinitionURL}/mono-config.js`,
+    );
+    workerContext.importScripts(
+      `${payload.compiledTaskDefinitionURL}/runtime.js`,
+    );
+  } catch (error) {
+    reportStatus(DistributedNodeWorkerStatus.Error);
+    sendComputationError([
+      'Cannot load task definition data',
+      error.toString(),
+    ]);
 
-  // config.deploy_prefix = `${payload.compiledTaskDefinitionURL}/managed`;
+    return;
+  }
 
-  importScripts(`${payload.compiledTaskDefinitionURL}/runtime.js`);
-
-  Module.locateFile = (fileName: string) =>
+  workerContext.Module.locateFile = (fileName: string) =>
     `${payload.compiledTaskDefinitionURL}/${fileName}`;
 
-  const { problemPluginInfo } = payload;
+  workerContext.App.init = appInitFactory(payload);
 
-  App.init = async () => {
-    // NOTE: This needs to run after the worker is initialized
-    BINDING.bindings_lazy_init();
-    const loadedAssembly = BINDING.assembly_load(
-      problemPluginInfo['assembly-name'],
-    );
-
-    const taskClass = BINDING.find_class(
-      loadedAssembly,
-      problemPluginInfo.namespace,
-      problemPluginInfo['class-name'],
-    );
-
-    // No idea what -1 means, but it is used in all find_method calls
-    const computeMethod = BINDING.find_method(taskClass, 'Compute', -1);
-
-    const computeTask = Module.mono_bind_static_method(
-      '[DistributedComputing] DistributedComputing.ProblemPluginFactory:ComputeTask',
-      'sso',
-    );
-
-    reportStatus(DistributedNodeWorkerStatus.DownloadingInputData);
-    const response = await fetch(payload.inputDataURL);
-    const data = await response.arrayBuffer();
-
-    reportStatus(DistributedNodeWorkerStatus.Computing);
-
-    reportStatus(DistributedNodeWorkerStatus.Computed);
-    sendComputationResults(null);
-
-    const result = computeTask(
-      problemPluginInfo['assembly-name'],
-      `${problemPluginInfo.namespace}.${problemPluginInfo['class-name']}`,
-      data,
-    );
-
-    // const problemPluginInstance = BINDING.extract_mono_obj(
-    //   problemPluginInstanceJSObj,
-    // );
-
-    // const result = BINDING.call_method(
-    //   computeMethod,
-    //   problemPluginInstance,
-    //   's',
-    //   ['abcd'],
-    // );
-
-    console.log(result);
-  };
-
-  importScripts(`${payload.compiledTaskDefinitionURL}/mono.js`);
-}
-
-function postMessage(message: DistributedWorkerMessage) {
-  context.postMessage(message);
-}
-
-function reportStatus(status: DistributedNodeWorkerStatus) {
-  postMessage({
-    type: 'STATUS_REPORT',
-    payload: status,
-  });
-}
-
-function sendComputationResults(results: any) {
-  postMessage({
-    type: 'COMPUTATION_RESULTS',
-    payload: results,
-  });
+  try {
+    workerContext.importScripts(`${payload.compiledTaskDefinitionURL}/mono.js`);
+  } catch (error) {
+    reportStatus(DistributedNodeWorkerStatus.Error);
+    sendComputationError([
+      'Cannot load task definition data',
+      error.toString(),
+    ]);
+  }
 }
