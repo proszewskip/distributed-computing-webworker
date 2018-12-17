@@ -36,8 +36,5 @@ export interface WorkerThreadProps {
 
   onComputationSuccess?: (resultData: ArrayBuffer) => void;
   onComputationError?: (errors: string[]) => void;
-}
-
-export interface WorkerThreadState {
-  workerStatus: WorkerThreadStatus;
+  onStatusChange?: (status: WorkerThreadStatus) => void;
 }
