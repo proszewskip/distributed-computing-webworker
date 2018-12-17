@@ -4,7 +4,7 @@ import { config } from 'product-specific';
 
 import DistributedNodeWorker from './worker/distributed-node.worker.ts';
 
-import { DistributedNodeProps, DistributedNodeState } from './types';
+import { WorkerThreadProps, WorkerThreadState } from './types';
 import {
   BeginComputationMessage,
   ComputationErrorMessage,
@@ -14,13 +14,13 @@ import {
   StatusReportMessage,
 } from './worker';
 
-export class DistributedNode extends PureComponent<
-  DistributedNodeProps,
-  DistributedNodeState
+export class WorkerThread extends PureComponent<
+  WorkerThreadProps,
+  WorkerThreadState
 > {
   public worker: DistributedNodeWorker | null = null;
 
-  public state: DistributedNodeState = {
+  public state: WorkerThreadState = {
     workerStatus: DistributedNodeWorkerStatus.WaitingForTask,
   };
 

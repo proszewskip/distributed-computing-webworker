@@ -28,12 +28,7 @@ export interface AssignNextResponse {
   'problem-plugin-info': ProblemPluginInfo;
 }
 
-export interface DistributedNodeProps {
-  /**
-   * The ID of the DistributedNode received from the server during registering.
-   */
-  distributedNodeId: string;
-
+export interface WorkerThreadProps {
   /**
    * Response from the subtask assignment. Determines the subtask that the worker will compute.
    */
@@ -43,6 +38,6 @@ export interface DistributedNodeProps {
   onComputationError?: (errors: string[]) => void;
 }
 
-export interface DistributedNodeState {
+export interface WorkerThreadState {
   workerStatus: DistributedNodeWorkerStatus;
 }
