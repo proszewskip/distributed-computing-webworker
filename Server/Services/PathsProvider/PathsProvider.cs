@@ -41,6 +41,11 @@ namespace Server.Services
             return Path.Combine(GetTaskDefinitionDirectoryPath(guid), mainDllName);
         }
 
+        public string GetCompiledTaskDefinitionWebPath(Guid guid)
+        {
+            return $"/public/task-definitions/${guid}";
+        }
+
         private void InitializePaths()
         {
             bool invalidEnvironmentConfiguration = false;
