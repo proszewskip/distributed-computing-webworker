@@ -6,7 +6,7 @@ using DistributedComputing;
 
 namespace FactorialTask
 {
-    public class FactorialSumPlugin : IProblemPlugin<string, int, int, int>
+    public class FactorialSumPlugin : IProblemPlugin<string, string, int, int>
     {
         private readonly IntDataFormatter _intDataFormatter = new IntDataFormatter();
         private readonly StringDataFormatter _stringDataFormatter = new StringDataFormatter();
@@ -17,9 +17,9 @@ namespace FactorialTask
                 .Select(int.Parse);
         }
 
-        public int JoinSubtaskResults(IEnumerable<int> subtaskResults)
+        public string JoinSubtaskResults(IEnumerable<int> subtaskResults)
         {
-            return subtaskResults.Sum();
+            return subtaskResults.Sum().ToString();
         }
 
         public int Compute(int subtask)
@@ -28,7 +28,7 @@ namespace FactorialTask
         }
 
         public IDataFormatter<string> TaskDataFormatter => _stringDataFormatter;
-        public IDataFormatter<int> TaskResultDataFormatter => _intDataFormatter;
+        public IDataFormatter<string> TaskResultDataFormatter => _stringDataFormatter;
         public IDataFormatter<int> SubtaskDataFormatter => _intDataFormatter;
         public IDataFormatter<int> SubtaskResultDataFormatter => _intDataFormatter;
 
