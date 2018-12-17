@@ -24,15 +24,12 @@ namespace Server.Services
 
     public class ProblemPluginFacade<TTask, TTaskResult, TSubtask, TSubtaskResult> : IProblemPluginFacade
     {
-        private readonly IDataFormatterFactory _dataFormatterFactory;
         private readonly IProblemPlugin<TTask, TTaskResult, TSubtask, TSubtaskResult> _problemPluginInstance;
 
         public ProblemPluginFacade(
-            IDataFormatterFactory dataFormatterFactory,
             IProblemPlugin<TTask, TTaskResult, TSubtask, TSubtaskResult> problemPluginInstance
         )
         {
-            _dataFormatterFactory = dataFormatterFactory;
             _problemPluginInstance = problemPluginInstance;
         }
 
@@ -41,15 +38,12 @@ namespace Server.Services
             var parsedTask = ParseTask(taskData);
             var subtasksData = DivideTask(parsedTask);
 
-            var subtasksDataFormatter = _dataFormatterFactory.Create<TSubtask>();
-
-            return subtasksData.Select(subtasksDataFormatter.Serialize);
+            return subtasksData.Select(_problemPluginInstance.SubtaskDataFormatter.Serialize);
         }
 
         public byte[] JoinSubtaskResults(IEnumerable<byte[]> subtaskResults)
         {
-            var subtaskResultsDataFormatter = _dataFormatterFactory.Create<TSubtaskResult>();
-            var subtasksDeserializedData = subtaskResults.Select(subtaskResultsDataFormatter.Deserialize);
+            var subtasksDeserializedData = subtaskResults.Select(_problemPluginInstance.SubtaskResultDataFormatter.Deserialize);
             var taskResult = JoinSubtaskResults(subtasksDeserializedData);
 
             return _problemPluginInstance.TaskResultDataFormatter.Serialize(taskResult);

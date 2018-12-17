@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using JsonApiDotNetCore.Extensions;
 using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Server.Models;
 using Server.Services;
@@ -46,7 +47,6 @@ namespace Server
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             EnsureDatabaseCreated(app);
-            ConfigureCompiledTaskDefinitionsHosting(app);
 
             if (env.IsDevelopment())
             {
@@ -64,6 +64,7 @@ namespace Server
                     .AllowAnyHeader()
                     .AllowAnyMethod()
             );
+            ConfigureCompiledTaskDefinitionsHosting(app);
             app.UseJsonApi();
         }
 
@@ -86,7 +87,6 @@ namespace Server
             services
                 .AddScoped<IAssemblyLoader, AssemblyLoader>()
                 .AddScoped<IPackager, Packager>()
-                .AddScoped<IDataFormatterFactory, DataFormatterFactory>()
                 .AddScoped<IProblemPluginFacadeFactory, ProblemPluginFacadeFactory>()
                 .AddScoped<IFileStorage, FileStorage>()
                 .AddScoped<IResourceService<DistributedTaskDefinition>, DistributedTaskDefinitionService>()
@@ -109,11 +109,16 @@ namespace Server
         private static void ConfigureCompiledTaskDefinitionsHosting(IApplicationBuilder app)
         {
             var pathsProvider = app.ApplicationServices.GetService<IPathsProvider>();
+            var contentTypeProvider = new FileExtensionContentTypeProvider();
+
+            contentTypeProvider.Mappings[".wasm"] = "application/wasm";
 
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(pathsProvider.CompiledTasksDefinitionsDirectoryPath),
-                RequestPath = "/public/task-definitions"
+                RequestPath = "/public/task-definitions",
+                ServeUnknownFileTypes = true,
+                ContentTypeProvider = contentTypeProvider
             });
         }
 
