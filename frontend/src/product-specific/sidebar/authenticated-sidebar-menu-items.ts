@@ -17,4 +17,8 @@ export const authenticatedSidebarMenuItems: ConnectedMenuItem[] = [
     route: '/distributed-nodes',
     title: 'Distributed Nodes',
   },
+  {
+    route: '/worker-example',
+    title: 'Worker',
+  },
 ];
