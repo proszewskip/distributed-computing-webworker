@@ -141,7 +141,7 @@ export class PureCreateDistributedTaskForm extends Component<
 
       toaster.success('Distributed Task added');
       resetForm();
-      router.push(`/distributed-tasks/${createdEntityId}`);
+      router.pushRoute(`/distributed-tasks/${createdEntityId}`);
     }
     setSubmitting(false);
   };
@@ -149,7 +149,9 @@ export class PureCreateDistributedTaskForm extends Component<
   private onCancelClick = () => {
     const { router, distributedTaskDefinitionId } = this.props;
 
-    router.push(`/distributed-task-definitions/${distributedTaskDefinitionId}`);
+    router.pushRoute(
+      `/distributed-task-definitions/${distributedTaskDefinitionId}`,
+    );
   };
 }
 
