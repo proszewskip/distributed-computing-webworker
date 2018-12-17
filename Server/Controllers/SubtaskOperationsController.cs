@@ -75,9 +75,8 @@ namespace Server.Controllers
 
             var response = new AssignNextSubtaskResultDTO()
             {
-                // TODO: fix URL. Currently the full filesystem path is provided
                 CompiledTaskDefinitionURL =
-                    _pathsProvider.GetCompiledTaskDefinitionDirectoryPath(distributedTaskDefinition.DefinitionGuid),
+                    _pathsProvider.GetCompiledTaskDefinitionWebPath(distributedTaskDefinition.DefinitionGuid),
                 SubtaskId = nextSubtask.StringId,
                 ProblemPluginInfo = distributedTaskDefinition.ProblemPluginInfo,
                 SubtaskInProgressId = createdSubtaskInProgress.StringId
