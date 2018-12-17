@@ -43,7 +43,7 @@ namespace Server.Services
 
         public string GetCompiledTaskDefinitionWebPath(Guid guid)
         {
-            return $"/public/task-definitions/${guid}";
+            return $"/public/task-definitions/{guid}";
         }
 
         private void InitializePaths()
