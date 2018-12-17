@@ -67,15 +67,17 @@ export class PureDistributedTasksTable extends Component<
       minWidth: 150,
     },
 
-    this.props.bindDistributedTaskDefinitionId === undefined && {
-      id: 'distributed-task-definition-name',
-      accessor: (distributedTask) =>
-        distributedTask['distributed-task-definition'].name,
-      Header: <Text>Distributed Task Definition</Text>,
-      Cell: TextCell,
-      Filter: TextFilter,
-      minWidth: 150,
-    },
+    this.props.bindDistributedTaskDefinitionId === undefined
+      ? {
+          id: 'distributed-task-definition-name',
+          accessor: (distributedTask) =>
+            distributedTask['distributed-task-definition'].name,
+          Header: <Text>Distributed Task Definition</Text>,
+          Cell: TextCell,
+          Filter: TextFilter,
+          minWidth: 150,
+        }
+      : undefined,
 
     {
       id: 'priority',
@@ -126,7 +128,7 @@ export class PureDistributedTasksTable extends Component<
       ),
       minWidth: 290,
     },
-  ] as Array<Column<DistributedTaskWithDefinition> | undefined>) as Array<
+  ] as Array<Column<DistributedTaskWithDefinition> | boolean>) as Array<
     Column<DistributedTaskWithDefinition>
   >;
 

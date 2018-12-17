@@ -39,5 +39,13 @@ namespace Server.Services
         /// <param name="mainDllName"></param>
         /// <returns></returns>
         string GetTaskDefinitionMainAssemblyPath(Guid guid, string mainDllName);
+
+        /// <summary>
+        /// Returns a web path to the directory containing files required to run a single task in WebAssembly.
+        /// Returned address has format of '/public/task-definitions/{guid}'
+        /// </summary>
+        /// <param name="guid">DefinitionGuid of a task</param>
+        /// <returns>A path to a directory containing files required to run a single task in WebAssembly</returns>
+        string GetCompiledTaskDefinitionWebPath(Guid guid);
     }
 }

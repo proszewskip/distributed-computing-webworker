@@ -13,12 +13,6 @@ namespace Server.Services
 
     public class ProblemPluginFacadeFactory : IProblemPluginFacadeFactory
     {
-        private readonly IDataFormatterFactory _dataFormatterFactory;
-
-        public ProblemPluginFacadeFactory(IDataFormatterFactory dataFormatterFactory)
-        {
-            _dataFormatterFactory = dataFormatterFactory;
-        }
 
         public IProblemPluginFacade Create(Assembly assembly)
         {
@@ -30,7 +24,7 @@ namespace Server.Services
 
             var typedProblemPluginFacadeType = typeof(ProblemPluginFacade<,,,>).MakeGenericType(genericTypes);
 
-            return (IProblemPluginFacade)Activator.CreateInstance(typedProblemPluginFacadeType, _dataFormatterFactory,
+            return (IProblemPluginFacade)Activator.CreateInstance(typedProblemPluginFacadeType,
                 pluginInstance);
         }
 

@@ -113,8 +113,8 @@ namespace Server.Controllers
         {
             string[] args =
             {
-                $"-prefix={_pathsProvider.GetTaskDefinitionDirectoryPath(taskDefinitionGuid)}",
-                $"-out={_pathsProvider.GetCompiledTaskDefinitionDirectoryPath(taskDefinitionGuid)}",
+                $"--prefix={_pathsProvider.GetTaskDefinitionDirectoryPath(taskDefinitionGuid)}",
+                $"--out={_pathsProvider.GetCompiledTaskDefinitionDirectoryPath(taskDefinitionGuid)}",
                 body.MainDll.FileName
             };
 
