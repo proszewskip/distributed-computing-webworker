@@ -13,17 +13,17 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
 
 const Index: StatelessComponent = () => {
   const assignNextResponse: AssignNextResponse = {
-    'subtask-in-progress-id': '8',
-    'subtask-id': '10',
+    'subtask-in-progress-id': '1',
+    'subtask-id': '1',
     'compiled-task-definition-url':
-      'http://localhost:5000/public/task-definitions/8479081f-b799-424c-befe-68925793622d',
+      'http://localhost:5000/public/task-definitions/0c87d875-1bfc-4335-9349-3dfce5c80339',
     'problem-plugin-info': {
       'assembly-name': 'FactorialTask',
       namespace: 'FactorialTask',
       'class-name': 'FactorialSumPlugin',
     },
   };
-  const distributedNodeId = '605495c7-6c04-42ff-8107-0034ca29ba81';
+  const distributedNodeId = '55301d87-cfc8-48c5-ad58-e188d7a39f38';
 
   return (
     <>
