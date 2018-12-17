@@ -17,7 +17,7 @@ namespace DistributedComputing
         {
             //TODO: use correct types
             var instance =
-                CreateProblemPlugin<string, int, int, int>(assemblyName,
+                CreateProblemPlugin<string, string, int, int>(assemblyName,
                     className);
 
             var serializedInputData = instance.SubtaskDataFormatter.Deserialize(taskData);

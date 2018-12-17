@@ -1,6 +1,6 @@
 import { ProblemPluginInfo } from 'models';
 
-import { DistributedNodeWorkerStatus } from './worker';
+import { WorkerThreadStatus } from './worker';
 
 export interface AssignNextResponse {
   /**
@@ -28,18 +28,14 @@ export interface AssignNextResponse {
   'problem-plugin-info': ProblemPluginInfo;
 }
 
-export interface DistributedNodeProps {
-  /**
-   * The ID of the DistributedNode received from the server during registering.
-   */
-  distributedNodeId: string;
-
+export interface WorkerThreadProps {
   /**
    * Response from the subtask assignment. Determines the subtask that the worker will compute.
    */
   assignNextResponse: AssignNextResponse;
-}
 
-export interface DistributedNodeState {
-  workerStatus: DistributedNodeWorkerStatus;
+  onWorkerCreated?: () => void;
+  onComputationSuccess?: (resultData: ArrayBuffer) => void;
+  onComputationError?: (errors: string[]) => void;
+  onStatusChange?: (status: WorkerThreadStatus) => void;
 }

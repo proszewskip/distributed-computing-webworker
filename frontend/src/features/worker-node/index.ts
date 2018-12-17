@@ -1,2 +1,1 @@
-export * from './distributed-node';
-export { DistributedNodeProps, AssignNextResponse } from './types';
+export * from './worker-thread';
