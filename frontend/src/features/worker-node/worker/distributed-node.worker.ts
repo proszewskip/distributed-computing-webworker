@@ -98,6 +98,7 @@ async function beginComputation(payload: BeginComputationPayload) {
     console.log(result);
   };
 
+  importScripts(`${payload.compiledTaskDefinitionURL}/mono-config.js`);
   importScripts(`${payload.compiledTaskDefinitionURL}/mono.js`);
 
   reportStatus(DistributedNodeWorkerStatus.DownloadingInputData);
