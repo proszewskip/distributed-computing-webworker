@@ -1,29 +1,20 @@
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
 
 import { config } from 'product-specific';
 
 import DistributedNodeWorker from './worker/distributed-node.worker.ts';
 
-import { formatWorkerThreadStatus } from './format-status';
-import { WorkerThreadProps, WorkerThreadState } from './types';
+import { WorkerThreadProps } from './types';
 import {
   BeginComputationMessage,
   ComputationErrorMessage,
   ComputationSuccessMessage,
   DistributedWorkerMessage,
   StatusReportMessage,
-  WorkerThreadStatus,
 } from './worker';
 
-export class WorkerThread extends PureComponent<
-  WorkerThreadProps,
-  WorkerThreadState
-> {
+export class WorkerThread extends PureComponent<WorkerThreadProps> {
   public worker: DistributedNodeWorker | null = null;
-
-  public state: WorkerThreadState = {
-    workerStatus: WorkerThreadStatus.WaitingForTask,
-  };
 
   public componentDidMount() {
     this.createWorker();
@@ -46,9 +37,7 @@ export class WorkerThread extends PureComponent<
   }
 
   public render() {
-    return (
-      <div>Status: {formatWorkerThreadStatus(this.state.workerStatus)}</div>
-    );
+    return this.props.children || null;
   }
 
   private onWorkerMessage = (event: MessageEvent) => {
@@ -113,9 +102,9 @@ export class WorkerThread extends PureComponent<
   };
 
   private onStatusReport = (message: StatusReportMessage) => {
-    this.setState({
-      workerStatus: message.payload,
-    });
+    if (this.props.onStatusChange) {
+      this.props.onStatusChange(message.payload);
+    }
   };
 
   private onComputationSuccess = (message: ComputationSuccessMessage) => {
