@@ -1,7 +1,6 @@
 import { Button, Pane, toaster } from 'evergreen-ui';
 import { Field, Form, Formik, FormikConfig } from 'formik';
 import { JsonApiErrorResponse } from 'kitsu';
-import { withRouter } from 'next/router';
 import React, { Component } from 'react';
 import { ClipLoader } from 'react-spinners';
 
@@ -14,12 +13,13 @@ import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
 import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
 
+import { withRouter } from 'components/router';
+
 import { getErrorsDictionary } from 'utils/forms/get-errors-dictionary';
 
 import {
   UpdateDistributedTaskDependencies,
   UpdateDistributedTaskModel,
-  UpdateDistributedTaskOwnProps,
   UpdateDistributedTaskProps,
   UpdateDistributedTaskState,
 } from './types';
@@ -122,7 +122,7 @@ class PureUpdateDistributedTaskForm extends Component<
       .then(() => {
         toaster.success('Distributed Task updated');
         resetForm();
-        router.push(`/distributed-tasks/${values.id}`);
+        router.pushRoute(`/distributed-tasks/${values.id}`);
       })
       .catch((response: JsonApiErrorResponse) => {
         const errorsObject = getErrorsDictionary(response);
@@ -137,7 +137,7 @@ class PureUpdateDistributedTaskForm extends Component<
     const { router } = this.props;
     const { data } = this.state;
 
-    router.push(`/distributed-tasks/${data.id}`);
+    router.pushRoute(`/distributed-tasks/${data.id}`);
   };
 }
 
@@ -146,6 +146,6 @@ const dependenciesExtractor: DependenciesExtractor<
   UpdateDistributedTaskDependencies
 > = ({ kitsu }) => ({ kitsu });
 
-export const UpdateDistributedTaskForm = withRouter<
-  UpdateDistributedTaskOwnProps
->(withDependencies(dependenciesExtractor)(PureUpdateDistributedTaskForm));
+export const UpdateDistributedTaskForm = withRouter(
+  withDependencies(dependenciesExtractor)(PureUpdateDistributedTaskForm),
+);

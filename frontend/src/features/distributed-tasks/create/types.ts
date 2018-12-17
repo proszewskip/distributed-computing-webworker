@@ -1,4 +1,4 @@
-import { WithRouterProps } from 'next/router';
+import { WithRouterProps } from 'components/router';
 
 export interface CreateDistributedTaskModel {
   DistributedTaskDefinitionId: string;
