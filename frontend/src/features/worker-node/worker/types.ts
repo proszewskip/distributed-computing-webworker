@@ -30,12 +30,18 @@ export type StatusReportMessage = BaseWorkerMessage<
   DistributedNodeWorkerStatus
 >;
 
-export type ComputationResultsMessage = BaseWorkerMessage<
-  'COMPUTATION_RESULTS',
-  {}
+export type ComputationSuccessMessage = BaseWorkerMessage<
+  'COMPUTATION_SUCCESS',
+  ArrayBuffer
+>;
+
+export type ComputationErrorMessage = BaseWorkerMessage<
+  'COMPUTATION_ERROR',
+  string[]
 >;
 
 export type DistributedWorkerMessage =
   | BeginComputationMessage
   | StatusReportMessage
-  | ComputationResultsMessage;
+  | ComputationSuccessMessage
+  | ComputationErrorMessage;
