@@ -43,7 +43,7 @@ namespace Server.Controllers
                 DistributedTaskDefinitionId = body.DistributedTaskDefinitionId,
                 Priority = body.Priority,
                 Name = body.Name,
-                Description = body.Description,
+                Description = body.Description ?? "",
                 InputData = new byte[body.InputData.Length],
                 TrustLevelToComplete = body.TrustLevelToComplete,
             };
