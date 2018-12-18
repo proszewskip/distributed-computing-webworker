@@ -87,7 +87,7 @@ namespace Server.Controllers
             var distributedTaskDefinition = new DistributedTaskDefinition
             {
                 Name = body.Name,
-                Description = body.Description,
+                Description = body.Description ?? "",
                 DefinitionGuid = taskDefinitionGuid,
                 ProblemPluginInfo = problemPluginInfo,
                 MainDllName = body.MainDll.FileName,
