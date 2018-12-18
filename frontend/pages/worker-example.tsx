@@ -6,7 +6,7 @@ import { Layout, LayoutProps } from 'components/layout';
 import {
   AssignNextResponse,
   formatWorkerThreadStatus,
-  WorkerThread,
+  WorkerThreadComponent,
   WorkerThreadProps,
   WorkerThreadStatus,
 } from 'features/worker-node';
@@ -159,7 +159,7 @@ class WorkerExample extends Component<{}, WorkerExampleState> {
     }
 
     return (
-      <WorkerThread
+      <WorkerThreadComponent
         assignNextResponse={assignNextResponse}
         onWorkerCreated={this.onWorkerCreated}
         onComputationError={this.onComputationError}
