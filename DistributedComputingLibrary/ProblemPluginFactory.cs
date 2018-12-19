@@ -1,56 +1,47 @@
 using System;
 using System.Reflection;
-using System.Xml.XPath;
 
 namespace DistributedComputing
 {
     /// <summary>
-    ///     Static factory used for instantiating a class that implements IProblemPlugin.
-    /// 
+    ///     Static factory used for running computations from JavaScript.
     ///     This class is required to create an instance of IProblemPlugin in the browser
     ///     of distributed nodes in WebAssembly.
     /// </summary>
     public static class ProblemPluginFactory
     {
-        public static byte[] ComputeTask<TTask, TTaskResult, TSubtask, TSubtaskResult>(string assemblyName,
-            string className, byte[] taskData)
+        public static byte[] ComputeTask(string assemblyName,
+            string className, byte[] subtaskData)
         {
-            //TODO: use correct types
-            var instance =
-                CreateProblemPlugin<string, string, int, int>(assemblyName,
+            var problemPluginFacade =
+                CreateProblemPluginFacade(assemblyName,
                     className);
 
-            var serializedInputData = instance.SubtaskDataFormatter.Deserialize(taskData);
+            var result = problemPluginFacade.Compute(subtaskData);
 
-            Console.WriteLine(serializedInputData);
-
-            var result = instance.Compute(serializedInputData);
-
-            Console.WriteLine(result);
-
-            var serializedResult = instance.SubtaskResultDataFormatter.Serialize(result);
-
-            return serializedResult;
+            return result;
         }
 
-        private static IProblemPlugin<TTask, TTaskResult, TSubtask, TSubtaskResult> CreateProblemPlugin<TTask,
-            TTaskResult, TSubtask, TSubtaskResult>(string assemblyName, string className)
+        private static IProblemPluginFacade CreateProblemPluginFacade(string assemblyName, string className)
         {
             var assembly = Assembly.Load(assemblyName);
 
-            var classType = assembly.GetType(className);
-            var problemPluginInterfaceName = (typeof(IProblemPlugin<,,,>)).Name;
+            var problemPluginType = assembly.GetType(className);
+            var problemPluginInterfaceName = typeof(IProblemPlugin<,,,>).Name;
 
-
-            var problemPluginInterface = classType.GetInterface(problemPluginInterfaceName);
+            var problemPluginInterface = problemPluginType.GetInterface(problemPluginInterfaceName);
 
             if (problemPluginInterface == null)
                 throw new ArgumentException(
                     $"Class {className} does not implement the {problemPluginInterfaceName} interface");
 
-            var pluginInstance = Activator.CreateInstance(classType);
+            var genericTypes = problemPluginInterface.GenericTypeArguments;
+            var pluginInstance = Activator.CreateInstance(problemPluginType);
 
-            return (IProblemPlugin<TTask, TTaskResult, TSubtask, TSubtaskResult>)pluginInstance;
+            var typedProblemPluginFacadeType = typeof(ProblemPluginFacade<,,,>).MakeGenericType(genericTypes);
+
+            return (IProblemPluginFacade) Activator.CreateInstance(typedProblemPluginFacadeType,
+                pluginInstance);
         }
     }
 }
