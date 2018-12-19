@@ -37,6 +37,7 @@
   <ItemGroup>
     <Compile Include="IDataFormatter.cs" />
     <Compile Include="IProblemPlugin.cs" />
+    <Compile Include="ProblemPluginFacade.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProblemPluginFactory.cs" />
   </ItemGroup>
