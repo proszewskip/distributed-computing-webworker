@@ -166,6 +166,7 @@ export class DistributedNodeService {
     const subtaskMessagePayload = createComputeSubtaskMessagePayload(
       assignNextSubtaskResponse,
     );
+    // TODO: add options to receive state updates
     const subtaskWorker = this.dependencies.subtaskWorkerFactory(
       subtaskMessagePayload,
     );
