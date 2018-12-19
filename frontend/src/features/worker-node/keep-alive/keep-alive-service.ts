@@ -5,7 +5,7 @@ import { KeepAliveServiceDependencies } from './types';
 const POLLING_INTERVAL = 5000;
 
 export class KeepAliveService {
-  private readonly fetch: GlobalFetch['fetch'];
+  private readonly fetch: KeepAliveServiceDependencies['fetch'];
   private timeoutId: number | null = null;
 
   public get isPolling() {
@@ -17,7 +17,9 @@ export class KeepAliveService {
   }
 
   public sendKeepAlive(distributedNodeId: string): Promise<boolean> {
-    return this.fetch(
+    const { fetch } = this;
+
+    return fetch(
       `${config.serverUrl}/distributed-nodes/${distributedNodeId}/keep-alive`,
       {
         method: 'POST',

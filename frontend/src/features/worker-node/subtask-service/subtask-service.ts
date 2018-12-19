@@ -8,7 +8,7 @@ import {
 } from './types';
 
 export class SubtaskSerivce {
-  private readonly fetch: GlobalFetch['fetch'];
+  private readonly fetch: SubtaskServiceDependencies['fetch'];
 
   constructor(dependencies: SubtaskServiceDependencies) {
     this.fetch = dependencies.fetch;
@@ -17,7 +17,9 @@ export class SubtaskSerivce {
   public assignNextTask = (
     distributedNodeId: string,
   ): Promise<AssignNextResponseBody> => {
-    return this.fetch(`${config.serverUrl}/subtasks/assign-next`, {
+    const { fetch } = this;
+
+    return fetch(`${config.serverUrl}/subtasks/assign-next`, {
       method: 'POST',
       body: JSON.stringify({
         'distributed-node-id': distributedNodeId,
@@ -39,7 +41,9 @@ export class SubtaskSerivce {
     formData.set('DistributedNodeId', requestBody.distributedNodeId);
     formData.set('SubtaskResult', new Blob([requestBody.subtaskResult]));
 
-    return this.fetch(
+    const { fetch } = this;
+
+    return fetch(
       `${config.serverUrl}/subtasks-in-progress/computation-success`,
       {
         method: 'POST',
@@ -57,13 +61,12 @@ export class SubtaskSerivce {
       formData.set('Errors', error);
     });
 
-    return this.fetch(
-      `${config.serverUrl}/subtasks-in-progress/computation-error`,
-      {
-        method: 'POST',
-        body: formData,
-      },
-    ).then(this.rejectIfNotOk('Cannot report subtask computation error'));
+    const { fetch } = this;
+
+    return fetch(`${config.serverUrl}/subtasks-in-progress/computation-error`, {
+      method: 'POST',
+      body: formData,
+    }).then(this.rejectIfNotOk('Cannot report subtask computation error'));
   };
 
   private rejectIfNotOk = (errorMessage: string) => (response: Response) => {

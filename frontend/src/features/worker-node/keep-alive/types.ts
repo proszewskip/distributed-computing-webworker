@@ -1,3 +1,5 @@
+import fetch from 'isomorphic-unfetch';
+
 export interface KeepAliveServiceDependencies {
-  fetch: GlobalFetch['fetch'];
+  fetch: typeof fetch;
 }

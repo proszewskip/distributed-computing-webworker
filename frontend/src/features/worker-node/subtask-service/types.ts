@@ -1,7 +1,9 @@
+import fetch from 'isomorphic-unfetch';
+
 import { ProblemPluginInfo } from 'models';
 
 export interface SubtaskServiceDependencies {
-  fetch: GlobalFetch['fetch'];
+  fetch: typeof fetch;
 }
 
 /**
