@@ -8,10 +8,10 @@ import { SubtaskWorker } from 'features/worker-node/worker';
  * Inner state when the worker has started
  */
 export enum DistributedNodeRunningState {
-  AskingForNewTask,
-  StartedNewWorker,
-  WaitingForEmptyThread,
-  WaitingForTimeout,
+  AskingForNewTask = 'ASKING_FOR_A_NEW_TASK',
+  StartedNewWorker = 'STARTED_NEW_WORKER_THREAD',
+  WaitingForEmptyThread = 'WAITING_FOR_EMPTY_THREAD',
+  WaitingForTimeout = 'WAITING_FOR_TIMEOUT',
 }
 
 export interface DistributedNodeRunningStateData {

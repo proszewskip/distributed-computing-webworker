@@ -1,4 +1,11 @@
-import { Button, Heading, majorScale, Pane, Paragraph } from 'evergreen-ui';
+import {
+  Button,
+  Heading,
+  IconButton,
+  majorScale,
+  Pane,
+  Paragraph,
+} from 'evergreen-ui';
 import fetch from 'isomorphic-unfetch';
 import React, { Component, ReactNode } from 'react';
 
@@ -27,6 +34,7 @@ import {
 interface WorkerExampleState {
   distributedNodeService?: DistributedNodeService;
   distributedNodeState?: DistributedNodeStateWithData;
+  threadsCount: number;
 }
 
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
@@ -34,7 +42,9 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
 );
 
 class WorkerExample extends Component<{}, WorkerExampleState> {
-  public state: WorkerExampleState = {};
+  public state: WorkerExampleState = {
+    threadsCount: 1,
+  };
 
   public componentDidMount() {
     const keepAliveService = new KeepAliveService({
@@ -64,6 +74,7 @@ class WorkerExample extends Component<{}, WorkerExampleState> {
       this.onDistributedNodeStateUpdate,
     );
 
+    distributedNodeService.setThreadsCount(this.state.threadsCount);
     distributedNodeService.init();
 
     this.setState({
@@ -89,6 +100,11 @@ class WorkerExample extends Component<{}, WorkerExampleState> {
                 Worker node
               </Heading>
 
+              <Paragraph>
+                State:{' '}
+                {this.state.distributedNodeState &&
+                  this.state.distributedNodeState.state}
+              </Paragraph>
               {this.renderContent()}
             </Pane>
           </Layout>
@@ -101,7 +117,7 @@ class WorkerExample extends Component<{}, WorkerExampleState> {
     newState,
   ) => {
     // tslint:disable-next-line:no-console
-    console.log('State updated', newState);
+    console.log(newState);
 
     this.setState({
       distributedNodeState: newState,
@@ -133,12 +149,49 @@ class WorkerExample extends Component<{}, WorkerExampleState> {
         <>
           <Paragraph>Running.</Paragraph>
           <Button onClick={this.stopNode}>Stop</Button>
-          For now, open the console to see the state.
+          <Paragraph>For now, open the console to see the state.</Paragraph>
+
+          <Pane>
+            Threads count: {this.state.threadsCount}
+            <IconButton icon="plus" onClick={this.incrementThreadsCount} />
+            <IconButton icon="minus" onClick={this.decrementThreadsCount} />
+          </Pane>
+
+          <Pane>
+            Workers count:{' '}
+            {this.state.distributedNodeState.data.subtaskWorkers.size}
+          </Pane>
+
+          <Pane>{this.state.distributedNodeState.data.runningState}</Pane>
         </>
       );
     }
 
     return 'Unknown state. Something is broken :(';
+  };
+
+  private incrementThreadsCount = () => {
+    const newThreadsCount = this.state.threadsCount + 1;
+
+    this.setState({
+      threadsCount: newThreadsCount,
+    });
+
+    if (this.state.distributedNodeService) {
+      this.state.distributedNodeService.setThreadsCount(newThreadsCount);
+    }
+  };
+
+  private decrementThreadsCount = () => {
+    const newThreadsCount = this.state.threadsCount - 1;
+
+    this.setState({
+      threadsCount: newThreadsCount,
+    });
+
+    if (this.state.distributedNodeService) {
+      this.state.distributedNodeService.setThreadsCount(newThreadsCount);
+    }
   };
 
   private startNode = () => {

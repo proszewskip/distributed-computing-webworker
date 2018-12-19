@@ -6,14 +6,14 @@ export enum DistributedNodeState {
   /**
    * Before any commands have been issued
    */
-  Pristine,
-  Registering,
+  Pristine = 'PRISTINE',
+  Registering = 'REGISTERING',
 
   /**
    * Registered and waiting for the user to start the node
    */
-  Idle,
-  Running,
+  Idle = 'IDLE',
+  Running = 'RUNNING',
 }
 
 export interface DistributedNodeIdState {
