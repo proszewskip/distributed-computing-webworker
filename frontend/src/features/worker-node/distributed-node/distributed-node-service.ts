@@ -14,6 +14,7 @@ import {
   DistributedNodeState,
   DistributedNodeStateWithData,
 } from './types';
+import { OnDistributedNodeStateUpdate } from './types/on-state-update';
 
 /**
  * The timeout between assigning next subtask
@@ -22,6 +23,7 @@ const SUBTASK_GRACE_PERIOD_TIMEOUT = 1000;
 
 export class DistributedNodeService {
   private readonly dependencies: DistributedNodeServiceDependencies;
+  private readonly onStateUpdate: OnDistributedNodeStateUpdate;
   private threadsCount = 1;
 
   /**
@@ -34,8 +36,12 @@ export class DistributedNodeService {
     state: DistributedNodeState.Pristine,
   };
 
-  constructor(dependencies: DistributedNodeServiceDependencies) {
+  constructor(
+    dependencies: DistributedNodeServiceDependencies,
+    onStateUpdate: OnDistributedNodeStateUpdate,
+  ) {
     this.dependencies = dependencies;
+    this.onStateUpdate = onStateUpdate;
   }
 
   public getState() {
@@ -115,7 +121,7 @@ export class DistributedNodeService {
   private setState(newState: DistributedNodeStateWithData) {
     this.state = newState;
 
-    // TODO: emit and event to notify the consumers of `DistributedNode`
+    this.onStateUpdate(newState);
   }
 
   private registerNode = async () => {
