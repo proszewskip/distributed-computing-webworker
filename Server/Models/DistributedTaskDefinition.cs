@@ -8,6 +8,12 @@ namespace Server.Models
     public class DistributedTaskDefinition : Identifiable
     {
         /// <summary>
+        /// ModelId is used to enable sorting of distributed task definitions by id.
+        /// </summary>
+        [Attr("id", isImmutable: true)]
+        public int ModelId => Id;
+
+        /// <summary>
         /// Distributed Task Definition's name.
         ///
         /// Has to be unique.
