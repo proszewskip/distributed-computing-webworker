@@ -14,6 +14,7 @@ export async function getEntities<Model extends Entity>(
   page = 1,
   pageSize = 20,
   relationshipsToInclude?: string,
+  sort = 'id',
 ) {
   const filtersDictionary: Dictionary<string> = {};
 
@@ -27,6 +28,7 @@ export async function getEntities<Model extends Entity>(
       size: pageSize,
       number: page,
     },
+    sort,
   };
 
   if (relationshipsToInclude) {
