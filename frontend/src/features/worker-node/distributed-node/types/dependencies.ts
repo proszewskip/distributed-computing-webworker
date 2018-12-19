@@ -4,8 +4,10 @@ import {
 } from 'features/worker-node';
 import { KeepAliveService } from 'features/worker-node/keep-alive';
 import { RegistrationService } from 'features/worker-node/registration';
+import { SubtaskSerivce } from 'features/worker-node/subtask-service';
+import { WorkerOptions } from 'features/worker-node/worker';
 
-export interface DistributedNodeDependencies {
+export interface DistributedNodeServiceDependencies {
   fetch: GlobalFetch['fetch'];
 
   keepAliveService: KeepAliveService;
@@ -16,8 +18,10 @@ export interface DistributedNodeDependencies {
    */
   registrationService: RegistrationService;
 
+  subtaskService: SubtaskSerivce;
+
   subtaskWorkerFactory: (
-    options: WorkerOptions,
     subtaskMetadata: ComputeSubtaskMessagePayload,
+    options?: WorkerOptions,
   ) => SubtaskWorker;
 }

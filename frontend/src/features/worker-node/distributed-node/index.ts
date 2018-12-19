@@ -1,2 +1,2 @@
 export * from './types';
-export * from './distributed-node';
+export * from './distributed-node-service';
