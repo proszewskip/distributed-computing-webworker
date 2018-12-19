@@ -43,7 +43,7 @@ export class ExampleForm extends Component<ExampleFormProps, ExampleFormState> {
 
   private validationSchema = Yup.object<ExampleModel>().shape({
     name: Yup.string()
-      .min(3, 'Must be longer than 3 characters')
+      .min(3, 'Must be longer than 2 characters')
       .required('Required'),
     description: Yup.string(),
   });

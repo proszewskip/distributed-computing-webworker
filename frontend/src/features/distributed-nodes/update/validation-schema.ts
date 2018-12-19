@@ -5,6 +5,6 @@ import { UpdateDistributedNodeModel } from './types';
 export const validationSchema = Yup.object<UpdateDistributedNodeModel>().shape({
   id: Yup.string().required(),
   'trust-level': Yup.number()
-    .positive('Trust level cannot be less than 0')
+    .moreThan(0, 'Trust level must be greater than 0')
     .required('Required'),
 });
