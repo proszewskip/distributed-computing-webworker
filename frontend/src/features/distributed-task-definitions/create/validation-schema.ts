@@ -7,7 +7,7 @@ export const validationSchema = Yup.object<
   CreateDistributedTaskDefinitionModel
 >().shape({
   Name: Yup.string()
-    .min(3, 'Must be longer than 3 characters')
+    .min(3, 'Must be longer than 2 characters')
     .required('Required'),
   Description: Yup.string(),
   MainDll: Yup.mixed().test('Required', 'Required', identity),
