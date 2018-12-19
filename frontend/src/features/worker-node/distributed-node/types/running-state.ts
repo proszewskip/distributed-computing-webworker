@@ -28,7 +28,7 @@ export type BaseDistribuedNodeRunningStateWithData<
 > = {
   runningState: RunningState;
 } & ExtractNonNeverProperties<{
-  subtaskWorkers: Map<string, SubtaskWorker>;
+  subtaskWorkers: Map<number, SubtaskWorker>;
   data: DistributedNodeRunningStateData[RunningState];
 }>;
 

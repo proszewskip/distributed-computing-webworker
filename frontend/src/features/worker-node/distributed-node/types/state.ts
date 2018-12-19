@@ -34,7 +34,7 @@ export type BaseDistributedNodeStateWithData<
   state: State;
 } & ExtractNonNeverProperties<{ data: DistributedNodeStateData[State] }>;
 
-export type DistributedNodeData =
+export type DistributedNodeStateWithData =
   | BaseDistributedNodeStateWithData<DistributedNodeState.Pristine>
   | BaseDistributedNodeStateWithData<DistributedNodeState.Registering>
   | BaseDistributedNodeStateWithData<DistributedNodeState.Idle>

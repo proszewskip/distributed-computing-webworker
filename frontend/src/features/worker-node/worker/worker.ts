@@ -20,8 +20,8 @@ export class SubtaskWorker {
 
   constructor(
     dependencies: WorkerDependencies,
-    options: WorkerOptions,
     subtaskMetadata: ComputeSubtaskMessagePayload,
+    options: WorkerOptions = {},
   ) {
     this.dependencies = dependencies;
     this.options = options;
@@ -97,13 +97,11 @@ export class SubtaskWorker {
 
     switch (payload.status) {
       case WorkerThreadStatus.ComputationSuccess:
-        this.resolveComputationPromise(payload);
-        break;
-
       case WorkerThreadStatus.ComputationError:
       case WorkerThreadStatus.NetworkError:
       case WorkerThreadStatus.UnknownError:
         this.resolveComputationPromise(payload);
+        this.destroyWorkerThread();
         break;
 
       default:
