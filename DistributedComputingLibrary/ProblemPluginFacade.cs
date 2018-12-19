@@ -1,15 +1,16 @@
 namespace DistributedComputing
 {
-    /// A facade for IProblemPlugin that simplifies interacting with the plugin.
-    /// 
-    /// It also hides away the generic type parameters of IProblemPlugin.
+    /// <summary>
+    ///     A facade for IProblemPlugin that simplifies interacting with the plugin.
+    ///     It also hides away the generic type parameters of IProblemPlugin.
+    /// </summary>
     internal interface IProblemPluginFacade
     {
         byte[] Compute(byte[] data);
     }
 
 
-    public class ProblemPluginFacade<TTask, TTaskResult, TSubtask, TSubtaskResult> : IProblemPluginFacade
+    internal class ProblemPluginFacade<TTask, TTaskResult, TSubtask, TSubtaskResult> : IProblemPluginFacade
     {
         private readonly IProblemPlugin<TTask, TTaskResult, TSubtask, TSubtaskResult> _problemPluginInstance;
 
