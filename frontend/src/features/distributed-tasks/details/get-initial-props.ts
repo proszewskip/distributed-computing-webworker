@@ -1,6 +1,7 @@
 import { transformRequestError } from 'error-handling';
 import Kitsu, { GetParams } from 'kitsu';
 import { NextComponentClass } from 'next';
+import { prop, sortBy } from 'ramda';
 
 import { DistributedTaskDetailsProps } from './types';
 
@@ -22,6 +23,11 @@ export const getDistributedTaskDetailsInitialProps = (
   return kitsu
     .get<DistributedTask>(`distributed-task/${id}`, getParams)
     .then((jsonApiResponse) => jsonApiResponse.data as any)
+    .then((data) => {
+      // NOTE: API does not allow to sort included elements
+      data.subtasks = sortBy(prop('sequence-number'))(data.subtasks);
+      return data;
+    })
     .then((data) => {
       return {
         distributedTaskDefinitionId: id,

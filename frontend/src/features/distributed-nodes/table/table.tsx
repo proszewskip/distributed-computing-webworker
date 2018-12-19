@@ -170,6 +170,8 @@ export class PureDistributedNodesTable extends Component<
   ) => {
     this.setState({
       forceFetchDataCallback: fetchData,
+      // NOTE: data is reassigned in order to re-render table so that forceFetchDataCallback is propagated
+      data: List(this.state.data.toArray()),
     });
   };
 }
