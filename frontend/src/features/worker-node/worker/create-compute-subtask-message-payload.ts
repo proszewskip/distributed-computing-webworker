@@ -1,11 +1,10 @@
 import { config } from 'product-specific';
 
+import { AssignNextResponseBody } from '../subtask-service';
 import { ComputeSubtaskMessagePayload } from '../worker-thread';
 
-import { AssignNextResponse } from './types';
-
 export function createComputeSubtaskMessagePayload(
-  assignNextResponse: AssignNextResponse,
+  assignNextResponse: AssignNextResponseBody,
 ): ComputeSubtaskMessagePayload {
   return {
     compiledTaskDefinitionURL: `${config.serverUrl}${
