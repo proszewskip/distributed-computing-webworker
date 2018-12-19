@@ -37,6 +37,10 @@ public class Packager : IPackager
 
     public string Run(string[] args)
     {
+        asm_map.Clear();
+        file_list.Clear();
+        root_search_paths.Clear();
+
         var add_binding = true;
         var root_assemblies = new List<string>();
         enable_debug = false;
