@@ -9,10 +9,10 @@ namespace Server.Models
     {
         private static readonly double DefaultTrustLevel = 1;
 
-        /// <remarks>
+        /// <summary>
         /// ModelId is used to allow filtering of distributed nodes by id.
-        /// </remarks>
-        [Attr("id")]
+        /// </summary>
+        [Attr("id", isImmutable: true)]
         public string ModelId => Id.ToString();
 
         /// <summary>

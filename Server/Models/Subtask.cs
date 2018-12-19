@@ -7,6 +7,12 @@ namespace Server.Models
     public class Subtask : Identifiable
     {
         /// <summary>
+        /// ModelId is used to enable sorting of subtasks by id.
+        /// </summary>
+        [Attr("id", isImmutable: true)]
+        public int ModelId => Id;
+
+        /// <summary>
         /// The index of the subtask, as used when splitting the task data
         /// into subtasks.
         /// </summary>
