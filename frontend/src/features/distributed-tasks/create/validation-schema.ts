@@ -11,6 +11,7 @@ export const validationSchema = Yup.object<CreateDistributedTaskModel>().shape({
   Description: Yup.string(),
   Priority: Yup.number()
     .moreThan(0, 'Priority must be greater than 0')
+    .integer('Priority must be integer')
     .required('Required'),
   TrustLevelToComplete: Yup.number()
     .moreThan(0, 'Trust level to complete must be greater than 0')
