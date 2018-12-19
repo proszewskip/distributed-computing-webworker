@@ -1,5 +1,7 @@
+import fetch from 'isomorphic-unfetch';
+
 export interface RegistrationServiceDependencies {
-  fetch: GlobalFetch['fetch'];
+  fetch: typeof fetch;
 }
 
 export interface RegisterResponseBody {

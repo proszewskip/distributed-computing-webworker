@@ -65,7 +65,10 @@ export class DistributedNodeService {
     }
 
     this.dependencies.keepAliveService.stopPolling();
-    this.stop();
+
+    if (this.state.state === DistributedNodeState.Running) {
+      this.stop();
+    }
   }
 
   public start() {
@@ -84,11 +87,11 @@ export class DistributedNodeService {
       },
     });
 
-    this.dependencies.keepAliveService.startPolling(distributedNodeId);
     this.assignNextSubtask();
   }
 
   public stop() {
+    // TODO: allow the user to stop when Registering
     if (this.state.state !== DistributedNodeState.Running) {
       throw new Error('DistributedNode is not running');
     }
@@ -131,6 +134,10 @@ export class DistributedNodeService {
 
     // TODO: add retrying if the request failed
     const distributedNodeId = await this.dependencies.registrationService.registerNode();
+    /**
+     * TODO: allow the user to click Stop and stop registering.
+     * This should be also handled in the `stop` method
+     */
 
     this.setState({
       state: DistributedNodeState.Idle,
@@ -138,6 +145,7 @@ export class DistributedNodeService {
         distributedNodeId,
       },
     });
+    this.dependencies.keepAliveService.startPolling(distributedNodeId);
   };
 
   private assignNextSubtask = async () => {
@@ -147,7 +155,6 @@ export class DistributedNodeService {
 
     const { distributedNodeId } = this.state.data;
 
-    // TODO: detect if there are no subtasks and go to Timeout state
     let assignNextSubtaskResponse: AssignNextResponseBody;
     try {
       assignNextSubtaskResponse = await this.dependencies.subtaskService.assignNextTask(
@@ -315,7 +322,7 @@ export class DistributedNodeService {
       this.setState({
         state: DistributedNodeState.Running,
         data: {
-          ...runningStateData,
+          distributedNodeId: runningStateData.distributedNodeId,
           runningState: DistributedNodeRunningState.WaitingForEmptyThread,
           subtaskWorkers: workersLeft,
         },

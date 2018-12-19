@@ -1,3 +1,5 @@
+import fetch from 'isomorphic-unfetch';
+
 import {
   ComputeSubtaskMessagePayload,
   SubtaskWorker,
@@ -8,7 +10,7 @@ import { SubtaskSerivce } from 'features/worker-node/subtask-service';
 import { WorkerOptions } from 'features/worker-node/worker';
 
 export interface DistributedNodeServiceDependencies {
-  fetch: GlobalFetch['fetch'];
+  fetch: typeof fetch;
 
   keepAliveService: KeepAliveService;
 

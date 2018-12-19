@@ -3,7 +3,7 @@ import { config } from 'product-specific';
 import { RegisterResponseBody, RegistrationServiceDependencies } from './types';
 
 export class RegistrationService {
-  private readonly fetch: GlobalFetch['fetch'];
+  private readonly fetch: RegistrationServiceDependencies['fetch'];
 
   constructor(dependencies: RegistrationServiceDependencies) {
     this.fetch = dependencies.fetch;
@@ -13,7 +13,9 @@ export class RegistrationService {
    * Registers the node and the newly received ID
    */
   public registerNode() {
-    return this.fetch(`${config.serverUrl}/distributed-nodes/register`, {
+    const { fetch } = this;
+
+    return fetch(`${config.serverUrl}/distributed-nodes/register`, {
       method: 'POST',
     })
       .then((response) => {
