@@ -4,7 +4,7 @@ import { NextComponentClass } from 'next';
 
 import { DistributedTaskDetailsProps } from './types';
 
-import { DistributedTask } from 'models';
+import { DistributedTask, Subtask } from 'models';
 
 type GetInitialPropsFn = NextComponentClass<
   DistributedTaskDetailsProps
@@ -22,6 +22,12 @@ export const getDistributedTaskDetailsInitialProps = (
   return kitsu
     .get<DistributedTask>(`distributed-task/${id}`, getParams)
     .then((jsonApiResponse) => jsonApiResponse.data as any)
+    .then((data) => {
+      data.subtasks = data.subtasks.sort(
+        (a: Subtask, b: Subtask) => a['sequence-number'] - b['sequence-number'],
+      );
+      return data;
+    })
     .then((data) => {
       return {
         distributedTaskDefinitionId: id,

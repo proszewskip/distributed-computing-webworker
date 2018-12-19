@@ -115,6 +115,8 @@ export class PureSubtasksTable extends Component<
       filtered,
       page,
       pageSize,
+      undefined,
+      'sequence-number',
     );
 
     this.setState({
