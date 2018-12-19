@@ -6,11 +6,11 @@ import { CreateDistributedTaskModel } from './types';
 export const validationSchema = Yup.object<CreateDistributedTaskModel>().shape({
   DistributedTaskDefinitionId: Yup.string().required('required'),
   Name: Yup.string()
-    .min(3, 'Must be longer than 3 characters')
+    .min(3, 'Must be longer than 2 characters')
     .required('Required'),
   Description: Yup.string(),
   Priority: Yup.number()
-    .positive('Priority cannot be less than 0')
+    .moreThan(0, 'Priority must be greater than 0')
     .required('Required'),
   TrustLevelToComplete: Yup.number()
     .moreThan(0, 'Trust level to complete must be greater than 0')
