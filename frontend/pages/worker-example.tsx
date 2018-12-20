@@ -125,26 +125,24 @@ class WorkerExample extends Component<{}, WorkerExampleState> {
   };
 
   private renderContent = (): ReactNode => {
+    const { distributedNodeState } = this.state;
+
     if (
-      !this.state.distributedNodeState ||
-      this.state.distributedNodeState.state === DistributedNodeState.Pristine
+      !distributedNodeState ||
+      distributedNodeState.state === DistributedNodeState.Pristine
     ) {
       return 'Initializing the worker';
     }
 
-    if (this.state.distributedNodeState.state === DistributedNodeState.Idle) {
+    if (distributedNodeState.state === DistributedNodeState.Idle) {
       return <Button onClick={this.startNode}>Start</Button>;
     }
 
-    if (
-      this.state.distributedNodeState.state === DistributedNodeState.Registering
-    ) {
+    if (distributedNodeState.state === DistributedNodeState.Registering) {
       return 'Registering the node';
     }
 
-    if (
-      this.state.distributedNodeState.state === DistributedNodeState.Running
-    ) {
+    if (distributedNodeState.state === DistributedNodeState.Running) {
       return (
         <>
           <Paragraph>Running.</Paragraph>
@@ -158,11 +156,10 @@ class WorkerExample extends Component<{}, WorkerExampleState> {
           </Pane>
 
           <Pane>
-            Workers count:{' '}
-            {this.state.distributedNodeState.data.subtaskWorkers.size}
+            Workers count: {distributedNodeState.data.subtaskWorkers.size}
           </Pane>
 
-          <Pane>{this.state.distributedNodeState.data.runningState}</Pane>
+          <Pane>{distributedNodeState.data.runningState}</Pane>
         </>
       );
     }
