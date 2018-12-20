@@ -1,41 +1,40 @@
-import { Button, Heading, majorScale, Pane } from 'evergreen-ui';
+import {
+  Button,
+  Heading,
+  IconButton,
+  majorScale,
+  Pane,
+  Paragraph,
+} from 'evergreen-ui';
+import fetch from 'isomorphic-unfetch';
 import React, { Component, ReactNode } from 'react';
 
 import { Layout, LayoutProps } from 'components/layout';
 
 import {
-  AssignNextResponse,
-  formatWorkerThreadStatus,
-  WorkerThread,
-  WorkerThreadProps,
-  WorkerThreadStatus,
+  DistributedNodeService,
+  DistributedNodeState,
+  DistributedNodeStateWithData,
+  KeepAliveService,
+  OnDistributedNodeStateUpdate,
+  RegistrationService,
+  SubtaskSerivce,
+  SubtaskWorker,
 } from 'features/worker-node';
+
+// @ts-ignore
+import WorkerThread from 'features/worker-node/worker-thread/worker-thread.worker';
 
 import {
   AuthenticatedSidebar,
   BaseDependenciesProvider,
-  config,
   Head,
 } from 'product-specific';
 
-enum WorkerExampleStatus {
-  BeforeRegistering,
-  Registering,
-  Registered,
-  FetchingNextSubtaskInfo,
-  ReceivedNextSubtaskInfo,
-  Computing,
-  SendingResponse,
-  DelayBeforeReady,
-}
-
 interface WorkerExampleState {
-  status: WorkerExampleStatus;
-  distributedNodeId?: string;
-
-  assignNextResponse?: AssignNextResponse;
-
-  workerThreadStatus?: WorkerThreadStatus;
+  distributedNodeService?: DistributedNodeService;
+  distributedNodeState?: DistributedNodeStateWithData;
+  threadsCount: number;
 }
 
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
@@ -44,27 +43,49 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
 
 class WorkerExample extends Component<{}, WorkerExampleState> {
   public state: WorkerExampleState = {
-    status: WorkerExampleStatus.BeforeRegistering,
+    threadsCount: 1,
   };
 
-  public async componentDidMount() {
-    this.setState({
-      status: WorkerExampleStatus.Registering,
+  public componentDidMount() {
+    const keepAliveService = new KeepAliveService({
+      fetch,
     });
-
-    const registerResponse = await fetch(
-      `${config.serverUrl}/distributed-nodes/register`,
+    const registrationService = new RegistrationService({
+      fetch,
+    });
+    const subtaskService = new SubtaskSerivce({
+      fetch,
+    });
+    const distributedNodeService = new DistributedNodeService(
       {
-        method: 'POST',
+        fetch,
+        keepAliveService,
+        registrationService,
+        subtaskService,
+        subtaskWorkerFactory: (subtaskMetadata, options) =>
+          new SubtaskWorker(
+            {
+              workerThreadProvider: () => new WorkerThread(),
+            },
+            subtaskMetadata,
+            options,
+          ),
       },
+      this.onDistributedNodeStateUpdate,
     );
-    const registerBody = await registerResponse.json();
-    const distributedNodeId = registerBody.data.attributes.id;
+
+    distributedNodeService.setThreadsCount(this.state.threadsCount);
+    distributedNodeService.init();
 
     this.setState({
-      status: WorkerExampleStatus.Registered,
-      distributedNodeId,
+      distributedNodeService,
     });
+  }
+
+  public componentWillUnmount() {
+    if (this.state.distributedNodeService) {
+      this.state.distributedNodeService.destroy();
+    }
   }
 
   public render() {
@@ -79,6 +100,11 @@ class WorkerExample extends Component<{}, WorkerExampleState> {
                 Worker node
               </Heading>
 
+              <Paragraph>
+                State:{' '}
+                {this.state.distributedNodeState &&
+                  this.state.distributedNodeState.state}
+              </Paragraph>
               {this.renderContent()}
             </Pane>
           </Layout>
@@ -87,181 +113,95 @@ class WorkerExample extends Component<{}, WorkerExampleState> {
     );
   }
 
+  private onDistributedNodeStateUpdate: OnDistributedNodeStateUpdate = (
+    newState,
+  ) => {
+    // tslint:disable-next-line:no-console
+    console.log(newState);
+
+    this.setState({
+      distributedNodeState: newState,
+    });
+  };
+
   private renderContent = (): ReactNode => {
-    switch (this.state.status) {
-      case WorkerExampleStatus.BeforeRegistering:
-        return 'Waiting for registration request';
+    const { distributedNodeState } = this.state;
 
-      case WorkerExampleStatus.Registered:
-        return (
-          <Button onClick={this.fetchNextSubtask}>Fetch next subtask</Button>
-        );
-
-      case WorkerExampleStatus.FetchingNextSubtaskInfo:
-        return 'Fetching next subtask info';
-
-      case WorkerExampleStatus.ReceivedNextSubtaskInfo:
-        return (
-          <>
-            Received next subtask info
-            {this.renderWorkerThread()}
-          </>
-        );
-
-      case WorkerExampleStatus.Computing:
-        return (
-          <>
-            Computing
-            {this.renderWorkerThread()}
-            {formatWorkerThreadStatus(this.state.workerThreadStatus as any)}
-          </>
-        );
-
-      case WorkerExampleStatus.SendingResponse:
-        return 'Sending the response';
-
-      case WorkerExampleStatus.DelayBeforeReady:
-        return 'Response sent. Please wait before you can continue computing.';
+    if (
+      !distributedNodeState ||
+      distributedNodeState.state === DistributedNodeState.Pristine
+    ) {
+      return 'Initializing the worker';
     }
 
-    return null;
-  };
-
-  private fetchNextSubtask = async () => {
-    const { distributedNodeId } = this.state;
-
-    if (!distributedNodeId) {
-      return;
+    if (distributedNodeState.state === DistributedNodeState.Idle) {
+      return <Button onClick={this.startNode}>Start</Button>;
     }
 
-    const response = await fetch(`${config.serverUrl}/subtasks/assign-next`, {
-      method: 'POST',
-      body: JSON.stringify({
-        'distributed-node-id': distributedNodeId,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const assignNextResponse: AssignNextResponse = await response.json();
-
-    this.setState({
-      assignNextResponse,
-      status: WorkerExampleStatus.ReceivedNextSubtaskInfo,
-    });
-  };
-
-  private renderWorkerThread = (): ReactNode => {
-    const { assignNextResponse } = this.state;
-
-    if (!assignNextResponse) {
-      return null;
+    if (distributedNodeState.state === DistributedNodeState.Registering) {
+      return 'Registering the node';
     }
 
-    return (
-      <WorkerThread
-        assignNextResponse={assignNextResponse}
-        onWorkerCreated={this.onWorkerCreated}
-        onComputationError={this.onComputationError}
-        onComputationSuccess={this.onComputationSuccess}
-        onStatusChange={this.onStatusChange}
-      />
-    );
-  };
+    if (distributedNodeState.state === DistributedNodeState.Running) {
+      return (
+        <>
+          <Paragraph>Running.</Paragraph>
+          <Button onClick={this.stopNode}>Stop</Button>
+          <Paragraph>For now, open the console to see the state.</Paragraph>
 
-  private onWorkerCreated: WorkerThreadProps['onWorkerCreated'] = () => {
-    this.setState({
-      status: WorkerExampleStatus.Computing,
-    });
-  };
+          <Pane>
+            Threads count: {this.state.threadsCount}
+            <IconButton icon="plus" onClick={this.incrementThreadsCount} />
+            <IconButton icon="minus" onClick={this.decrementThreadsCount} />
+          </Pane>
 
-  private onComputationError: WorkerThreadProps['onComputationError'] = async (
-    errors,
-  ) => {
-    this.setState({
-      status: WorkerExampleStatus.SendingResponse,
-    });
+          <Pane>
+            Workers count: {distributedNodeState.data.subtaskWorkers.size}
+          </Pane>
 
-    const { assignNextResponse, distributedNodeId } = this.state;
-
-    if (!assignNextResponse || !distributedNodeId) {
-      return;
+          <Pane>{distributedNodeState.data.runningState}</Pane>
+        </>
+      );
     }
 
-    const formData = new FormData();
-    formData.set(
-      'SubtaskInProgressId',
-      assignNextResponse['subtask-in-progress-id'],
-    );
-    formData.set('DistributedNodeId', distributedNodeId);
-    errors.forEach((error) => {
-      formData.set('Errors', error);
-    });
-
-    await fetch(`${config.serverUrl}/subtasks-in-progress/computation-error`, {
-      method: 'POST',
-      body: formData,
-    });
-
-    this.delayBeforeReady();
+    return 'Unknown state. Something is broken :(';
   };
 
-  private onComputationSuccess: WorkerThreadProps['onComputationSuccess'] = async (
-    results,
-  ) => {
+  private incrementThreadsCount = () => {
+    const newThreadsCount = this.state.threadsCount + 1;
+
     this.setState({
-      status: WorkerExampleStatus.SendingResponse,
+      threadsCount: newThreadsCount,
     });
 
-    const { assignNextResponse, distributedNodeId } = this.state;
-
-    if (!assignNextResponse || !distributedNodeId) {
-      return;
+    if (this.state.distributedNodeService) {
+      this.state.distributedNodeService.setThreadsCount(newThreadsCount);
     }
-
-    const formData = new FormData();
-    formData.set(
-      'SubtaskInProgressId',
-      assignNextResponse['subtask-in-progress-id'],
-    );
-    formData.set('DistributedNodeId', distributedNodeId);
-    formData.set('SubtaskResult', new Blob([results]));
-
-    await fetch(
-      `${config.serverUrl}/subtasks-in-progress/computation-success`,
-      {
-        method: 'POST',
-        body: formData,
-      },
-    );
-
-    this.delayBeforeReady();
   };
 
-  private onStatusChange: WorkerThreadProps['onStatusChange'] = (status) => {
+  private decrementThreadsCount = () => {
+    const newThreadsCount = this.state.threadsCount - 1;
+
     this.setState({
-      workerThreadStatus: status,
+      threadsCount: newThreadsCount,
     });
+
+    if (this.state.distributedNodeService) {
+      this.state.distributedNodeService.setThreadsCount(newThreadsCount);
+    }
   };
 
-  private delayBeforeReady = async () => {
-    this.setState({
-      status: WorkerExampleStatus.DelayBeforeReady,
-    });
+  private startNode = () => {
+    if (this.state.distributedNodeService) {
+      this.state.distributedNodeService.start();
+    }
+  };
 
-    const DELAY = 1000;
-    await delay(DELAY);
-
-    this.setState({
-      status: WorkerExampleStatus.Registered,
-    });
+  private stopNode = () => {
+    if (this.state.distributedNodeService) {
+      this.state.distributedNodeService.stop();
+    }
   };
 }
 
 export default WorkerExample;
-
-function delay(ms: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
