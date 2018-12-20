@@ -58,7 +58,7 @@ export class SubtaskSerivce {
     formData.set('SubtaskInProgressId', requestBody.subtaskInProgressId);
     formData.set('DistributedNodeId', requestBody.distributedNodeId);
     requestBody.errors.forEach((error) => {
-      formData.set('Errors', error);
+      formData.append('Errors', error);
     });
 
     const { fetch } = this;
