@@ -1,41 +1,79 @@
+import { ExtractNonNeverProperties } from 'types/extract-non-never-properties';
+
 import { ProblemPluginInfo } from 'models';
 
-import { WorkerThreadStatus } from './worker';
-
-export interface AssignNextResponse {
-  /**
-   * SubtaskInProgress's id
-   *
-   * Necessary to report the computation result.
-   */
-  'subtask-in-progress-id': string;
-
-  /**
-   * Subtask's id
-   *
-   * Necessary the download the input data
-   */
-  'subtask-id': string;
-
-  /**
-   * The base URL to the directory that contains the compiled task definition.
-   */
-  'compiled-task-definition-url': string;
-
-  /**
-   * Information about the assembly that is required for the computation.
-   */
-  'problem-plugin-info': ProblemPluginInfo;
+export interface BaseWorkerThreadMessage<Type extends string, Payload> {
+  type: Type;
+  payload: Payload;
 }
 
-export interface WorkerThreadProps {
-  /**
-   * Response from the subtask assignment. Determines the subtask that the worker will compute.
-   */
-  assignNextResponse: AssignNextResponse;
-
-  onWorkerCreated?: () => void;
-  onComputationSuccess?: (resultData: ArrayBuffer) => void;
-  onComputationError?: (errors: string[]) => void;
-  onStatusChange?: (status: WorkerThreadStatus) => void;
+export interface ComputeSubtaskMessagePayload {
+  problemPluginInfo: ProblemPluginInfo;
+  compiledTaskDefinitionURL: string;
+  inputDataURL: string;
 }
+
+export type ComputeSubtaskMessage = BaseWorkerThreadMessage<
+  'COMPUTE_SUBTASK',
+  ComputeSubtaskMessagePayload
+>;
+
+/**
+ * The only message accepted by the `WorkerThread` is the message that instructs it to start
+ * the computation.
+ */
+export type WorkerThreadInputMessage = ComputeSubtaskMessage;
+
+export enum WorkerThreadStatus {
+  WaitingForSubtaskInfo,
+  LoadingTaskDefinition,
+  LoadingInputData,
+  Computing,
+  ComputationSuccess,
+  Finished,
+  NetworkError,
+  ComputationError,
+  UnknownError,
+}
+
+export type WorkerThreadError = string[];
+
+export interface WorkerUpdatedStatusData {
+  [WorkerThreadStatus.WaitingForSubtaskInfo]: never;
+  [WorkerThreadStatus.LoadingTaskDefinition]: never;
+  [WorkerThreadStatus.LoadingInputData]: never;
+  [WorkerThreadStatus.Computing]: never;
+  [WorkerThreadStatus.ComputationSuccess]: ArrayBuffer;
+  [WorkerThreadStatus.Finished]: never;
+  [WorkerThreadStatus.NetworkError]: WorkerThreadError;
+  [WorkerThreadStatus.ComputationError]: WorkerThreadError;
+  [WorkerThreadStatus.UnknownError]: WorkerThreadError;
+}
+
+export type BaseWorkerUpdatedMessagePayload<
+  Status extends WorkerThreadStatus
+> = {
+  status: Status;
+} & ExtractNonNeverProperties<{ data: WorkerUpdatedStatusData[Status] }>;
+
+export type WorkerUpdatedMessagePayload =
+  | BaseWorkerUpdatedMessagePayload<WorkerThreadStatus.WaitingForSubtaskInfo>
+  | BaseWorkerUpdatedMessagePayload<WorkerThreadStatus.LoadingTaskDefinition>
+  | BaseWorkerUpdatedMessagePayload<WorkerThreadStatus.LoadingInputData>
+  | BaseWorkerUpdatedMessagePayload<WorkerThreadStatus.Computing>
+  | BaseWorkerUpdatedMessagePayload<WorkerThreadStatus.ComputationSuccess>
+  | BaseWorkerUpdatedMessagePayload<WorkerThreadStatus.Finished>
+  | BaseWorkerUpdatedMessagePayload<WorkerThreadStatus.NetworkError>
+  | BaseWorkerUpdatedMessagePayload<WorkerThreadStatus.ComputationError>
+  | BaseWorkerUpdatedMessagePayload<WorkerThreadStatus.UnknownError>;
+
+export type WorkerUpdatedMessage = BaseWorkerThreadMessage<
+  'WORKER_UPDATED',
+  WorkerUpdatedMessagePayload
+>;
+
+/**
+ * The only message sent by the `WorkerThread` is a message that the state of the worker
+ * has updated.
+ */
+export type WorkerThreadOutputMessage = WorkerUpdatedMessage;
