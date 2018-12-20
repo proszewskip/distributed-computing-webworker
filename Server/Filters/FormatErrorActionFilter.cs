@@ -6,11 +6,10 @@ using Server.Services;
 namespace Server.Filters
 {
     /// <summary>
-    /// Filter used to convert controller error responses to JSON API errors
-    /// in a specific format.
-    ///
-    /// This standardizes the output format from JSON API controllers
-    /// to report errors in one way.
+    ///     Filter used to convert controller error responses to JSON API errors
+    ///     in a specific format.
+    ///     This standardizes the output format from JSON API controllers
+    ///     to report errors in one way.
     /// </summary>
     public class FormatErrorActionFilter : ActionFilterAttribute
     {

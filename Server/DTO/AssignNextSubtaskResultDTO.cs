@@ -8,13 +8,11 @@ namespace Server.DTO
         [JsonProperty("subtask-in-progress-id")]
         public string SubtaskInProgressId { get; set; }
 
-        [JsonProperty("subtask-id")]
-        public string SubtaskId { get; set; }
+        [JsonProperty("subtask-id")] public string SubtaskId { get; set; }
 
         [JsonProperty("compiled-task-definition-url")]
         public string CompiledTaskDefinitionURL { get; set; }
 
-        [JsonProperty("problem-plugin-info")]
-        public ProblemPluginInfo ProblemPluginInfo { get; set; }
+        [JsonProperty("problem-plugin-info")] public ProblemPluginInfo ProblemPluginInfo { get; set; }
     }
 }

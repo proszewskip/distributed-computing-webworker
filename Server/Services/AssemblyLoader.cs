@@ -4,7 +4,7 @@ using System.Reflection;
 namespace Server.Services
 {
     /// <summary>
-    /// Loads assemblies from the file system.
+    ///     Loads assemblies from the file system.
     /// </summary>
     public interface IAssemblyLoader
     {
@@ -14,7 +14,6 @@ namespace Server.Services
 
     public class AssemblyLoader : IAssemblyLoader
     {
-
         public Assembly LoadAssembly(string path)
         {
             return Assembly.Load(File.ReadAllBytes(path));

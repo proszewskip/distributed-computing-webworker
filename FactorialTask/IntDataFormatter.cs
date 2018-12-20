@@ -3,7 +3,7 @@ using DistributedComputing;
 
 namespace FactorialTask
 {
-    class IntDataFormatter : IDataFormatter<int>
+    internal class IntDataFormatter : IDataFormatter<int>
     {
         public byte[] Serialize(int data)
         {

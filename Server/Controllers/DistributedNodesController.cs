@@ -9,7 +9,7 @@ using Server.Models;
 namespace Server.Controllers
 {
     /// <summary>
-    /// Controller responsible for managing distributed nodes.
+    ///     Controller responsible for managing distributed nodes.
     /// </summary>
     [ServiceFilter(typeof(FormatErrorActionFilter))]
     public class DistributedNodesController : BaseJsonApiController<DistributedNode, Guid>
@@ -25,12 +25,17 @@ namespace Server.Controllers
         }
 
         [HttpGet]
-        public override Task<IActionResult> GetAsync() => base.GetAsync();
+        public override Task<IActionResult> GetAsync()
+        {
+            return base.GetAsync();
+        }
 
         [HttpPatch("{id}")]
-        public override Task<IActionResult> PatchAsync(Guid id, DistributedNode entity) =>
-            base.PatchAsync(id, entity);
-        
+        public override Task<IActionResult> PatchAsync(Guid id, DistributedNode entity)
+        {
+            return base.PatchAsync(id, entity);
+        }
+
 
         [HttpPost("register")]
         public Task<IActionResult> Register()

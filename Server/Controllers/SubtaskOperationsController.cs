@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using JsonApiDotNetCore.Models;
 using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +13,7 @@ using Server.Validation;
 namespace Server.Controllers
 {
     /// <summary>
-    /// Controller responsible for assigning subtasks to distributed nodes.
+    ///     Controller responsible for assigning subtasks to distributed nodes.
     /// </summary>
     [Route("subtasks")]
     [ServiceFilter(typeof(FormatErrorActionFilter))]
@@ -22,9 +21,9 @@ namespace Server.Controllers
     {
         private readonly DistributedComputingDbContext _dbContext;
         private readonly IResourceService<DistributedNode, Guid> _distributedNodeResourceService;
-        private readonly IResourceService<SubtaskInProgress> _subtaskInProgressResourceService;
         private readonly IJsonApiResponseFactory _jsonApiResponseFactory;
         private readonly IPathsProvider _pathsProvider;
+        private readonly IResourceService<SubtaskInProgress> _subtaskInProgressResourceService;
 
         public SubtaskOperationsController(
             IResourceService<DistributedNode, Guid> distributedNodeResourceService,
@@ -73,7 +72,7 @@ namespace Server.Controllers
 
             var distributedTaskDefinition = await GetSubtasksDistributedTaskDefinition(nextSubtask);
 
-            var response = new AssignNextSubtaskResultDTO()
+            var response = new AssignNextSubtaskResultDTO
             {
                 CompiledTaskDefinitionURL =
                     _pathsProvider.GetCompiledTaskDefinitionWebPath(distributedTaskDefinition.DefinitionGuid),
@@ -89,13 +88,13 @@ namespace Server.Controllers
         {
             // TODO: add sorting by DistributedTask priority
             return _dbContext.Subtasks.FirstOrDefaultAsync(subtask =>
-                   (subtask.Status == SubtaskStatus.WaitingForExecution || subtask.Status == SubtaskStatus.Executing) &&
-                   subtask.DistributedTask.Status == DistributedTaskStatus.InProgress &&
-                   (!subtask.SubtasksInProgress.Any() ||
-                   subtask.SubtasksInProgress
-                      .Where(subtaskInProgress => subtaskInProgress.Status != SubtaskStatus.Error)
-                      .Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel)
-                   < subtask.DistributedTask.TrustLevelToComplete)
+                (subtask.Status == SubtaskStatus.WaitingForExecution || subtask.Status == SubtaskStatus.Executing) &&
+                subtask.DistributedTask.Status == DistributedTaskStatus.InProgress &&
+                (!subtask.SubtasksInProgress.Any() ||
+                 subtask.SubtasksInProgress
+                     .Where(subtaskInProgress => subtaskInProgress.Status != SubtaskStatus.Error)
+                     .Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel)
+                 < subtask.DistributedTask.TrustLevelToComplete)
             );
         }
 

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using DistributedComputing;
 using Server.Exceptions;
 using Server.Models;
@@ -9,10 +8,9 @@ using Server.Models;
 namespace Server.Services
 {
     /// <summary>
-    /// A facade for IProblemPlugin that simplifies interacting with the plugin
-    /// from the server's point of view.
-    ///
-    /// It also hides away the generic type parameters of IProblemPlugin.
+    ///     A facade for IProblemPlugin that simplifies interacting with the plugin
+    ///     from the server's point of view.
+    ///     It also hides away the generic type parameters of IProblemPlugin.
     /// </summary>
     public interface IProblemPluginFacade
     {
@@ -43,7 +41,8 @@ namespace Server.Services
 
         public byte[] JoinSubtaskResults(IEnumerable<byte[]> subtaskResults)
         {
-            var subtasksDeserializedData = subtaskResults.Select(_problemPluginInstance.SubtaskResultDataFormatter.Deserialize);
+            var subtasksDeserializedData =
+                subtaskResults.Select(_problemPluginInstance.SubtaskResultDataFormatter.Deserialize);
             var taskResult = JoinSubtaskResults(subtasksDeserializedData);
 
             return _problemPluginInstance.TaskResultDataFormatter.Serialize(taskResult);
@@ -57,7 +56,7 @@ namespace Server.Services
             {
                 AssemblyName = problemPluginType.Assembly.GetName().Name,
                 ClassName = problemPluginType.Name,
-                Namespace = problemPluginType.Namespace,
+                Namespace = problemPluginType.Namespace
             };
         }
 

@@ -11,7 +11,7 @@ using Server.Validation;
 namespace Server.Controllers
 {
     /// <summary>
-    /// Controller responsible for managing subtasks in progress
+    ///     Controller responsible for managing subtasks in progress
     /// </summary>
     [Route("subtasks-in-progress")]
     [ServiceFilter(typeof(FormatErrorActionFilter))]
@@ -31,7 +31,8 @@ namespace Server.Controllers
 
         [HttpPost("computation-success")]
         [ValidateModel]
-        public async Task<IActionResult> ReportComputationSuccessAsync([FromForm] ComputationSuccessDTO computationSuccessDto)
+        public async Task<IActionResult> ReportComputationSuccessAsync(
+            [FromForm] ComputationSuccessDTO computationSuccessDto)
         {
             if (!Guid.TryParse(computationSuccessDto.DistributedNodeId, out var distributedNodeId))
                 return BadRequest(); // TODO: specify the reason

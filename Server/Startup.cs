@@ -1,33 +1,32 @@
 using System.Buffers;
+using JsonApiDotNetCore.Extensions;
+using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using JsonApiDotNetCore.Extensions;
-using JsonApiDotNetCore.Services;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Server.Models;
-using Server.Services;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Server.Filters;
+using Server.Models;
+using Server.Services;
 using Server.Services.Api;
 
 namespace Server
 {
     public class Startup
     {
-        public IConfiguration Configuration { get; }
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
+
+        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -35,7 +34,8 @@ namespace Server
             AddMvc(services);
             ConfigureDependencyInjection(services);
             ConfigureDatabaseProvider(services);
-            services.AddJsonApi<DistributedComputingDbContext>(options => {
+            services.AddJsonApi<DistributedComputingDbContext>(options =>
+            {
                 options.IncludeTotalRecordCount = true;
                 options.DefaultPageSize = 25;
             });
@@ -49,13 +49,9 @@ namespace Server
             EnsureDatabaseCreated(app);
 
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
             else
-            {
                 app.UseHsts();
-            }
 
             // app.UseHttpsRedirection();
             app.UseCors(builder =>
@@ -73,7 +69,7 @@ namespace Server
             services.AddMvc(options =>
                 {
                     options.OutputFormatters.Clear();
-                    options.OutputFormatters.Add(new JsonOutputFormatter(new JsonSerializerSettings()
+                    options.OutputFormatters.Add(new JsonOutputFormatter(new JsonSerializerSettings
                     {
                         ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                         ContractResolver = new CamelCasePropertyNamesContractResolver()

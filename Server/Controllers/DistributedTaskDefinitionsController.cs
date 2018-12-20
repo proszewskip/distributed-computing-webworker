@@ -5,7 +5,6 @@ using JsonApiDotNetCore.Controllers;
 using JsonApiDotNetCore.Internal;
 using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyModel.Resolution;
 using Microsoft.Extensions.Logging;
 using Server.DTO;
 using Server.Exceptions;
@@ -17,19 +16,19 @@ using Server.Validation;
 namespace Server.Controllers
 {
     /// <summary>
-    /// Controller responsible for managing distributed task definitions.
+    ///     Controller responsible for managing distributed task definitions.
     /// </summary>
     [ServiceFilter(typeof(FormatErrorActionFilter))]
     public class DistributedTaskDefinitionsController : JsonApiController<DistributedTaskDefinition>
     {
-        private readonly IProblemPluginFacadeFactory _problemPluginFacadeFactory;
         private readonly IAssemblyLoader _assemblyLoader;
         private readonly IFileStorage _fileStorage;
-        private readonly IPackager _packager;
         private readonly IJsonApiResponseFactory _jsonApiResponseFactory;
-        private readonly IResourceService<DistributedTaskDefinition> _taskDefinitionResourceService;
-        private readonly IPathsProvider _pathsProvider;
         private readonly ILogger<DistributedTaskDefinitionsController> _logger;
+        private readonly IPackager _packager;
+        private readonly IPathsProvider _pathsProvider;
+        private readonly IProblemPluginFacadeFactory _problemPluginFacadeFactory;
+        private readonly IResourceService<DistributedTaskDefinition> _taskDefinitionResourceService;
 
 
         public DistributedTaskDefinitionsController(
@@ -82,7 +81,7 @@ namespace Server.Controllers
 
 
             // TODO: handle packager errors and display them to the user
-            string packagerLogs = await PackAssemblyAsync(body, taskDefinitionGuid);
+            var packagerLogs = await PackAssemblyAsync(body, taskDefinitionGuid);
 
             var distributedTaskDefinition = new DistributedTaskDefinition
             {

@@ -26,10 +26,7 @@ namespace Server.Services
 
         private void CreateDirectoryIfNotExists(string path)
         {
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
+            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
         }
 
         private async Task<string> UnsafeSaveFileAsync(string directoryPath, IFormFile file)

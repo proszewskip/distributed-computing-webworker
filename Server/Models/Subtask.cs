@@ -7,43 +7,41 @@ namespace Server.Models
     public class Subtask : Identifiable
     {
         /// <summary>
-        /// ModelId is used to enable sorting of subtasks by id.
+        ///     ModelId is used to enable sorting of subtasks by id.
         /// </summary>
-        [Attr("id", isImmutable: true)]
+        [Attr("id", true)]
         public int ModelId => Id;
 
         /// <summary>
-        /// The index of the subtask, as used when splitting the task data
-        /// into subtasks.
+        ///     The index of the subtask, as used when splitting the task data
+        ///     into subtasks.
         /// </summary>
         [Required]
-        [Attr("sequence-number", isImmutable: true)]
+        [Attr("sequence-number", true)]
         public int SequenceNumber { get; set; }
 
-        [Attr("distributed-task-id", isImmutable: true)]
-        public int DistributedTaskId { get; set; }
+        [Attr("distributed-task-id", true)] public int DistributedTaskId { get; set; }
 
         [Required]
         [HasOne("distributed-task")]
         public DistributedTask DistributedTask { get; set; }
 
         /// <summary>
-        /// The input data for the subtask, as returned by SubtaskDataFormatter
-        /// in IProblemPlugin
+        ///     The input data for the subtask, as returned by SubtaskDataFormatter
+        ///     in IProblemPlugin
         /// </summary>
         [Required]
         public byte[] InputData { get; set; }
 
         /// <summary>
-        /// The subtask results, as returned by SubtaskResultDataFormatter in IProblemPlugin.
+        ///     The subtask results, as returned by SubtaskResultDataFormatter in IProblemPlugin.
         /// </summary>
         public byte[] Result { get; set; }
 
         [Required]
-        [Attr("subtask-status", isImmutable: true)]
+        [Attr("subtask-status", true)]
         public SubtaskStatus Status { get; set; }
 
-        [HasMany("subtasks-in-progress")]
-        public virtual List<SubtaskInProgress> SubtasksInProgress { get; set; }
+        [HasMany("subtasks-in-progress")] public virtual List<SubtaskInProgress> SubtasksInProgress { get; set; }
     }
 }

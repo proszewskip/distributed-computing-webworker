@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Server.Services
 {
     /// <summary>
-    /// Exposes internal JSON API action results for returning errors.
+    ///     Exposes internal JSON API action results for returning errors.
     /// </summary>
     public interface IJsonApiActionResultFactory
     {
@@ -13,7 +13,7 @@ namespace Server.Services
         IActionResult Errors(ErrorCollection errors);
     }
 
-    public class JsonApiActionResultFactory : JsonApiControllerMixin, IJsonApiActionResultFactory 
+    public class JsonApiActionResultFactory : JsonApiControllerMixin, IJsonApiActionResultFactory
     {
         public new IActionResult Error(Error error)
         {

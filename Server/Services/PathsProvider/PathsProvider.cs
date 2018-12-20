@@ -22,9 +22,9 @@ namespace Server.Services
             InitializePaths();
         }
 
-        public string CompiledTasksDefinitionsDirectoryPath { get; private set; }
-
         private string TaskDefinitionsDirectoryPath { get; set; }
+
+        public string CompiledTasksDefinitionsDirectoryPath { get; private set; }
 
         public string GetTaskDefinitionDirectoryPath(Guid guid)
         {
@@ -48,7 +48,7 @@ namespace Server.Services
 
         private void InitializePaths()
         {
-            bool invalidEnvironmentConfiguration = false;
+            var invalidEnvironmentConfiguration = false;
 
             TaskDefinitionsDirectoryPath = GetFullPath(_serverConfig.TaskDefinitionsDirectoryPath);
             if (!Directory.Exists(TaskDefinitionsDirectoryPath))
@@ -67,10 +67,7 @@ namespace Server.Services
                 invalidEnvironmentConfiguration = true;
             }
 
-            if (invalidEnvironmentConfiguration)
-            {
-                throw new InvalidEnvironmentConfigurationException();
-            }
+            if (invalidEnvironmentConfiguration) throw new InvalidEnvironmentConfigurationException();
         }
 
         private string GetFullPath(string value)

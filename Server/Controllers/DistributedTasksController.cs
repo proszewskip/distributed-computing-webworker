@@ -1,5 +1,4 @@
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using JsonApiDotNetCore.Controllers;
 using JsonApiDotNetCore.Internal;
@@ -15,7 +14,7 @@ using Server.Validation;
 namespace Server.Controllers
 {
     /// <summary>
-    /// Controller responsible for managing distributed tasks
+    ///     Controller responsible for managing distributed tasks
     /// </summary>
     [ServiceFilter(typeof(FormatErrorActionFilter))]
     public class DistributedTasksController : JsonApiController<DistributedTask>
@@ -45,7 +44,7 @@ namespace Server.Controllers
                 Name = body.Name,
                 Description = body.Description ?? "",
                 InputData = new byte[body.InputData.Length],
-                TrustLevelToComplete = body.TrustLevelToComplete,
+                TrustLevelToComplete = body.TrustLevelToComplete
             };
 
             var memoryStream = new MemoryStream(distributedTask.InputData);

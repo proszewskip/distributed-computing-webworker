@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc.Filters;
 namespace Server.Validation
 {
     /// <summary>
-    /// Attribute that enforces model validation before the controller
-    /// action is executed.
+    ///     Attribute that enforces model validation before the controller
+    ///     action is executed.
     /// </summary>
     public class ValidateModelAttribute : ActionFilterAttribute
     {

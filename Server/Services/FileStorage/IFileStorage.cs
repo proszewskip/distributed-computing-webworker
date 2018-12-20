@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 namespace Server.Services
 {
     /// <summary>
-    /// Enables interaction with the file system.
+    ///     Enables interaction with the file system.
     /// </summary>
     public interface IFileStorage
     {

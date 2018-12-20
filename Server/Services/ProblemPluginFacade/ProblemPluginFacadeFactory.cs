@@ -13,7 +13,6 @@ namespace Server.Services
 
     public class ProblemPluginFacadeFactory : IProblemPluginFacadeFactory
     {
-
         public IProblemPluginFacade Create(Assembly assembly)
         {
             var problemPluginType = GetImplementedProblemPluginType(assembly);
@@ -24,7 +23,7 @@ namespace Server.Services
 
             var typedProblemPluginFacadeType = typeof(ProblemPluginFacade<,,,>).MakeGenericType(genericTypes);
 
-            return (IProblemPluginFacade)Activator.CreateInstance(typedProblemPluginFacadeType,
+            return (IProblemPluginFacade) Activator.CreateInstance(typedProblemPluginFacadeType,
                 pluginInstance);
         }
 
@@ -36,9 +35,11 @@ namespace Server.Services
                 .ToList();
 
             if (implementedProblemPluginTypes.Count == 0)
-                throw new InvalidAssemblyException($"The assembly does not contain a class that implements the {problemPluginType.Name} interface");
+                throw new InvalidAssemblyException(
+                    $"The assembly does not contain a class that implements the {problemPluginType.Name} interface");
             if (implementedProblemPluginTypes.Count > 1)
-                throw new InvalidAssemblyException($"The assembly contains multiple classes that implement the {problemPluginType.Name} interface");
+                throw new InvalidAssemblyException(
+                    $"The assembly contains multiple classes that implement the {problemPluginType.Name} interface");
 
             return implementedProblemPluginTypes.Single();
         }
