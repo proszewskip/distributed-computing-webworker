@@ -3,10 +3,17 @@ import { NextComponentClass } from 'next';
 
 import { DistributedTaskDefinition } from 'models';
 
+import {
+  handleAuthenticationErrorFactory,
+  redirectToLoginPage,
+} from 'features/authentication';
+
 import { getEntities } from 'utils/table/get-entities';
 
 import { distributedTaskDefinitionModelName } from './common';
 import { DistributedTaskDefinitionsTableOwnProps } from './types';
+
+import { routes } from '../../../../routes';
 
 type GetInitialPropsFn = NextComponentClass<
   DistributedTaskDefinitionsTableOwnProps
@@ -14,9 +21,13 @@ type GetInitialPropsFn = NextComponentClass<
 
 export const getDistributedTaskDefinitionsTableInitialProps = (
   kitsu: Kitsu,
-): GetInitialPropsFn => () => {
+): GetInitialPropsFn => ({ res }) => {
+  const handleAuthenticationError = handleAuthenticationErrorFactory<
+    DistributedTaskDefinitionsTableOwnProps
+  >(redirectToLoginPage({ res, router: routes.Router }));
+
   return getEntities<DistributedTaskDefinition>(
     kitsu,
     distributedTaskDefinitionModelName,
-  );
+  ).catch(handleAuthenticationError);
 };
