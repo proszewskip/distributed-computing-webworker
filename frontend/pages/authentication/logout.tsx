@@ -2,9 +2,7 @@ import fetch from 'isomorphic-unfetch';
 import { NextComponentType } from 'next';
 import React from 'react';
 
-import { redirectToLoginPage } from 'features/authentication';
-
-import { config } from 'product-specific';
+import { logout, redirectToLoginPage } from 'features/authentication';
 
 import { routes } from '../../routes';
 
@@ -13,11 +11,7 @@ const LogoutPage: NextComponentType = () => {
 };
 
 LogoutPage.getInitialProps = async ({ res }) => {
-  try {
-    await fetch(`${config.serverUrl}/users/logout`, { method: 'POST' });
-  } catch (error) {
-    // NOOP
-  }
+  await logout(fetch);
 
   redirectToLoginPage({ res, router: routes.Router })();
 
