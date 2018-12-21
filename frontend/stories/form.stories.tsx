@@ -1,5 +1,5 @@
 import { storiesOf } from '@storybook/react';
-import { Button, Pane } from 'evergreen-ui';
+import { Button, majorScale, Pane } from 'evergreen-ui';
 import { Field, Form, Formik, FormikActions, FormikConfig } from 'formik';
 import 'normalize.css';
 import React, { Component } from 'react';
@@ -90,7 +90,12 @@ export class ExampleForm extends Component<ExampleFormProps, ExampleFormState> {
             Cancel
           </Button>
 
-          <Button type="submit" disabled={isSubmitting} appearance="primary">
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            appearance="primary"
+            margin={majorScale(1)}
+          >
             Submit
           </Button>
 
