@@ -5,6 +5,10 @@ import React, { Component } from 'react';
 import { Layout, LayoutProps } from 'components/layout';
 
 import {
+  handleAuthenticationErrorFactory,
+  redirectToLoginPage,
+} from 'features/authentication';
+import {
   DistributedNodesTable,
   DistributedNodesTableOwnProps,
 } from 'features/distributed-nodes/table';
@@ -19,6 +23,8 @@ import {
   kitsuFactory,
 } from 'product-specific';
 
+import { routes } from '../../routes';
+
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
   <AuthenticatedSidebar />
 );
@@ -32,10 +38,16 @@ type GetInitialPropsFn = NextComponentClass<
 export default class DistributedNodesPage extends Component<
   DistributedNodesPageProps
 > {
-  public static getInitialProps: GetInitialPropsFn = () => {
+  public static getInitialProps: GetInitialPropsFn = ({ res }) => {
     const kitsu = kitsuFactory();
 
-    return getEntities<DistributedNode>(kitsu, 'distributed-node');
+    const handleAuthenticationError = handleAuthenticationErrorFactory<
+      DistributedNodesPageProps
+    >(redirectToLoginPage({ res, router: routes.Router }));
+
+    return getEntities<DistributedNode>(kitsu, 'distributed-node').catch(
+      handleAuthenticationError,
+    );
   };
 
   public render() {

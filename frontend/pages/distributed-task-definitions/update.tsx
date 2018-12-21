@@ -7,6 +7,10 @@ import { Layout, LayoutProps } from 'components/layout';
 import { withRouter, WithRouterProps } from 'components/router';
 
 import {
+  handleAuthenticationErrorFactory,
+  redirectToLoginPage,
+} from 'features/authentication';
+import {
   UpdateDistributedTaskDefinitionForm,
   UpdateDistributedTaskDefinitionModel,
 } from 'features/distributed-task-definitions/update';
@@ -18,6 +22,8 @@ import {
   Head,
   kitsuFactory,
 } from 'product-specific';
+
+import { routes } from '../../routes';
 
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
   <AuthenticatedSidebar />
@@ -31,10 +37,14 @@ export interface UpdatePageProps {
 type GetInitialPropsFn = NextComponentClass<UpdatePageProps>['getInitialProps'];
 
 class UpdatePage extends PureComponent<UpdatePageProps & WithRouterProps> {
-  public static getInitialProps: GetInitialPropsFn = ({ query }) => {
+  public static getInitialProps: GetInitialPropsFn = ({ query, res }) => {
     const kitsu = kitsuFactory();
 
     const id = parseInt(query.id as string, 10);
+
+    const handleAuthenticationError = handleAuthenticationErrorFactory<
+      UpdatePageProps
+    >(redirectToLoginPage({ res, router: routes.Router }));
 
     return kitsu
       .get<UpdateDistributedTaskDefinitionModel>(
@@ -44,13 +54,16 @@ class UpdatePage extends PureComponent<UpdatePageProps & WithRouterProps> {
         (jsonApiResponse) =>
           jsonApiResponse.data as UpdateDistributedTaskDefinitionModel,
       )
-      .then((data) => ({
-        modelData: {
-          description: data.description,
-          id: data.id,
-          name: data.name,
-        },
-      }))
+      .then(
+        (data): UpdatePageProps => ({
+          modelData: {
+            description: data.description,
+            id: data.id,
+            name: data.name,
+          },
+        }),
+      )
+      .catch(handleAuthenticationError)
       .catch((error) => ({
         errors: transformRequestError(error),
       }));
