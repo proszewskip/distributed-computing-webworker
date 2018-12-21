@@ -20,6 +20,7 @@ namespace Server.Controllers
     /// Controller responsible for managing distributed task definitions.
     /// </summary>
     [ServiceFilter(typeof(FormatErrorActionFilter))]
+    [ServiceFilter(typeof(AuthorizationFilter))]
     public class DistributedTaskDefinitionsController : JsonApiController<DistributedTaskDefinition>
     {
         private readonly IProblemPluginFacadeFactory _problemPluginFacadeFactory;
