@@ -12,6 +12,12 @@ const clientSideRedirect = (router: Router) => (url: string) => {
   router.pushRoute(url);
 };
 
+/**
+ * Redirect the user to a specific URL, regardless of whether the environment
+ * is the server or the client.
+ *
+ * @param url
+ */
 export const isomorphicRedirect = (url: string) => ({
   res,
   router,
@@ -28,4 +34,7 @@ export const isomorphicRedirect = (url: string) => ({
 // logged out.
 const loginPageUrl = '/authentication/login';
 
+/**
+ * Redirects the user to the login page
+ */
 export const redirectToLoginPage = isomorphicRedirect(loginPageUrl);
