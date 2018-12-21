@@ -1,8 +1,13 @@
 import { isJsonApiErrorResponse } from 'error-handling';
 
+/**
+ * Handles JSON API errors that resulted from the user being unauthenticated.
+ *
+ * @param redirect Function to be called if the user should be redirected
+ * @param fallbackProps Fallback props that will be used
+ */
 export const handleAuthenticationErrorFactory = <Props>(
   redirect: () => void,
-  fallbackProps: Props,
 ) => (error: unknown) => {
   if (isJsonApiErrorResponse(error)) {
     const isForbidden = error.errors.find(
@@ -11,8 +16,6 @@ export const handleAuthenticationErrorFactory = <Props>(
 
     if (isForbidden) {
       redirect();
-    } else {
-      return Promise.reject<Props>(error);
     }
   }
 
@@ -20,5 +23,5 @@ export const handleAuthenticationErrorFactory = <Props>(
    * TODO: handle `fetch` responses
    */
 
-  return fallbackProps;
+  return Promise.reject<Props>(error);
 };
