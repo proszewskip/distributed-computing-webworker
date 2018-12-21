@@ -45,7 +45,7 @@ const IndexPage: NextStatelessComponent<IndexPageProps> = (props) => {
   );
 };
 
-IndexPage.getInitialProps = () =>
+IndexPage.getInitialProps = ({ req }) =>
   isAuthenticated(fetch).then(
     (authenticated): IndexPageProps => ({
       isAuthenticated: authenticated,
