@@ -5,15 +5,31 @@ import React from 'react';
 
 import { Layout, LayoutProps } from 'components/layout';
 
-import { AuthenticatedSidebar, Head } from 'product-specific';
+import {
+  AuthenticatedSidebar,
+  Head,
+  UnauthenticatedSidebar,
+} from 'product-specific';
 
 import { isAuthenticated } from 'features/authentication';
 
-const renderSidebar: LayoutProps['renderSidebar'] = () => (
+const renderAuthenticatedSidebar: LayoutProps['renderSidebar'] = () => (
   <AuthenticatedSidebar />
 );
 
-const Index: NextStatelessComponent = () => {
+const renderUnauthenticatedSidebar: LayoutProps['renderSidebar'] = () => (
+  <UnauthenticatedSidebar />
+);
+
+interface IndexPageProps {
+  isAuthenticated: boolean;
+}
+
+const IndexPage: NextStatelessComponent<IndexPageProps> = (props) => {
+  const renderSidebar = props.isAuthenticated
+    ? renderAuthenticatedSidebar
+    : renderUnauthenticatedSidebar;
+
   return (
     <>
       <Head />
@@ -29,8 +45,11 @@ const Index: NextStatelessComponent = () => {
   );
 };
 
-Index.getInitialProps = async () => {
-  await isAuthenticated(fetch);
-};
+IndexPage.getInitialProps = () =>
+  isAuthenticated(fetch).then(
+    (authenticated): IndexPageProps => ({
+      isAuthenticated: authenticated,
+    }),
+  );
 
-export default Index;
+export default IndexPage;
