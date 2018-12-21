@@ -87,16 +87,17 @@ namespace Server.Controllers
 
         private Task<Subtask> GetNextSubtaskAsync()
         {
-            // TODO: add sorting by DistributedTask priority
-            return _dbContext.Subtasks.FirstOrDefaultAsync(subtask =>
-                   (subtask.Status == SubtaskStatus.WaitingForExecution || subtask.Status == SubtaskStatus.Executing) &&
-                   subtask.DistributedTask.Status == DistributedTaskStatus.InProgress &&
-                   (!subtask.SubtasksInProgress.Any() ||
-                   subtask.SubtasksInProgress
-                      .Where(subtaskInProgress => subtaskInProgress.Status != SubtaskStatus.Error)
-                      .Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel)
-                   < subtask.DistributedTask.TrustLevelToComplete)
-            );
+            return _dbContext.Subtasks.OrderByDescending(subtask => subtask.DistributedTask.Priority)
+                .FirstOrDefaultAsync(subtask =>
+                    (subtask.Status == SubtaskStatus.WaitingForExecution ||
+                     subtask.Status == SubtaskStatus.Executing) &&
+                    subtask.DistributedTask.Status == DistributedTaskStatus.InProgress &&
+                    (!subtask.SubtasksInProgress.Any() ||
+                     subtask.SubtasksInProgress
+                         .Where(subtaskInProgress => subtaskInProgress.Status != SubtaskStatus.Error)
+                         .Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel)
+                     < subtask.DistributedTask.TrustLevelToComplete)
+                );
         }
 
         private Task<DistributedTaskDefinition> GetSubtasksDistributedTaskDefinition(Subtask subtask)
