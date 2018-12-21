@@ -15,6 +15,8 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
   <AuthenticatedSidebar />
 );
 
+// TODO: check if the user is authenticated
+
 export default class CreatePage extends PureComponent {
   public render() {
     return (

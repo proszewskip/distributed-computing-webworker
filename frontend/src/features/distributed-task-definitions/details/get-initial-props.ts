@@ -4,9 +4,15 @@ import { NextComponentClass } from 'next';
 import { transformRequestError } from 'error-handling';
 import { DistributedTaskDefinition } from 'models';
 
+import {
+  handleAuthenticationErrorFactory,
+  redirectToLoginPage,
+} from 'features/authentication';
 import { fetchDistributedTasksWithDefinitions } from 'features/distributed-tasks';
 
 import { DistributedTaskDefinitionDetailsOwnProps } from './types';
+
+import { routes } from '../../../../routes';
 
 type GetInitialPropsFn = NextComponentClass<
   DistributedTaskDefinitionDetailsOwnProps
@@ -14,8 +20,12 @@ type GetInitialPropsFn = NextComponentClass<
 
 export const getDistributedTaskDefinitionDetailsInitialProps = (
   kitsu: Kitsu,
-): NonNullable<GetInitialPropsFn> => ({ query }) => {
+): NonNullable<GetInitialPropsFn> => ({ query, res }) => {
   const distributedTaskDefinitionId = parseInt(query.id as string, 10);
+
+  const handleAuthenticationError = handleAuthenticationErrorFactory<
+    DistributedTaskDefinitionDetailsOwnProps
+  >(redirectToLoginPage({ res, router: routes.Router }));
 
   const tableDataPromise = fetchDistributedTasksWithDefinitions(
     kitsu,
@@ -33,10 +43,13 @@ export const getDistributedTaskDefinitionDetailsInitialProps = (
     );
 
   return Promise.all([tableDataPromise, detailsDataPromise])
-    .then(([tableData, detailsData]) => ({
-      ...detailsData,
-      tableData,
-    }))
+    .then(
+      ([tableData, detailsData]): DistributedTaskDefinitionDetailsOwnProps => ({
+        ...detailsData,
+        tableData,
+      }),
+    )
+    .catch(handleAuthenticationError)
     .catch(
       (error): DistributedTaskDefinitionDetailsOwnProps => ({
         id: distributedTaskDefinitionId,

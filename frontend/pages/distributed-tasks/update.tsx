@@ -9,6 +9,10 @@ import { withRouter, WithRouterProps } from 'components/router';
 import { RequestError, transformRequestError } from 'error-handling';
 
 import {
+  handleAuthenticationErrorFactory,
+  redirectToLoginPage,
+} from 'features/authentication';
+import {
   UpdateDistributedTaskForm,
   UpdateDistributedTaskModel,
 } from 'features/distributed-tasks/update';
@@ -20,6 +24,8 @@ import {
   isomorphicGetBaseUrl,
   kitsuFactory,
 } from 'product-specific';
+
+import { routes } from '../../routes';
 
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
   <AuthenticatedSidebar />
@@ -33,30 +39,39 @@ export interface UpdatePageProps {
 type GetInitialPropsFn = NextComponentClass<UpdatePageProps>['getInitialProps'];
 
 class UpdatePage extends PureComponent<UpdatePageProps & WithRouterProps> {
-  public static getInitialProps: GetInitialPropsFn = ({ query, req }) => {
+  public static getInitialProps: GetInitialPropsFn = ({ query, req, res }) => {
     const kitsu = kitsuFactory({
       baseURL: isomorphicGetBaseUrl(req),
     });
 
     const id = parseInt(query.id as string, 10);
 
+    const handleAuthenticationError = handleAuthenticationErrorFactory<
+      UpdatePageProps
+    >(redirectToLoginPage({ res, router: routes.Router }));
+
     return kitsu
       .get<UpdateDistributedTaskModel>(`distributed-task/${id}`)
       .then(
         (jsonApiResponse) => jsonApiResponse.data as UpdateDistributedTaskModel,
       )
-      .then((data) => ({
-        modelData: {
-          description: data.description,
-          id: data.id,
-          name: data.name,
-          priority: data.priority,
-          'trust-level-to-complete': data['trust-level-to-complete'],
-        },
-      }))
-      .catch((error) => ({
-        errors: transformRequestError(error),
-      }));
+      .then(
+        (data): UpdatePageProps => ({
+          modelData: {
+            description: data.description,
+            id: data.id,
+            name: data.name,
+            priority: data.priority,
+            'trust-level-to-complete': data['trust-level-to-complete'],
+          },
+        }),
+      )
+      .catch(handleAuthenticationError)
+      .catch(
+        (error): UpdatePageProps => ({
+          errors: transformRequestError(error),
+        }),
+      );
   };
 
   public render() {
