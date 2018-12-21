@@ -18,6 +18,7 @@ namespace Server.Controllers
     /// Controller responsible for managing distributed tasks
     /// </summary>
     [ServiceFilter(typeof(FormatErrorActionFilter))]
+    [ServiceFilter(typeof(AuthorizationFilter))]
     public class DistributedTasksController : JsonApiController<DistributedTask>
     {
         private readonly IResourceService<DistributedTask> _distributedTaskResourceService;
