@@ -7,7 +7,9 @@ interface IsAuthenticatedResponseBody {
 }
 
 export async function isAuthenticated(fetch: typeof unfetch) {
-  return fetch(`${config.serverUrl}/users/is-authenticated`)
+  return fetch(`${config.serverUrl}/users/is-authenticated`, {
+    credentials: 'include',
+  })
     .then((response) => response.json())
     .then((body: IsAuthenticatedResponseBody) => body.isSignedIn);
 }
