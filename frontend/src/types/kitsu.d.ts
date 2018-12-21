@@ -59,8 +59,8 @@ declare module 'kitsu' {
   export interface JsonApiError {
     id?: number;
     links?: object;
-    status?: number;
-    code?: number;
+    status?: string;
+    code?: string;
     title?: string;
     detail?: string;
     source?: object;
