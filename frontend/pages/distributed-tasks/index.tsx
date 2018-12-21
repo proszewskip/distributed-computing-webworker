@@ -13,10 +13,16 @@ import {
 } from 'product-specific';
 
 import {
+  handleAuthenticationErrorFactory,
+  redirectToLoginPage,
+} from 'features/authentication';
+import {
   DistributedTasksTable,
   DistributedTasksTableOwnProps,
   fetchDistributedTasksWithDefinitions,
 } from 'features/distributed-tasks';
+
+import { routes } from '../../routes';
 
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
   <AuthenticatedSidebar />
@@ -29,12 +35,15 @@ class DistributedTasksTablePage extends Component<
 > {
   public static getInitialProps: NextComponentType<
     DistributedTasksTablePageProps
-  >['getInitialProps'] = ({ req }) =>
-    fetchDistributedTasksWithDefinitions(
-      kitsuFactory({
-        baseURL: isomorphicGetBaseUrl(req),
-      }),
-    );
+  >['getInitialProps'] = ({ req, res }) => {
+    const handleAuthenticationError = handleAuthenticationErrorFactory<
+      DistributedTasksTablePageProps
+    >(redirectToLoginPage({ res, router: routes.Router }));
+
+    return fetchDistributedTasksWithDefinitions(
+      kitsuFactory({ baseURL: isomorphicGetBaseUrl(req) }),
+    ).catch(handleAuthenticationError);
+  };
 
   public render() {
     return (

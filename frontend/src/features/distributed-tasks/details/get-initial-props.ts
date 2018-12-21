@@ -3,9 +3,16 @@ import Kitsu, { GetParams } from 'kitsu';
 import { NextComponentClass } from 'next';
 import { prop, sortBy } from 'ramda';
 
+import {
+  handleAuthenticationErrorFactory,
+  redirectToLoginPage,
+} from 'features/authentication';
+
 import { DistributedTaskDetailsProps } from './types';
 
 import { DistributedTask } from 'models';
+
+import { routes } from '../../../../routes';
 
 type GetInitialPropsFn = NextComponentClass<
   DistributedTaskDetailsProps
@@ -13,12 +20,16 @@ type GetInitialPropsFn = NextComponentClass<
 
 export const getDistributedTaskDetailsInitialProps = (
   kitsu: Kitsu,
-): NonNullable<GetInitialPropsFn> => ({ query }) => {
+): NonNullable<GetInitialPropsFn> => ({ query, res }) => {
   const id = parseInt(query.id as string, 10);
 
   const getParams: GetParams = {
     include: 'subtasks',
   };
+
+  const handleAuthenticationError = handleAuthenticationErrorFactory<
+    DistributedTaskDetailsProps
+  >(redirectToLoginPage({ res, router: routes.Router }));
 
   return kitsu
     .get<DistributedTask>(`distributed-task/${id}`, getParams)
@@ -47,6 +58,7 @@ export const getDistributedTaskDetailsInitialProps = (
         },
       };
     })
+    .catch(handleAuthenticationError)
     .catch((error) => ({
       distributedTaskDefinitionId: id,
       errors: transformRequestError(error),

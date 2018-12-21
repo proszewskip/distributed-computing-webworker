@@ -24,6 +24,8 @@ type GetInitialPropsFn = NextComponentClass<CreatePageProps>['getInitialProps'];
 
 export default class CreatePage extends PureComponent<CreatePageProps> {
   public static getInitialProps: GetInitialPropsFn = ({ query }) => {
+    // TODO: check if the user is authenticated
+
     return {
       distributedTaskDefinitionId: query.distributedTaskDefinitionId as string,
     };

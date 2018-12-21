@@ -1,15 +1,19 @@
 import { Card, Pane } from 'evergreen-ui';
-import React, { StatelessComponent } from 'react';
+import fetch from 'isomorphic-unfetch';
+import { NextStatelessComponent } from 'next';
+import React from 'react';
 
 import { Layout, LayoutProps } from 'components/layout';
 
 import { AuthenticatedSidebar, Head } from 'product-specific';
 
+import { isAuthenticated } from 'features/authentication';
+
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
   <AuthenticatedSidebar />
 );
 
-const Index: StatelessComponent = () => {
+const Index: NextStatelessComponent = () => {
   return (
     <>
       <Head />
@@ -23,6 +27,10 @@ const Index: StatelessComponent = () => {
       </Layout>
     </>
   );
+};
+
+Index.getInitialProps = async () => {
+  await isAuthenticated(fetch);
 };
 
 export default Index;
