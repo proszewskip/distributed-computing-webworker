@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using JsonApiDotNetCore.Controllers;
 using JsonApiDotNetCore.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Filters;
 using Server.Models;
@@ -12,6 +13,7 @@ namespace Server.Controllers
     /// Controller responsible for managing distributed nodes.
     /// </summary>
     [ServiceFilter(typeof(FormatErrorActionFilter))]
+    [ServiceFilter(typeof(AuthorizationFilter))]
     public class DistributedNodesController : BaseJsonApiController<DistributedNode, Guid>
     {
         private readonly IResourceService<DistributedNode, Guid> _resourceService;
@@ -30,8 +32,9 @@ namespace Server.Controllers
         [HttpPatch("{id}")]
         public override Task<IActionResult> PatchAsync(Guid id, DistributedNode entity) =>
             base.PatchAsync(id, entity);
-        
 
+
+        [AllowAnonymous]
         [HttpPost("register")]
         public Task<IActionResult> Register()
         {
@@ -43,6 +46,7 @@ namespace Server.Controllers
             return base.PostAsync(distributedNode);
         }
 
+        [AllowAnonymous]
         [HttpPost("{id}/keep-alive")]
         public async Task<IActionResult> KeepAlive(Guid id)
         {

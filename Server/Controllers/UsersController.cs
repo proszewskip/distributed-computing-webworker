@@ -20,8 +20,7 @@ namespace Server.Controllers
             _jsonApiActionResultFactory = jsonApiActionResultFactory;
         }
 
-        [Route("login")]
-        [HttpPost]
+        [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO body)
         {
             var signInResult = await _signInManager.PasswordSignInAsync(body.Username, body.Password, true, true);
@@ -35,8 +34,7 @@ namespace Server.Controllers
             return Ok();
         }
 
-        [Route("logout")]
-        [HttpPost]
+        [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
@@ -44,8 +42,7 @@ namespace Server.Controllers
             return Ok();
         }
 
-        [Route("is-authenticated")]
-        [HttpGet]
+        [HttpGet("is-authenticated")]
         public IActionResult IsAuthenticated()
         {
             var isSignedIn = _signInManager.IsSignedIn(User);

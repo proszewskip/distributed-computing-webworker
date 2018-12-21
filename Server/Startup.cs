@@ -11,7 +11,6 @@ using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Server.Models;
 using Server.Services;
 using Microsoft.Extensions.FileProviders;
@@ -109,7 +108,8 @@ namespace Server
                 .AddScoped<IFinishComputationService, FinishComputationService>()
                 .AddScoped<IJsonApiResponseFactory, JsonApiResponseFactory>()
                 .AddScoped<IJsonApiActionResultFactory, JsonApiActionResultFactory>()
-                .AddScoped<FormatErrorActionFilter>();
+                .AddScoped<FormatErrorActionFilter>()
+                .AddScoped<AuthorizationFilter>();
 
             services.AddSingleton<IPathsProvider, PathsProvider>();
         }
