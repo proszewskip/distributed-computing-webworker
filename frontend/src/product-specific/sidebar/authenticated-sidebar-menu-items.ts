@@ -21,4 +21,8 @@ export const authenticatedSidebarMenuItems: ConnectedMenuItem[] = [
     route: '/worker-example',
     title: 'Worker',
   },
+  {
+    route: '/authentication/logout',
+    title: 'Logout',
+  },
 ];
