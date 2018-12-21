@@ -70,7 +70,7 @@ class PureUpdateDistributedTaskForm extends Component<
             Cancel
           </Button>
 
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting} appearance="primary">
             Submit
           </Button>
 

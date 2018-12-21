@@ -90,7 +90,7 @@ export class ExampleForm extends Component<ExampleFormProps, ExampleFormState> {
             Cancel
           </Button>
 
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting} appearance="primary">
             Submit
           </Button>
 
