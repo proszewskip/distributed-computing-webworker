@@ -1,4 +1,4 @@
-import { Button, Pane, toaster } from 'evergreen-ui';
+import { Button, majorScale, Pane, toaster } from 'evergreen-ui';
 import { Field, Form, Formik, FormikConfig } from 'formik';
 import fetch from 'isomorphic-unfetch';
 import React, { Component } from 'react';
@@ -105,7 +105,12 @@ export class PureCreateDistributedTaskForm extends Component<
             Cancel
           </Button>
 
-          <Button type="submit" disabled={isSubmitting} appearance="primary">
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            appearance="primary"
+            margin={majorScale(1)}
+          >
             Submit
           </Button>
 
