@@ -14,7 +14,7 @@ type GetInitialPropsFn = NextComponentClass<
 
 export const getDistributedTaskDefinitionsTableInitialProps = (
   kitsu: Kitsu,
-): GetInitialPropsFn => () => {
+): NonNullable<GetInitialPropsFn> => () => {
   return getEntities<DistributedTaskDefinition>(
     kitsu,
     distributedTaskDefinitionModelName,
