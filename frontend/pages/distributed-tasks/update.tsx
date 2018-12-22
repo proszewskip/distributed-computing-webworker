@@ -21,6 +21,7 @@ import {
   AuthenticatedSidebar,
   BaseDependenciesProvider,
   Head,
+  isomorphicGetBaseUrl,
   kitsuFactory,
 } from 'product-specific';
 
@@ -38,8 +39,10 @@ export interface UpdatePageProps {
 type GetInitialPropsFn = NextComponentClass<UpdatePageProps>['getInitialProps'];
 
 class UpdatePage extends PureComponent<UpdatePageProps & WithRouterProps> {
-  public static getInitialProps: GetInitialPropsFn = ({ query, res }) => {
-    const kitsu = kitsuFactory();
+  public static getInitialProps: GetInitialPropsFn = ({ query, req, res }) => {
+    const kitsu = kitsuFactory({
+      baseURL: isomorphicGetBaseUrl(req),
+    });
 
     const id = parseInt(query.id as string, 10);
 

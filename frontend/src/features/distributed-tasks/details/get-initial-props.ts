@@ -20,7 +20,7 @@ type GetInitialPropsFn = NextComponentClass<
 
 export const getDistributedTaskDetailsInitialProps = (
   kitsu: Kitsu,
-): GetInitialPropsFn => ({ query, res }) => {
+): NonNullable<GetInitialPropsFn> => ({ query, res }) => {
   const id = parseInt(query.id as string, 10);
 
   const getParams: GetParams = {
