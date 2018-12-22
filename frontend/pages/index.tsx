@@ -45,11 +45,16 @@ const IndexPage: NextStatelessComponent<IndexPageProps> = (props) => {
   );
 };
 
-IndexPage.getInitialProps = ({ req }) =>
-  isAuthenticated(fetch).then(
+IndexPage.getInitialProps = ({ req }) => {
+  const headers: Record<string, string> = req
+    ? { cookie: (req.headers.cookie as string) || '' }
+    : {};
+
+  return isAuthenticated(fetch, headers).then(
     (authenticated): IndexPageProps => ({
       isAuthenticated: authenticated,
     }),
   );
+};
 
 export default IndexPage;
