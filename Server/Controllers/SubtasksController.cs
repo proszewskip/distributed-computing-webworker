@@ -12,6 +12,7 @@ namespace Server.Controllers
     /// Controller responsible for managing subtasks.
     /// </summary>
     [HttpReadOnly]
+    [ServiceFilter(typeof(AuthorizationFilter))]
     [ServiceFilter(typeof(FormatErrorActionFilter))]
     public class SubtasksController : JsonApiController<Subtask>
     {
