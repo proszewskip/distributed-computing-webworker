@@ -2,7 +2,7 @@ import { Button, majorScale, Pane } from 'evergreen-ui';
 import React, { StatelessComponent } from 'react';
 
 export interface FormButtonsProps {
-  onCancelClick: () => any;
+  onCancelClick: () => void;
   isSubmitting: boolean;
 }
 
