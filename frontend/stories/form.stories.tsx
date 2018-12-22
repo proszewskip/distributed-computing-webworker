@@ -1,5 +1,5 @@
 import { storiesOf } from '@storybook/react';
-import { Button, majorScale, Pane } from 'evergreen-ui';
+import { Pane } from 'evergreen-ui';
 import { Field, Form, Formik, FormikActions, FormikConfig } from 'formik';
 import 'normalize.css';
 import React, { Component } from 'react';
@@ -7,6 +7,7 @@ import { ClipLoader } from 'react-spinners';
 import * as Yup from 'yup';
 
 import { ErrorAlert } from 'components/form/errors/error-alert';
+import { FormButtons } from 'components/form/form-buttons';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
 import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
@@ -86,18 +87,10 @@ export class ExampleForm extends Component<ExampleFormProps, ExampleFormState> {
             height="6rem"
           />
 
-          <Button type="button" onClick={onCancelClick}>
-            Cancel
-          </Button>
-
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            appearance="primary"
-            margin={majorScale(1)}
-          >
-            Submit
-          </Button>
+          <FormButtons
+            isSubmitting={isSubmitting}
+            onCancelClick={onCancelClick}
+          />
 
           <ClipLoader loading={isSubmitting} />
         </Form>

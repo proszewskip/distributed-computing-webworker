@@ -1,4 +1,4 @@
-import { Button, majorScale, Pane, toaster } from 'evergreen-ui';
+import { Pane, toaster } from 'evergreen-ui';
 import { Field, Form, Formik, FormikConfig } from 'formik';
 import { JsonApiErrorResponse } from 'kitsu';
 import React, { Component } from 'react';
@@ -9,6 +9,7 @@ import {
   withDependencies,
 } from 'components/dependency-injection/with-dependencies';
 import { ErrorAlert } from 'components/form/errors/error-alert';
+import { FormButtons } from 'components/form/form-buttons';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
 
@@ -66,18 +67,10 @@ class PureUpdateDistributedTaskForm extends Component<
             width="100%"
           />
 
-          <Button type="button" onClick={this.onCancelClick}>
-            Cancel
-          </Button>
-
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            appearance="primary"
-            margin={majorScale(1)}
-          >
-            Submit
-          </Button>
+          <FormButtons
+            isSubmitting={isSubmitting}
+            onCancelClick={this.onCancelClick}
+          />
 
           <ClipLoader loading={isSubmitting} />
         </Form>
