@@ -1,12 +1,11 @@
-version: '3.1'
+version: "3.1"
 
 services:
-
   db:
     image: postgres
     restart: always
     ports:
-      - "5432:5432"
+      - 5432:5432
     environment:
       POSTGRES_PASSWORD: test-password
 
@@ -14,7 +13,21 @@ services:
     image: dpage/pgadmin4
     restart: always
     ports:
-      - "4826:80"
+      - 4826:80
     environment:
       PGADMIN_DEFAULT_EMAIL: user@domain.com
       PGADMIN_DEFAULT_PASSWORD: SuperSecret
+
+  dockerhost:
+    image: qoomon/docker-host
+    cap_add: ["NET_ADMIN", "NET_RAW"]
+    restart: on-failure
+
+  proxy:
+    image: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - dockerhost
+    ports:
+      - 80:80
