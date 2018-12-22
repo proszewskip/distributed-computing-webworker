@@ -10,7 +10,6 @@ class LoginPage extends Component {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
         body: JSON.stringify({ username: 'admin', password: 'D1stributed$' }),
       });
 
