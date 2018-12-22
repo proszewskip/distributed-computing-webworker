@@ -40,9 +40,13 @@ class DistributedTasksTablePage extends Component<
       DistributedTasksTablePageProps
     >(redirectToLoginPage({ res, router: routes.Router }));
 
-    return fetchDistributedTasksWithDefinitions(
-      kitsuFactory({ baseURL: isomorphicGetBaseUrl(req) }),
-    ).catch(handleAuthenticationError);
+    const kitsu = kitsuFactory({
+      baseURL: isomorphicGetBaseUrl(req),
+    });
+
+    return fetchDistributedTasksWithDefinitions(kitsu).catch(
+      handleAuthenticationError,
+    );
   };
 
   public render() {
