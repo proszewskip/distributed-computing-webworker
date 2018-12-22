@@ -8,6 +8,7 @@ import {
   AuthenticatedSidebar,
   BaseDependenciesProvider,
   Head,
+  isomorphicGetBaseUrl,
   kitsuFactory,
 } from 'product-specific';
 
@@ -34,12 +35,16 @@ class DistributedTasksTablePage extends Component<
 > {
   public static getInitialProps: NextComponentType<
     DistributedTasksTablePageProps
-  >['getInitialProps'] = ({ res }) => {
+  >['getInitialProps'] = ({ req, res }) => {
     const handleAuthenticationError = handleAuthenticationErrorFactory<
       DistributedTasksTablePageProps
     >(redirectToLoginPage({ res, router: routes.Router }));
 
-    return fetchDistributedTasksWithDefinitions(kitsuFactory()).catch(
+    const kitsu = kitsuFactory({
+      baseURL: isomorphicGetBaseUrl(req),
+    });
+
+    return fetchDistributedTasksWithDefinitions(kitsu).catch(
       handleAuthenticationError,
     );
   };

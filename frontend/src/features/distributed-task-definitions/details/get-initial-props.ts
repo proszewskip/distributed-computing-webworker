@@ -20,7 +20,7 @@ type GetInitialPropsFn = NextComponentClass<
 
 export const getDistributedTaskDefinitionDetailsInitialProps = (
   kitsu: Kitsu,
-): GetInitialPropsFn => ({ query, res }) => {
+): NonNullable<GetInitialPropsFn> => ({ query, res }) => {
   const distributedTaskDefinitionId = parseInt(query.id as string, 10);
 
   const handleAuthenticationError = handleAuthenticationErrorFactory<

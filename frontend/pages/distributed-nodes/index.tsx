@@ -20,6 +20,7 @@ import {
   AuthenticatedSidebar,
   BaseDependenciesProvider,
   Head,
+  isomorphicGetBaseUrl,
   kitsuFactory,
 } from 'product-specific';
 
@@ -38,8 +39,10 @@ type GetInitialPropsFn = NextComponentClass<
 export default class DistributedNodesPage extends Component<
   DistributedNodesPageProps
 > {
-  public static getInitialProps: GetInitialPropsFn = ({ res }) => {
-    const kitsu = kitsuFactory();
+  public static getInitialProps: GetInitialPropsFn = ({ req, res }) => {
+    const kitsu = kitsuFactory({
+      baseURL: isomorphicGetBaseUrl(req),
+    });
 
     const handleAuthenticationError = handleAuthenticationErrorFactory<
       DistributedNodesPageProps

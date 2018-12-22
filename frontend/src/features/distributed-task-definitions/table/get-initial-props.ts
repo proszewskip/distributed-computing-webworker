@@ -21,7 +21,7 @@ type GetInitialPropsFn = NextComponentClass<
 
 export const getDistributedTaskDefinitionsTableInitialProps = (
   kitsu: Kitsu,
-): GetInitialPropsFn => ({ res }) => {
+): NonNullable<GetInitialPropsFn> => ({ res }) => {
   const handleAuthenticationError = handleAuthenticationErrorFactory<
     DistributedTaskDefinitionsTableOwnProps
   >(redirectToLoginPage({ res, router: routes.Router }));
