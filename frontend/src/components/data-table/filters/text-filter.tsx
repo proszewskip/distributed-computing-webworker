@@ -7,21 +7,21 @@ type OnChange = (value: string) => any;
 const onChangeFactory = (originalOnChange: OnChange) => (event: any) =>
   originalOnChange(event.target.value);
 
-export interface TextFilterProps {
+interface TextFilterProps {
   filter: any;
-  onChange: () => any;
+  onChange: () => void;
 }
 
-export interface TextFilterState {
-  isShown: boolean;
+interface TextFilterState {
+  isTooltipShown: boolean | null;
 }
 
 class TextFilterComponent extends PureComponent<
   TextFilterProps,
   TextFilterState
 > {
-  public state = {
-    isShown: false,
+  public state: TextFilterState = {
+    isTooltipShown: null,
   };
 
   public render() {
@@ -31,7 +31,7 @@ class TextFilterComponent extends PureComponent<
       <Tooltip
         content="For partial match type: 'like:value'"
         position="top"
-        isShown={this.state.isShown}
+        isShown={this.state.isTooltipShown}
       >
         <TextInput
           width="100%"
@@ -46,13 +46,13 @@ class TextFilterComponent extends PureComponent<
 
   private onFocus = () => {
     this.setState({
-      isShown: true,
+      isTooltipShown: true,
     });
   };
 
   private onBlur = () => {
     this.setState({
-      isShown: false,
+      isTooltipShown: null,
     });
   };
 }
