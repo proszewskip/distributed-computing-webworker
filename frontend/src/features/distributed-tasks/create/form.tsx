@@ -1,4 +1,4 @@
-import { Button, Pane, toaster } from 'evergreen-ui';
+import { Pane, toaster } from 'evergreen-ui';
 import { Field, Form, Formik, FormikConfig } from 'formik';
 import fetch from 'isomorphic-unfetch';
 import React, { Component } from 'react';
@@ -6,6 +6,7 @@ import { ClipLoader } from 'react-spinners';
 
 import { ErrorAlert } from 'components/form/errors/error-alert';
 import { FilePickerWithLabel } from 'components/form/file-picker';
+import { FormButtons } from 'components/form/form-buttons';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
 import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
@@ -101,13 +102,10 @@ export class PureCreateDistributedTaskForm extends Component<
             component={FilePickerWithLabel}
           />
 
-          <Button type="button" onClick={this.onCancelClick}>
-            Cancel
-          </Button>
-
-          <Button type="submit" disabled={isSubmitting}>
-            Submit
-          </Button>
+          <FormButtons
+            isSubmitting={isSubmitting}
+            onCancelClick={this.onCancelClick}
+          />
 
           <ClipLoader loading={isSubmitting} />
         </Form>

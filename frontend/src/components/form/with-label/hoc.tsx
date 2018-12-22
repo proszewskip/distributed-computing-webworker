@@ -22,9 +22,18 @@ export function withLabel<Props extends FieldProps>(
       const { label, isRequired, field } = this.props;
       const { name } = field;
 
+      const labelProps = {
+        marginTop: '10px',
+      };
+
       return (
         <>
-          <FormField labelFor={name} label={label} isRequired={isRequired} />
+          <FormField
+            labelFor={name}
+            label={label}
+            isRequired={isRequired}
+            labelProps={labelProps}
+          />
           <WrappedComponent {...this.props} />
         </>
       );
