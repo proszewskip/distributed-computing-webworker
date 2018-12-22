@@ -8,6 +8,7 @@ import {
   AuthenticatedSidebar,
   BaseDependenciesProvider,
   Head,
+  isomorphicGetBaseUrl,
   kitsuFactory,
 } from 'product-specific';
 
@@ -28,8 +29,12 @@ class DistributedTasksTablePage extends Component<
 > {
   public static getInitialProps: NextComponentType<
     DistributedTasksTablePageProps
-  >['getInitialProps'] = () =>
-    fetchDistributedTasksWithDefinitions(kitsuFactory());
+  >['getInitialProps'] = ({ req }) =>
+    fetchDistributedTasksWithDefinitions(
+      kitsuFactory({
+        baseURL: isomorphicGetBaseUrl(req),
+      }),
+    );
 
   public render() {
     return (
