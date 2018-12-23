@@ -7,5 +7,7 @@ const defaultOptions: KitsuOptions = {
   camelCaseTypes: false,
 };
 
-export const kitsuFactory = (options: KitsuOptions = {}) =>
+export type KitsuFactory = (options?: KitsuOptions) => Kitsu;
+
+export const kitsuFactory: KitsuFactory = (options = {}) =>
   new Kitsu({ ...defaultOptions, ...options });
