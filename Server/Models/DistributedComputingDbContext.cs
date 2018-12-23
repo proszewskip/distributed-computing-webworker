@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Server.Models
 {
-    public class DistributedComputingDbContext : DbContext
+    public class DistributedComputingDbContext : IdentityDbContext<IdentityUser>
     {
         public DistributedComputingDbContext(DbContextOptions options) : base(options)
         {
@@ -10,6 +12,8 @@ namespace Server.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<DistributedTaskDefinition>().OwnsOne(p => p.ProblemPluginInfo);
             modelBuilder.Entity<DistributedTaskDefinition>().HasIndex(definition => definition.Name).IsUnique();
 
