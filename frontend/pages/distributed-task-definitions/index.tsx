@@ -1,5 +1,4 @@
 import { majorScale, Pane } from 'evergreen-ui';
-import { NextContext } from 'next';
 import React, { Component } from 'react';
 
 import { Layout, LayoutProps } from 'components/layout';
@@ -11,11 +10,10 @@ import {
 } from 'features/distributed-task-definitions/table';
 
 import {
+  AppContext,
   AuthenticatedSidebar,
   BaseDependenciesProvider,
   Head,
-  isomorphicGetBaseUrl,
-  kitsuFactory,
 } from 'product-specific';
 
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
@@ -27,12 +25,11 @@ type DistributedTaskDefinitionsTablePageInitialProps = DistributedTaskDefinition
 class DistributedTaskDefinitionsTablePage extends Component<
   DistributedTaskDefinitionsTablePageInitialProps
 > {
-  public static getInitialProps = (context: NextContext) =>
-    getDistributedTaskDefinitionsTableInitialProps(
-      kitsuFactory({
-        baseURL: isomorphicGetBaseUrl(context.req),
-      }),
-    )(context);
+  public static getInitialProps = (context: AppContext) => {
+    const kitsu = context.kitsuFactory();
+
+    return getDistributedTaskDefinitionsTableInitialProps(kitsu)(context);
+  };
 
   public render() {
     return (
