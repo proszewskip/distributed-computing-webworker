@@ -44,7 +44,6 @@ export class PureLoginForm extends Component<
     touched,
     errors,
     isSubmitting,
-    dirty,
   }) => {
     return (
       <Pane maxWidth={600}>
