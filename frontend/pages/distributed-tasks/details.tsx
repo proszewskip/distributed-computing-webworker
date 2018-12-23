@@ -1,16 +1,14 @@
 import { Heading, majorScale, Pane } from 'evergreen-ui';
-import { NextContext } from 'next';
 import React, { PureComponent } from 'react';
 
 import { Layout, LayoutProps } from 'components/layout';
 import { withRouter, WithRouterProps } from 'components/router';
 
 import {
+  AppContext,
   AuthenticatedSidebar,
   BaseDependenciesProvider,
   Head,
-  isomorphicGetBaseUrl,
-  kitsuFactory,
 } from 'product-specific';
 
 import {
@@ -26,12 +24,11 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
 class DetailsPage extends PureComponent<
   DistributedTaskDetailsProps & WithRouterProps
 > {
-  public static getInitialProps = (context: NextContext) =>
-    getDistributedTaskDetailsInitialProps(
-      kitsuFactory({
-        baseURL: isomorphicGetBaseUrl(context.req),
-      }),
-    )(context);
+  public static getInitialProps = (context: AppContext) => {
+    const kitsu = context.kitsuFactory();
+
+    return getDistributedTaskDetailsInitialProps(kitsu)(context);
+  };
 
   public render() {
     return (

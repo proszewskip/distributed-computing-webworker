@@ -1,17 +1,16 @@
 import { Card, Pane } from 'evergreen-ui';
-import fetch from 'isomorphic-unfetch';
 import { NextStatelessComponent } from 'next';
 import React from 'react';
 
 import { Layout, LayoutProps } from 'components/layout';
 
 import {
+  AppContext,
   AuthenticatedSidebar,
   Head,
+  isAuthenticated,
   UnauthenticatedSidebar,
 } from 'product-specific';
-
-import { isAuthenticated } from 'features/authentication';
 
 const renderAuthenticatedSidebar: LayoutProps['renderSidebar'] = () => (
   <AuthenticatedSidebar />
@@ -25,7 +24,11 @@ interface IndexPageProps {
   isAuthenticated: boolean;
 }
 
-const IndexPage: NextStatelessComponent<IndexPageProps> = (props) => {
+const IndexPage: NextStatelessComponent<
+  IndexPageProps,
+  IndexPageProps,
+  AppContext
+> = (props) => {
   const renderSidebar = props.isAuthenticated
     ? renderAuthenticatedSidebar
     : renderUnauthenticatedSidebar;
@@ -45,12 +48,8 @@ const IndexPage: NextStatelessComponent<IndexPageProps> = (props) => {
   );
 };
 
-IndexPage.getInitialProps = ({ req }) => {
-  const headers: Record<string, string> = req
-    ? { cookie: (req.headers.cookie as string) || '' }
-    : {};
-
-  return isAuthenticated(fetch, headers).then(
+IndexPage.getInitialProps = ({ fetch }) => {
+  return isAuthenticated(fetch).then(
     (authenticated): IndexPageProps => ({
       isAuthenticated: authenticated,
     }),

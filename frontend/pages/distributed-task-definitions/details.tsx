@@ -1,5 +1,4 @@
 import { Heading, majorScale, Pane } from 'evergreen-ui';
-import { NextContext } from 'next';
 import React, { PureComponent } from 'react';
 
 import { Layout, LayoutProps } from 'components/layout';
@@ -12,11 +11,10 @@ import {
 import { DistributedTaskDefinitionDetailsOwnProps } from 'features/distributed-task-definitions/details/types';
 
 import {
+  AppContext,
   AuthenticatedSidebar,
   BaseDependenciesProvider,
   Head,
-  isomorphicGetBaseUrl,
-  kitsuFactory,
 } from 'product-specific';
 
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
@@ -26,12 +24,11 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
 class DetailsPage extends PureComponent<
   DistributedTaskDefinitionDetailsOwnProps & WithRouterProps
 > {
-  public static getInitialProps = (context: NextContext) =>
-    getDistributedTaskDefinitionDetailsInitialProps(
-      kitsuFactory({
-        baseURL: isomorphicGetBaseUrl(context.req),
-      }),
-    )(context);
+  public static getInitialProps = (context: AppContext) => {
+    const kitsu = context.kitsuFactory();
+
+    return getDistributedTaskDefinitionDetailsInitialProps(kitsu)(context);
+  };
 
   public render() {
     return (

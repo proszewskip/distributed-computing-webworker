@@ -1,5 +1,4 @@
 import { Heading, majorScale, Pane } from 'evergreen-ui';
-import { NextComponentClass } from 'next';
 import React, { PureComponent } from 'react';
 
 import { Layout, LayoutProps } from 'components/layout';
@@ -7,9 +6,11 @@ import { Layout, LayoutProps } from 'components/layout';
 import { CreateDistributedTaskForm } from 'features/distributed-tasks';
 
 import {
+  AppPageComponentType,
   AuthenticatedSidebar,
   BaseDependenciesProvider,
   Head,
+  isAuthenticated,
 } from 'product-specific';
 
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
@@ -20,11 +21,19 @@ export interface CreatePageProps {
   distributedTaskDefinitionId: string;
 }
 
-type GetInitialPropsFn = NextComponentClass<CreatePageProps>['getInitialProps'];
+type GetInitialPropsFn = AppPageComponentType<
+  CreatePageProps
+>['getInitialProps'];
 
 export default class CreatePage extends PureComponent<CreatePageProps> {
-  public static getInitialProps: GetInitialPropsFn = ({ query }) => {
-    // TODO: check if the user is authenticated
+  public static getInitialProps: GetInitialPropsFn = async ({
+    query,
+    fetch,
+    redirectToLoginPage,
+  }) => {
+    if (!(await isAuthenticated(fetch))) {
+      redirectToLoginPage();
+    }
 
     return {
       distributedTaskDefinitionId: query.distributedTaskDefinitionId as string,
