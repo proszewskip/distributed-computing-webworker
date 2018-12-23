@@ -1,31 +1,21 @@
 import Kitsu from 'kitsu';
-import { NextComponentClass } from 'next';
 
 import { DistributedTaskDefinition } from 'models';
 
-import {
-  handleAuthenticationErrorFactory,
-  redirectToLoginPage,
-} from 'features/authentication';
+import { AppPageComponentType } from 'product-specific';
 
 import { getEntities } from 'utils/table/get-entities';
 
 import { distributedTaskDefinitionModelName } from './common';
 import { DistributedTaskDefinitionsTableOwnProps } from './types';
 
-import { routes } from '../../../../routes';
-
-type GetInitialPropsFn = NextComponentClass<
+type GetInitialPropsFn = AppPageComponentType<
   DistributedTaskDefinitionsTableOwnProps
 >['getInitialProps'];
 
 export const getDistributedTaskDefinitionsTableInitialProps = (
   kitsu: Kitsu,
-): NonNullable<GetInitialPropsFn> => ({ res }) => {
-  const handleAuthenticationError = handleAuthenticationErrorFactory<
-    DistributedTaskDefinitionsTableOwnProps
-  >(redirectToLoginPage({ res, router: routes.Router }));
-
+): NonNullable<GetInitialPropsFn> => ({ handleAuthenticationError }) => {
   return getEntities<DistributedTaskDefinition>(
     kitsu,
     distributedTaskDefinitionModelName,
