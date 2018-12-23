@@ -33,8 +33,7 @@ export default class CreatePage extends PureComponent<CreatePageProps> {
     redirect,
   }) => {
     if (!(await isAuthenticated(fetch))) {
-      // TODO: add a query param that the user has been logged out
-      redirect(config.loginPageUrl);
+      redirect(`${config.loginPageUrl}?unauthenticated`);
     }
 
     return {

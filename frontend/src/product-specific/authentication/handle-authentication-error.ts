@@ -24,8 +24,7 @@ export const handleAuthenticationErrorFactory = <Props>(
     );
 
     if (isForbidden) {
-      // TODO: add a query param that the user has been logged out
-      redirect(config.loginPageUrl);
+      redirect(`${config.loginPageUrl}?unauthenticated`);
     }
   }
 
