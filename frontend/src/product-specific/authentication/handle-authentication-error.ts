@@ -1,14 +1,15 @@
 import { isJsonApiErrorResponse } from 'error-handling';
 
+/**
+ * Handles JSON API errors that resulted from the user being unauthenticated.
+ *
+ * Treat this function as middleware, as it **rethrows the original error**.
+ */
 export type HandleAuthenticationErrorFn<Props> = (
   error: unknown,
 ) => Promise<Props>;
 
 /**
- * Handles JSON API errors that resulted from the user being unauthenticated.
- *
- * Treat this function as middleware, as it **rethrows the original error**.
- *
  * @param redirect Function to be called if the user should be redirected
  */
 export const handleAuthenticationErrorFactory = <Props>(

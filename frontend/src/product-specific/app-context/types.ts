@@ -7,6 +7,10 @@ import { KitsuFactory } from 'product-specific/kitsu';
 export interface AppContext<Q extends DefaultQuery = DefaultQuery>
   extends NextContext<Q> {
   handleAuthenticationError: HandleAuthenticationErrorFn<any>;
+
+  /**
+   * Contains augmented headers and baseURL so that authentication also works server-side
+   */
   kitsuFactory: KitsuFactory;
 }
 
