@@ -6,7 +6,6 @@ import { ClipLoader } from 'react-spinners';
 import { ErrorAlert } from 'components/form/errors/error-alert';
 import { FormButtons } from 'components/form/form-buttons';
 import { TextInputWithLabel } from 'components/form/text-input';
-import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
 import { withRouter } from 'components/router';
 
 import { getErrorsDictionary } from 'utils/forms/get-errors-dictionary';
@@ -74,7 +73,6 @@ export class PureLoginForm extends Component<
 
           <ClipLoader loading={isSubmitting} />
         </Form>
-        <WarnOnUnsavedData warn={dirty} />
       </Pane>
     );
   };
