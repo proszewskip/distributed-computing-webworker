@@ -5,7 +5,7 @@ import Index from '../../pages/index';
 
 describe('index page', () => {
   it('should match snapshot', () => {
-    const component = renderer.create(<Index />);
+    const component = renderer.create(<Index isAuthenticated={true} />);
     const tree = component.toJSON();
 
     expect(tree).toMatchSnapshot();
