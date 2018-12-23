@@ -1,5 +1,4 @@
 import { Pane } from 'evergreen-ui';
-import { NextComponentClass } from 'next';
 import React, { Component } from 'react';
 
 import { Layout, LayoutProps } from 'components/layout';
@@ -13,11 +12,10 @@ import { getEntities } from 'utils/table/get-entities';
 
 import { DistributedNode } from 'models';
 import {
+  AppPageComponentType,
   AuthenticatedSidebar,
   BaseDependenciesProvider,
   Head,
-  isomorphicGetBaseUrl,
-  kitsuFactory,
 } from 'product-specific';
 
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
@@ -26,19 +24,22 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
 
 type DistributedNodesPageProps = DistributedNodesTableOwnProps;
 
-type GetInitialPropsFn = NextComponentClass<
+type GetInitialPropsFn = AppPageComponentType<
   DistributedNodesPageProps
 >['getInitialProps'];
 
 export default class DistributedNodesPage extends Component<
   DistributedNodesPageProps
 > {
-  public static getInitialProps: GetInitialPropsFn = ({ req }) => {
-    const kitsu = kitsuFactory({
-      baseURL: isomorphicGetBaseUrl(req),
-    });
+  public static getInitialProps: GetInitialPropsFn = ({
+    kitsuFactory,
+    handleAuthenticationError,
+  }) => {
+    const kitsu = kitsuFactory();
 
-    return getEntities<DistributedNode>(kitsu, 'distributed-node');
+    return getEntities<DistributedNode>(kitsu, 'distributed-node').catch(
+      handleAuthenticationError,
+    );
   };
 
   public render() {

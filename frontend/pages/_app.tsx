@@ -2,6 +2,8 @@ import { Router } from 'next-routes';
 import App, { Container, NextAppContext } from 'next/app';
 import React, { ChildContextProvider, ComponentClass } from 'react';
 
+import { appContextFactory } from 'product-specific/app-context';
+
 import { routes } from '../routes';
 
 interface AppProps {
@@ -20,7 +22,8 @@ export default class CustomApp extends App<AppProps>
     let pageProps = {};
 
     if (Component.getInitialProps) {
-      pageProps = await Component.getInitialProps(ctx);
+      const augmentedCtx = appContextFactory(ctx);
+      pageProps = await Component.getInitialProps(augmentedCtx);
     }
 
     return { pageProps };

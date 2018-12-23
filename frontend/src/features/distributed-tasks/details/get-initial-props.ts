@@ -1,19 +1,19 @@
 import { transformRequestError } from 'error-handling';
 import Kitsu, { GetParams } from 'kitsu';
-import { NextComponentClass } from 'next';
 import { prop, sortBy } from 'ramda';
 
 import { DistributedTaskDetailsProps } from './types';
 
 import { DistributedTask } from 'models';
+import { AppPageComponentType } from 'product-specific';
 
-type GetInitialPropsFn = NextComponentClass<
+type GetInitialPropsFn = AppPageComponentType<
   DistributedTaskDetailsProps
 >['getInitialProps'];
 
 export const getDistributedTaskDetailsInitialProps = (
   kitsu: Kitsu,
-): NonNullable<GetInitialPropsFn> => ({ query }) => {
+): NonNullable<GetInitialPropsFn> => ({ query, handleAuthenticationError }) => {
   const id = parseInt(query.id as string, 10);
 
   const getParams: GetParams = {
@@ -47,6 +47,7 @@ export const getDistributedTaskDetailsInitialProps = (
         },
       };
     })
+    .catch(handleAuthenticationError)
     .catch((error) => ({
       distributedTaskDefinitionId: id,
       errors: transformRequestError(error),

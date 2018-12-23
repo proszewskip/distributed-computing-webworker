@@ -6,9 +6,11 @@ import { Layout, LayoutProps } from 'components/layout';
 import { CreateDistributedTaskDefinitionForm } from 'features/distributed-task-definitions/create';
 
 import {
+  AppContext,
   AuthenticatedSidebar,
   BaseDependenciesProvider,
   Head,
+  isAuthenticated,
 } from 'product-specific';
 
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
@@ -16,6 +18,17 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
 );
 
 export default class CreatePage extends PureComponent {
+  public static getInitialProps = async ({
+    fetch,
+    redirectToLoginPage,
+  }: AppContext) => {
+    if (!(await isAuthenticated(fetch))) {
+      redirectToLoginPage();
+    }
+
+    return {};
+  };
+
   public render() {
     return (
       <>

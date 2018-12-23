@@ -1,20 +1,20 @@
 import Kitsu from 'kitsu';
-import { NextComponentClass } from 'next';
 
 import { transformRequestError } from 'error-handling';
 import { DistributedTaskDefinition } from 'models';
+import { AppPageComponentType } from 'product-specific';
 
 import { fetchDistributedTasksWithDefinitions } from 'features/distributed-tasks';
 
 import { DistributedTaskDefinitionDetailsOwnProps } from './types';
 
-type GetInitialPropsFn = NextComponentClass<
+type GetInitialPropsFn = AppPageComponentType<
   DistributedTaskDefinitionDetailsOwnProps
 >['getInitialProps'];
 
 export const getDistributedTaskDefinitionDetailsInitialProps = (
   kitsu: Kitsu,
-): NonNullable<GetInitialPropsFn> => ({ query }) => {
+): NonNullable<GetInitialPropsFn> => ({ query, handleAuthenticationError }) => {
   const distributedTaskDefinitionId = parseInt(query.id as string, 10);
 
   const tableDataPromise = fetchDistributedTasksWithDefinitions(
@@ -33,10 +33,13 @@ export const getDistributedTaskDefinitionDetailsInitialProps = (
     );
 
   return Promise.all([tableDataPromise, detailsDataPromise])
-    .then(([tableData, detailsData]) => ({
-      ...detailsData,
-      tableData,
-    }))
+    .then(
+      ([tableData, detailsData]): DistributedTaskDefinitionDetailsOwnProps => ({
+        ...detailsData,
+        tableData,
+      }),
+    )
+    .catch(handleAuthenticationError)
     .catch(
       (error): DistributedTaskDefinitionDetailsOwnProps => ({
         id: distributedTaskDefinitionId,

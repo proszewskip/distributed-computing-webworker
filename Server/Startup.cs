@@ -71,7 +71,8 @@ namespace Server
             // app.UseHttpsRedirection();
             app.UseCors(builder =>
                 builder
-                    .AllowAnyOrigin()
+                    .WithOrigins("http://localhost:3000")
+                    .AllowCredentials()
                     .AllowAnyHeader()
                     .AllowAnyMethod()
             );
