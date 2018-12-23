@@ -1,13 +1,13 @@
 import fetch from 'isomorphic-unfetch';
 
 import {
-  ComputeSubtaskMessagePayload,
+  KeepAliveService,
+  RegistrationService,
+  SubtaskSerivce,
   SubtaskWorker,
-} from 'features/worker-node';
-import { KeepAliveService } from 'features/worker-node/keep-alive';
-import { RegistrationService } from 'features/worker-node/registration';
-import { SubtaskSerivce } from 'features/worker-node/subtask-service';
-import { WorkerOptions } from 'features/worker-node/worker';
+  WorkerOptions,
+} from 'features/worker/services';
+import { ComputeSubtaskMessagePayload } from 'features/worker/worker-thread';
 
 export interface DistributedNodeServiceDependencies {
   fetch: typeof fetch;
