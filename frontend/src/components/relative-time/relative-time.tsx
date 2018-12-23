@@ -2,22 +2,21 @@ import { distanceInWordsToNow } from 'date-fns';
 import { Text } from 'evergreen-ui';
 import React, { PureComponent } from 'react';
 
-import { getRerenderTimeoutFnType } from './get-rerender-timeout';
+import { getRerenderTimeout } from './get-rerender-timeout';
 
-export interface UpdatedDateTextProps {
-  dateString: string;
-  getRerenderTimeout: getRerenderTimeoutFnType;
+export interface RelativeTimeProps {
+  eventDate: Date;
 }
 
-interface UpdatedDateTextState {
+interface RelativeTimeState {
   updateTimeoutId?: number;
 }
 
 export class RelativeTime extends PureComponent<
-  UpdatedDateTextProps,
-  UpdatedDateTextState
+  RelativeTimeProps,
+  RelativeTimeState
 > {
-  public state: UpdatedDateTextState = {
+  public state: RelativeTimeState = {
     updateTimeoutId: undefined,
   };
 
@@ -25,8 +24,9 @@ export class RelativeTime extends PureComponent<
     this.updateTimeout();
   }
 
-  public componentDidUpdate(prevProps: UpdatedDateTextProps) {
-    if (prevProps.dateString !== this.props.dateString) {
+  public componentDidUpdate(prevProps: RelativeTimeProps) {
+    if (prevProps.eventDate !== this.props.eventDate) {
+      window.clearTimeout(this.state.updateTimeoutId);
       this.updateTimeout();
     }
   }
@@ -36,25 +36,26 @@ export class RelativeTime extends PureComponent<
   }
 
   public render() {
-    const { dateString } = this.props;
+    const { eventDate } = this.props;
 
-    return <Text>{distanceInWordsToNow(dateString)}</Text>;
+    return <Text>{distanceInWordsToNow(eventDate)}</Text>;
   }
 
   private updateTimeout = () => {
-    const { dateString, getRerenderTimeout } = this.props;
+    const { eventDate } = this.props;
 
-    const eventDate = new Date(dateString);
+    const currentDate = new Date();
 
-    const rerenderTimeout = getRerenderTimeout(eventDate);
+    const rerenderTimeout = getRerenderTimeout(eventDate, currentDate);
 
     /**
      * NOTE: use `window.setTimeout` becuase `@types/node` override the type of `setTimeout`
      * and use a return type that is incompatible with the browser.
      */
-    const updateTimeoutId = window.setTimeout(() => {
-      this.updateTimeout();
-    }, rerenderTimeout);
+    const updateTimeoutId = window.setTimeout(
+      this.updateTimeout,
+      rerenderTimeout,
+    );
 
     this.setState({ updateTimeoutId });
   };

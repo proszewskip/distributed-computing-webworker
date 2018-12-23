@@ -1,12 +1,14 @@
 import { differenceInSeconds } from 'date-fns';
 
-export type getRerenderTimeoutFnType = (eventDate: Date) => number;
-
-export const getRerenderTimeout: getRerenderTimeoutFnType = (
+export type GetRerenderTimeoutFnType = (
   eventDate: Date,
-) => {
-  const currentDate = new Date();
+  currentDate: Date,
+) => number;
 
+export const getRerenderTimeout: GetRerenderTimeoutFnType = (
+  eventDate: Date,
+  currentDate: Date,
+) => {
   const datesDifferenceInSeconds = differenceInSeconds(currentDate, eventDate);
 
   let rerenderDelay = 0;
