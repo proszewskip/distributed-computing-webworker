@@ -1,22 +1,23 @@
 import Kitsu from 'kitsu';
-import { NextComponentClass } from 'next';
 
 import { DistributedTaskDefinition } from 'models';
+
+import { AppPageComponentType } from 'product-specific';
 
 import { getEntities } from 'utils/table/get-entities';
 
 import { distributedTaskDefinitionModelName } from './common';
 import { DistributedTaskDefinitionsTableOwnProps } from './types';
 
-type GetInitialPropsFn = NextComponentClass<
+type GetInitialPropsFn = AppPageComponentType<
   DistributedTaskDefinitionsTableOwnProps
 >['getInitialProps'];
 
 export const getDistributedTaskDefinitionsTableInitialProps = (
   kitsu: Kitsu,
-): NonNullable<GetInitialPropsFn> => () => {
+): NonNullable<GetInitialPropsFn> => ({ handleAuthenticationError }) => {
   return getEntities<DistributedTaskDefinition>(
     kitsu,
     distributedTaskDefinitionModelName,
-  );
+  ).catch(handleAuthenticationError);
 };

@@ -1,15 +1,13 @@
 import { majorScale, Pane } from 'evergreen-ui';
-import { NextComponentType } from 'next';
 import React, { Component } from 'react';
 
 import { Layout, LayoutProps } from 'components/layout';
 
 import {
+  AppPageComponentType,
   AuthenticatedSidebar,
   BaseDependenciesProvider,
   Head,
-  isomorphicGetBaseUrl,
-  kitsuFactory,
 } from 'product-specific';
 
 import {
@@ -27,14 +25,15 @@ type DistributedTasksTablePageProps = DistributedTasksTableOwnProps;
 class DistributedTasksTablePage extends Component<
   DistributedTasksTablePageProps
 > {
-  public static getInitialProps: NextComponentType<
+  public static getInitialProps: AppPageComponentType<
     DistributedTasksTablePageProps
-  >['getInitialProps'] = ({ req }) =>
-    fetchDistributedTasksWithDefinitions(
-      kitsuFactory({
-        baseURL: isomorphicGetBaseUrl(req),
-      }),
+  >['getInitialProps'] = ({ kitsuFactory, handleAuthenticationError }) => {
+    const kitsu = kitsuFactory();
+
+    return fetchDistributedTasksWithDefinitions(kitsu).catch(
+      handleAuthenticationError,
     );
+  };
 
   public render() {
     return (

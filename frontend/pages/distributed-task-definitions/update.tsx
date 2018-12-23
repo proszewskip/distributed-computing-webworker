@@ -1,5 +1,4 @@
 import { Heading, Link, majorScale, Pane } from 'evergreen-ui';
-import { NextComponentClass } from 'next';
 import React, { PureComponent, ReactNode } from 'react';
 
 import { ErrorPage, RequestErrorInfo } from 'components/errors';
@@ -13,11 +12,10 @@ import {
 
 import { RequestError, transformRequestError } from 'error-handling';
 import {
+  AppPageComponentType,
   AuthenticatedSidebar,
   BaseDependenciesProvider,
   Head,
-  isomorphicGetBaseUrl,
-  kitsuFactory,
 } from 'product-specific';
 
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
@@ -29,13 +27,17 @@ export interface UpdatePageProps {
   modelData?: UpdateDistributedTaskDefinitionModel;
 }
 
-type GetInitialPropsFn = NextComponentClass<UpdatePageProps>['getInitialProps'];
+type GetInitialPropsFn = AppPageComponentType<
+  UpdatePageProps
+>['getInitialProps'];
 
 class UpdatePage extends PureComponent<UpdatePageProps & WithRouterProps> {
-  public static getInitialProps: GetInitialPropsFn = ({ query, req }) => {
-    const kitsu = kitsuFactory({
-      baseURL: isomorphicGetBaseUrl(req),
-    });
+  public static getInitialProps: GetInitialPropsFn = ({
+    query,
+    handleAuthenticationError,
+    kitsuFactory,
+  }) => {
+    const kitsu = kitsuFactory();
 
     const id = parseInt(query.id as string, 10);
 
@@ -47,13 +49,16 @@ class UpdatePage extends PureComponent<UpdatePageProps & WithRouterProps> {
         (jsonApiResponse) =>
           jsonApiResponse.data as UpdateDistributedTaskDefinitionModel,
       )
-      .then((data) => ({
-        modelData: {
-          description: data.description,
-          id: data.id,
-          name: data.name,
-        },
-      }))
+      .then(
+        (data): UpdatePageProps => ({
+          modelData: {
+            description: data.description,
+            id: data.id,
+            name: data.name,
+          },
+        }),
+      )
+      .catch(handleAuthenticationError)
       .catch((error) => ({
         errors: transformRequestError(error),
       }));
