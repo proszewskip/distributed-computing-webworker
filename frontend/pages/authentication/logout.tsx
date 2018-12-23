@@ -26,8 +26,7 @@ LogoutPage.getInitialProps = async ({
     ) as string);
   }
 
-  // TODO: add a query param that the logout has been successful
-  redirect(config.loginPageUrl);
+  redirect(`${config.loginPageUrl}?logout-successful`);
 
   return {};
 };
