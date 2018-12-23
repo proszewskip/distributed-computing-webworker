@@ -30,7 +30,7 @@ export const isomorphicRedirect = (url: string) => ({
   return redirect(url);
 };
 
-// NOTE: add some query parameter so that the login page displays that the user has been
+// TODO: add some query parameter so that the login page displays that the user has been
 // logged out.
 const loginPageUrl = '/authentication/login';
 
