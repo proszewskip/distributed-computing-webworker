@@ -1,5 +1,4 @@
 import { Heading, Link, majorScale, Pane } from 'evergreen-ui';
-import { NextComponentClass } from 'next';
 import React, { PureComponent, ReactNode } from 'react';
 
 import { ErrorPage, RequestErrorInfo } from 'components/errors';
@@ -9,23 +8,16 @@ import { withRouter, WithRouterProps } from 'components/router';
 import { RequestError, transformRequestError } from 'error-handling';
 
 import {
-  handleAuthenticationErrorFactory,
-  redirectToLoginPage,
-} from 'features/authentication';
-import {
   UpdateDistributedTaskForm,
   UpdateDistributedTaskModel,
 } from 'features/distributed-tasks/update';
 
 import {
+  AppPageComponentType,
   AuthenticatedSidebar,
   BaseDependenciesProvider,
   Head,
-  isomorphicGetBaseUrl,
-  kitsuFactory,
 } from 'product-specific';
-
-import { routes } from '../../routes';
 
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
   <AuthenticatedSidebar />
@@ -36,19 +28,19 @@ export interface UpdatePageProps {
   modelData?: UpdateDistributedTaskModel;
 }
 
-type GetInitialPropsFn = NextComponentClass<UpdatePageProps>['getInitialProps'];
+type GetInitialPropsFn = AppPageComponentType<
+  UpdatePageProps
+>['getInitialProps'];
 
 class UpdatePage extends PureComponent<UpdatePageProps & WithRouterProps> {
-  public static getInitialProps: GetInitialPropsFn = ({ query, req, res }) => {
-    const kitsu = kitsuFactory({
-      baseURL: isomorphicGetBaseUrl(req),
-    });
+  public static getInitialProps: GetInitialPropsFn = ({
+    query,
+    kitsuFactory,
+    handleAuthenticationError,
+  }) => {
+    const kitsu = kitsuFactory();
 
     const id = parseInt(query.id as string, 10);
-
-    const handleAuthenticationError = handleAuthenticationErrorFactory<
-      UpdatePageProps
-    >(redirectToLoginPage({ res, router: routes.Router }));
 
     return kitsu
       .get<UpdateDistributedTaskModel>(`distributed-task/${id}`)

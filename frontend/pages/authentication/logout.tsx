@@ -1,19 +1,29 @@
-import fetch from 'isomorphic-unfetch';
-import { NextComponentType } from 'next';
+import { NextStatelessComponent } from 'next';
 import React from 'react';
 
-import { logout, redirectToLoginPage } from 'features/authentication';
+import { AppContext, logout } from 'product-specific';
 
-import { routes } from '../../routes';
-
-const LogoutPage: NextComponentType = () => {
+const LogoutPage: NextStatelessComponent<{}, {}, AppContext> = () => {
   return <div>Logging out...</div>;
 };
 
-LogoutPage.getInitialProps = async ({ res }) => {
-  await logout(fetch);
+LogoutPage.getInitialProps = async ({
+  redirectToLoginPage,
+  fetch,
+  res: nextjsResponse,
+}) => {
+  const logoutResponse = await logout(fetch);
 
-  redirectToLoginPage({ res, router: routes.Router })();
+  if (logoutResponse && nextjsResponse) {
+    const headerName = 'set-cookie';
+
+    console.log(logoutResponse.headers);
+    nextjsResponse.setHeader(headerName, logoutResponse.headers.get(
+      headerName,
+    ) as string);
+  }
+
+  redirectToLoginPage();
 
   return {};
 };
