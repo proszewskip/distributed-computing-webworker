@@ -33,10 +33,9 @@ const LoginPage: NextStatelessComponent<{}, {}, AppContext> = () => (
   </>
 );
 
-LoginPage.getInitialProps = async ({ fetch }) => {
+LoginPage.getInitialProps = async ({ fetch, redirect }) => {
   if (await isAuthenticated(fetch)) {
-    console.log('Is authenticated');
-    // TODO: redirect to /
+    redirect('/');
   }
 
   return {};
