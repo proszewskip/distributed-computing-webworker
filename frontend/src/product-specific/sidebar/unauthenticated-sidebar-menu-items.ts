@@ -1,12 +1,14 @@
 import { ConnectedMenuItem } from 'components/sidebar';
 
+import { config } from 'product-specific/config';
+
 export const unauthenticatedSidebarMenuItems: ConnectedMenuItem[] = [
   {
     route: '/',
     title: 'Home',
   },
   {
-    route: '/authentication/login',
+    route: config.loginPageUrl,
     title: 'Login',
   },
 ];
