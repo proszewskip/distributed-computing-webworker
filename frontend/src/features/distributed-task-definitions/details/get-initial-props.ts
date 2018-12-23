@@ -14,7 +14,7 @@ type GetInitialPropsFn = NextComponentClass<
 
 export const getDistributedTaskDefinitionDetailsInitialProps = (
   kitsu: Kitsu,
-): GetInitialPropsFn => ({ query }) => {
+): NonNullable<GetInitialPropsFn> => ({ query }) => {
   const distributedTaskDefinitionId = parseInt(query.id as string, 10);
 
   const tableDataPromise = fetchDistributedTasksWithDefinitions(
