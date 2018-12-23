@@ -57,6 +57,7 @@ const fetchFactory = (
 ) => {
   if (typeof requestInfo === 'string') {
     return fetch(getIsomorphicUrl(requestInfo, serverUrl), {
+      ...requestInit,
       headers: {
         ...requestInit.headers,
         ...additionalHeaders,
