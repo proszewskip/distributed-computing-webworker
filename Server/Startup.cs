@@ -1,3 +1,4 @@
+using System;
 using System.Buffers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,9 +8,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using JsonApiDotNetCore.Extensions;
 using JsonApiDotNetCore.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Server.Models;
 using Server.Services;
 using Microsoft.Extensions.FileProviders;
@@ -39,12 +40,22 @@ namespace Server
                 options.IncludeTotalRecordCount = true;
                 options.DefaultPageSize = 25;
             });
+            services.AddDefaultIdentity<IdentityUser>()
+                .AddEntityFrameworkStores<DistributedComputingDbContext>();
+
+            services.Configure<IdentityOptions>(options => { });
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.ExpireTimeSpan = TimeSpan.FromDays(30);
+            });
+
             services.Configure<ServerConfig>(Configuration.GetSection("ServerConfig"));
             services.AddCors();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, UserManager<IdentityUser> userManager)
         {
             EnsureDatabaseCreated(app);
 
@@ -65,6 +76,9 @@ namespace Server
                     .AllowAnyMethod()
             );
             ConfigureCompiledTaskDefinitionsHosting(app);
+
+            app.UseAuthentication();
+            IdentityDataSeeder.SeedUsers(userManager);
             app.UseJsonApi();
         }
 
@@ -94,7 +108,8 @@ namespace Server
                 .AddScoped<IFinishComputationService, FinishComputationService>()
                 .AddScoped<IJsonApiResponseFactory, JsonApiResponseFactory>()
                 .AddScoped<IJsonApiActionResultFactory, JsonApiActionResultFactory>()
-                .AddScoped<FormatErrorActionFilter>();
+                .AddScoped<FormatErrorActionFilter>()
+                .AddScoped<AuthorizationFilter>();
 
             services.AddSingleton<IPathsProvider, PathsProvider>();
         }
