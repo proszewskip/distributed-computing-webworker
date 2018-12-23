@@ -37,4 +37,4 @@ const loginPageUrl = '/authentication/login';
 /**
  * Redirects the user to the login page
  */
-export const redirectToLoginPage = isomorphicRedirect(loginPageUrl);
+export const redirectToLoginPageFactory = isomorphicRedirect(loginPageUrl);
