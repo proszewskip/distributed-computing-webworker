@@ -1,13 +1,8 @@
 import { Pane } from 'evergreen-ui';
-import { NextComponentClass } from 'next';
 import React, { Component } from 'react';
 
 import { Layout, LayoutProps } from 'components/layout';
 
-import {
-  handleAuthenticationErrorFactory,
-  redirectToLoginPage,
-} from 'features/authentication';
 import {
   DistributedNodesTable,
   DistributedNodesTableOwnProps,
@@ -17,14 +12,11 @@ import { getEntities } from 'utils/table/get-entities';
 
 import { DistributedNode } from 'models';
 import {
+  AppPageComponentType,
   AuthenticatedSidebar,
   BaseDependenciesProvider,
   Head,
-  isomorphicGetBaseUrl,
-  kitsuFactory,
 } from 'product-specific';
-
-import { routes } from '../../routes';
 
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
   <AuthenticatedSidebar />
@@ -32,21 +24,18 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
 
 type DistributedNodesPageProps = DistributedNodesTableOwnProps;
 
-type GetInitialPropsFn = NextComponentClass<
+type GetInitialPropsFn = AppPageComponentType<
   DistributedNodesPageProps
 >['getInitialProps'];
 
 export default class DistributedNodesPage extends Component<
   DistributedNodesPageProps
 > {
-  public static getInitialProps: GetInitialPropsFn = ({ req, res }) => {
-    const kitsu = kitsuFactory({
-      baseURL: isomorphicGetBaseUrl(req),
-    });
-
-    const handleAuthenticationError = handleAuthenticationErrorFactory<
-      DistributedNodesPageProps
-    >(redirectToLoginPage({ res, router: routes.Router }));
+  public static getInitialProps: GetInitialPropsFn = ({
+    kitsuFactory,
+    handleAuthenticationError,
+  }) => {
+    const kitsu = kitsuFactory();
 
     return getEntities<DistributedNode>(kitsu, 'distributed-node').catch(
       handleAuthenticationError,
