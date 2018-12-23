@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using JsonApiDotNetCore.Controllers;
 using JsonApiDotNetCore.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Server.Filters;
@@ -29,6 +30,7 @@ namespace Server.Controllers
 
 
         [HttpGet("{id}/input-data")]
+        [AllowAnonymous]
         public async Task<IActionResult> DownloadInputData(int id)
         {
             var subtask = await _subtaskResourceService.GetAsync(id);
