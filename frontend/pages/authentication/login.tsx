@@ -1,25 +1,45 @@
-import React, { Component } from 'react';
+import { Heading, majorScale, Pane } from 'evergreen-ui';
+import { NextStatelessComponent } from 'next';
+import React from 'react';
 
-import { config } from 'product-specific';
+import { Layout, LayoutProps } from 'components/layout';
 
-class LoginPage extends Component {
-  public componentDidMount() {
-    setTimeout(async () => {
-      await fetch(`${config.serverUrl}/users/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: 'admin', password: 'D1stributed$' }),
-      });
+import {
+  AppContext,
+  Head,
+  isAuthenticated,
+  UnauthenticatedSidebar,
+} from 'product-specific';
 
-      console.log('Logged in');
-    }, 2000);
+import { LoginForm } from 'features/authentication';
+
+const renderSidebar: LayoutProps['renderSidebar'] = () => (
+  <UnauthenticatedSidebar />
+);
+
+const LoginPage: NextStatelessComponent<{}, {}, AppContext> = () => (
+  <>
+    <Head />
+
+    <Layout renderSidebar={renderSidebar}>
+      <Pane margin={majorScale(1)}>
+        <Heading size={700} marginBottom={majorScale(1)}>
+          Log in
+        </Heading>
+
+        <LoginForm />
+      </Pane>
+    </Layout>
+  </>
+);
+
+LoginPage.getInitialProps = async ({ fetch }) => {
+  if (await isAuthenticated(fetch)) {
+    console.log('Is authenticated');
+    // TODO: redirect to /
   }
 
-  public render() {
-    return <div>Login</div>;
-  }
-}
+  return {};
+};
 
 export default LoginPage;
