@@ -5,8 +5,8 @@ import { NextContext } from 'next';
 import {
   forwardCookies,
   handleAuthenticationErrorFactory,
-  redirectToLoginPageFactory,
 } from 'product-specific/authentication';
+import { isomorphicRedirectFactory } from 'product-specific/isomorphic-redirect';
 import { kitsuFactory } from 'product-specific/kitsu';
 import { serverUrlProvider } from 'product-specific/server-url-provider';
 
@@ -29,13 +29,11 @@ export const appContextFactory = (
 
   forwardCookies(additionalHeaders, req);
 
-  const redirectToLoginPage = redirectToLoginPageFactory({
+  const redirect = isomorphicRedirectFactory({
     res,
     router: Router,
   });
-  const handleAuthenticationError = handleAuthenticationErrorFactory(
-    redirectToLoginPage,
-  );
+  const handleAuthenticationError = handleAuthenticationErrorFactory(redirect);
 
   return {
     ...nextContext,
@@ -44,7 +42,7 @@ export const appContextFactory = (
       kitsuFactory({ ...kitsuOptions, ...additionalOptions }),
     serverUrl,
     fetch: fetchFactory(serverUrl, additionalHeaders),
-    redirectToLoginPage,
+    redirect,
   };
 };
 

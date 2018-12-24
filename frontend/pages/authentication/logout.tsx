@@ -1,14 +1,14 @@
 import { NextStatelessComponent } from 'next';
 import React from 'react';
 
-import { AppContext, logout } from 'product-specific';
+import { AppContext, config, logout } from 'product-specific';
 
 const LogoutPage: NextStatelessComponent<{}, {}, AppContext> = () => {
   return <div>Logging out...</div>;
 };
 
 LogoutPage.getInitialProps = async ({
-  redirectToLoginPage,
+  redirect,
   fetch,
   res: nextjsResponse,
 }) => {
@@ -17,13 +17,17 @@ LogoutPage.getInitialProps = async ({
   if (logoutResponse && nextjsResponse) {
     const headerName = 'set-cookie';
 
-    console.log(logoutResponse.headers);
+    /**
+     * NOTE: forward headers so that the client logs out properly even when
+     * next.js makes the request
+     */
     nextjsResponse.setHeader(headerName, logoutResponse.headers.get(
       headerName,
     ) as string);
   }
 
-  redirectToLoginPage();
+  // TODO: add a query param that the logout has been successful
+  redirect(config.loginPageUrl);
 
   return {};
 };

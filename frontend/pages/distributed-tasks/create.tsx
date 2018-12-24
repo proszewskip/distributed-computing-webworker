@@ -9,6 +9,7 @@ import {
   AppPageComponentType,
   AuthenticatedSidebar,
   BaseDependenciesProvider,
+  config,
   Head,
   isAuthenticated,
 } from 'product-specific';
@@ -29,10 +30,11 @@ export default class CreatePage extends PureComponent<CreatePageProps> {
   public static getInitialProps: GetInitialPropsFn = async ({
     query,
     fetch,
-    redirectToLoginPage,
+    redirect,
   }) => {
     if (!(await isAuthenticated(fetch))) {
-      redirectToLoginPage();
+      // TODO: add a query param that the user has been logged out
+      redirect(config.loginPageUrl);
     }
 
     return {

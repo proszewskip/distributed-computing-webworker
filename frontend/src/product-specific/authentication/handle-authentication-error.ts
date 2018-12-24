@@ -1,5 +1,8 @@
 import { isJsonApiErrorResponse } from 'error-handling';
 
+import { config } from 'product-specific/config';
+import { Redirect } from 'product-specific/isomorphic-redirect';
+
 /**
  * Handles JSON API errors that resulted from the user being unauthenticated.
  *
@@ -13,7 +16,7 @@ export type HandleAuthenticationErrorFn<Props> = (
  * @param redirect Function to be called if the user should be redirected
  */
 export const handleAuthenticationErrorFactory = <Props>(
-  redirect: () => void,
+  redirect: Redirect,
 ): HandleAuthenticationErrorFn<Props> => (error) => {
   if (isJsonApiErrorResponse(error)) {
     const isForbidden = error.errors.find(
@@ -21,7 +24,8 @@ export const handleAuthenticationErrorFactory = <Props>(
     );
 
     if (isForbidden) {
-      redirect();
+      // TODO: add a query param that the user has been logged out
+      redirect(config.loginPageUrl);
     }
   }
 
