@@ -4,7 +4,7 @@ import {
   WorkerThreadOutputMessage,
   WorkerThreadStatus,
   WorkerUpdatedMessagePayload,
-} from '../worker-thread';
+} from 'features/worker/worker-thread';
 
 import {
   WorkerComputationResult,

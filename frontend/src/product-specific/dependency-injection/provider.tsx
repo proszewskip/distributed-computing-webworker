@@ -1,3 +1,4 @@
+import unfetch from 'isomorphic-unfetch';
 import React, { StatelessComponent } from 'react';
 
 import {
@@ -11,6 +12,7 @@ import { BaseDependencies } from './types';
 
 const provideDependencies: DependenciesProvider<BaseDependencies> = () => ({
   kitsu: kitsuFactory(),
+  fetch: unfetch,
 });
 
 export const BaseDependenciesProvider: StatelessComponent = ({ children }) => (
