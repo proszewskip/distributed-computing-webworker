@@ -12,12 +12,24 @@ import {
 } from 'product-specific';
 
 import { LoginForm } from 'features/authentication';
+import {
+  LogoutSuccessful,
+  Unauthenticated,
+} from 'features/authentication/login-redirect-reasons';
 
 const renderSidebar: LayoutProps['renderSidebar'] = () => (
   <UnauthenticatedSidebar />
 );
 
-const LoginPage: NextStatelessComponent<{}, {}, AppContext> = () => (
+interface LoginPageProps {
+  additionalInfo?: 'logout-successful' | 'unauthenticated';
+}
+
+const LoginPage: NextStatelessComponent<
+  LoginPageProps,
+  LoginPageProps,
+  AppContext
+> = ({ additionalInfo }) => (
   <>
     <Head />
 
@@ -27,15 +39,32 @@ const LoginPage: NextStatelessComponent<{}, {}, AppContext> = () => (
           Log in
         </Heading>
 
+        {additionalInfo === 'unauthenticated' && <Unauthenticated />}
+        {additionalInfo === 'logout-successful' && <LogoutSuccessful />}
+
         <LoginForm />
       </Pane>
     </Layout>
   </>
 );
 
-LoginPage.getInitialProps = async ({ fetch, redirect }) => {
+LoginPage.getInitialProps = async ({
+  fetch,
+  redirect,
+  query,
+}): Promise<LoginPageProps> => {
   if (await isAuthenticated(fetch)) {
     redirect('/');
+  }
+
+  if (query.unauthenticated !== undefined) {
+    return {
+      additionalInfo: 'unauthenticated',
+    };
+  } else if (query['logout-successful'] !== undefined) {
+    return {
+      additionalInfo: 'logout-successful',
+    };
   }
 
   return {};
