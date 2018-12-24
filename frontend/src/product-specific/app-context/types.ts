@@ -3,6 +3,7 @@ import { NextComponentType, NextContext } from 'next';
 import { DefaultQuery } from 'next/router';
 
 import { HandleAuthenticationErrorFn } from 'product-specific/authentication';
+import { Redirect } from 'product-specific/isomorphic-redirect';
 import { KitsuFactory } from 'product-specific/kitsu';
 
 export interface AppContext<Q extends DefaultQuery = DefaultQuery>
@@ -25,7 +26,10 @@ export interface AppContext<Q extends DefaultQuery = DefaultQuery>
    */
   fetch: typeof unfetch;
 
-  redirectToLoginPage: () => void;
+  /**
+   * Isomorphic redirect
+   */
+  redirect: Redirect;
 }
 
 export type AppPageComponentType<

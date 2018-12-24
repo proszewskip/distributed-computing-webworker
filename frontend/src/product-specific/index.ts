@@ -3,6 +3,7 @@ export * from './authentication';
 export * from './config';
 export * from './dependency-injection';
 export * from './head';
+export * from './isomorphic-redirect';
 export * from './kitsu';
 export * from './server-url-provider';
 export * from './sidebar';
