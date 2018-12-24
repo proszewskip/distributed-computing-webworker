@@ -21,8 +21,7 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
 export default class CreatePage extends PureComponent {
   public static getInitialProps = async ({ fetch, redirect }: AppContext) => {
     if (!(await isAuthenticated(fetch))) {
-      // TODO: add a query param that the user has been logged out
-      redirect(config.loginPageUrl);
+      redirect(`${config.loginPageUrl}?unauthenticated`);
     }
 
     return {};
