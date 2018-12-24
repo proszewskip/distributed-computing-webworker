@@ -12,7 +12,7 @@ export async function getEntities<Model extends Entity>(
   modelName: string,
   filters: StyledDataTableProps['filtered'] = [],
   page = 1,
-  pageSize = 20,
+  pageSize = 10,
   relationshipsToInclude?: string,
   sort = 'id',
 ) {
