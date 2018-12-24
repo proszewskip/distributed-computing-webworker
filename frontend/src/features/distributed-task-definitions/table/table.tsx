@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { Column } from 'react-table';
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
 
-import { TextCell } from 'components/data-table/cells/text-cell';
+import { LongTextCell, TextCell } from 'components/data-table/cells';
 import { DataTable, DataTableProps } from 'components/data-table/data-table';
 import {
   DataTableView,
@@ -54,7 +54,7 @@ export class PureDistributedTaskDefinitionsTable extends Component<
       id: 'name',
       accessor: 'name',
       Header: <Text>Name</Text>,
-      Cell: TextCell,
+      Cell: LongTextCell,
       Filter: TextFilter,
       minWidth: 150,
     },
