@@ -6,71 +6,28 @@ import {
   Pane,
   Paragraph,
 } from 'evergreen-ui';
-import fetch from 'isomorphic-unfetch';
 import React, { Component, ReactNode } from 'react';
 
-import { Layout, LayoutProps } from 'components/layout';
+import { withDependencies } from 'components/dependency-injection/with-dependencies';
 
 import {
-  DistributedNodeService,
   DistributedNodeState,
-  DistributedNodeStateWithData,
-  KeepAliveService,
   OnDistributedNodeStateUpdate,
-  RegistrationService,
-  SubtaskSerivce,
-  SubtaskWorker,
-} from 'features/worker-node';
+} from 'features/worker/services';
 
-// @ts-ignore
-import WorkerThread from 'features/worker-node/worker-thread/worker-thread.worker';
+import { dependenciesExtractor } from './dependencies';
+import { PureWorkerControllerProps, WorkerControllerState } from './types';
 
-import {
-  AuthenticatedSidebar,
-  BaseDependenciesProvider,
-  Head,
-} from 'product-specific';
-
-interface WorkerExampleState {
-  distributedNodeService?: DistributedNodeService;
-  distributedNodeState?: DistributedNodeStateWithData;
-  threadsCount: number;
-}
-
-const renderSidebar: LayoutProps['renderSidebar'] = () => (
-  <AuthenticatedSidebar />
-);
-
-class WorkerExample extends Component<{}, WorkerExampleState> {
-  public state: WorkerExampleState = {
+export class PureWorkerController extends Component<
+  PureWorkerControllerProps,
+  WorkerControllerState
+> {
+  public state: WorkerControllerState = {
     threadsCount: 1,
   };
 
   public componentDidMount() {
-    const keepAliveService = new KeepAliveService({
-      fetch,
-    });
-    const registrationService = new RegistrationService({
-      fetch,
-    });
-    const subtaskService = new SubtaskSerivce({
-      fetch,
-    });
-    const distributedNodeService = new DistributedNodeService(
-      {
-        fetch,
-        keepAliveService,
-        registrationService,
-        subtaskService,
-        subtaskWorkerFactory: (subtaskMetadata, options) =>
-          new SubtaskWorker(
-            {
-              workerThreadProvider: () => new WorkerThread(),
-            },
-            subtaskMetadata,
-            options,
-          ),
-      },
+    const distributedNodeService = this.props.distributedNodeServiceFactory(
       this.onDistributedNodeStateUpdate,
     );
 
@@ -90,26 +47,18 @@ class WorkerExample extends Component<{}, WorkerExampleState> {
 
   public render() {
     return (
-      <>
-        <Head />
+      <Pane margin={majorScale(1)}>
+        <Heading size={700} marginBottom={majorScale(1)}>
+          Worker node
+        </Heading>
 
-        <BaseDependenciesProvider>
-          <Layout renderSidebar={renderSidebar}>
-            <Pane margin={majorScale(1)}>
-              <Heading size={700} marginBottom={majorScale(1)}>
-                Worker node
-              </Heading>
-
-              <Paragraph>
-                State:{' '}
-                {this.state.distributedNodeState &&
-                  this.state.distributedNodeState.state}
-              </Paragraph>
-              {this.renderContent()}
-            </Pane>
-          </Layout>
-        </BaseDependenciesProvider>
-      </>
+        <Paragraph>
+          State:{' '}
+          {this.state.distributedNodeState &&
+            this.state.distributedNodeState.state}
+        </Paragraph>
+        {this.renderContent()}
+      </Pane>
     );
   }
 
@@ -204,4 +153,6 @@ class WorkerExample extends Component<{}, WorkerExampleState> {
   };
 }
 
-export default WorkerExample;
+export const WorkerController = withDependencies(dependenciesExtractor)(
+  PureWorkerController,
+);

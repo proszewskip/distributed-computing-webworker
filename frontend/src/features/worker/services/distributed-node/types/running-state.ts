@@ -2,7 +2,7 @@ import { Map } from 'immutable';
 
 import { ExtractNonNeverProperties } from 'types/extract-non-never-properties';
 
-import { SubtaskWorker } from 'features/worker-node/worker';
+import { SubtaskWorker } from 'features/worker/services';
 
 /**
  * Inner state when the worker has started
