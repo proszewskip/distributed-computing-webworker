@@ -6,6 +6,10 @@ export const unauthenticatedSidebarMenuItems: ConnectedMenuItem[] = [
     title: 'Home',
   },
   {
+    route: '/worker',
+    title: 'Worker',
+  },
+  {
     route: '/authentication/login',
     title: 'Login',
   },

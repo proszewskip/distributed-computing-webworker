@@ -2,7 +2,7 @@ import {
   BaseWorkerUpdatedMessagePayload,
   WorkerThreadStatus,
   WorkerUpdatedMessagePayload,
-} from '../worker-thread';
+} from 'features/worker/worker-thread';
 
 export type WorkerThreadProvider = () => Worker;
 
