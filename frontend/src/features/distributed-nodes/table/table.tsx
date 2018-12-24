@@ -1,5 +1,4 @@
-import { distanceInWordsToNow } from 'date-fns';
-import { Heading, Pane, Text, Tooltip } from 'evergreen-ui';
+import { Heading, Pane, Text } from 'evergreen-ui';
 import { List } from 'immutable';
 import React, { Component } from 'react';
 import { Column } from 'react-table';
@@ -24,6 +23,7 @@ import {
 import { getEntities } from 'utils/table/get-entities';
 import { preventPropagationHandler } from 'utils/table/prevent-propagation-handler';
 
+import { DateCell } from './date-cell';
 import { EditNodeButton } from './edit-node-cell';
 import {
   DistributedNodesTableDependencies,
@@ -33,12 +33,6 @@ import {
 
 import { DistributedNode } from 'models';
 import { BaseDependencies } from 'product-specific';
-
-const DateCell = (row: { value: any }) => (
-  <Tooltip content={new Date(row.value).toLocaleString()}>
-    <Text>{distanceInWordsToNow(row.value)}</Text>
-  </Tooltip>
-);
 
 export class PureDistributedNodesTable extends Component<
   DistributedNodesTableProps,
