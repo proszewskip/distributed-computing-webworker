@@ -3,9 +3,9 @@ import { FilterRender } from 'react-table';
 
 import { FilterComponentWithTooltip } from './filter-component-with-tooltip';
 
-export const TextFilter: FilterRender = (params) => (
+export const NumericFilter: FilterRender = (params) => (
   <FilterComponentWithTooltip
     {...params}
-    tooltipMessage="For partial match type: 'like:value'"
+    tooltipMessage="For greater than search `gt:value` or `lt:value` for less than."
   />
 );

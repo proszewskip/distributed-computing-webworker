@@ -14,7 +14,7 @@ import {
   ToggleFiltersActionButton,
 } from 'components/data-table/data-table-view/action-buttons';
 import { DataTableError } from 'components/data-table/errors';
-import { TextFilter } from 'components/data-table/filters';
+import { NumericFilter, TextFilter } from 'components/data-table/filters';
 
 import {
   DependenciesExtractor,
@@ -40,7 +40,7 @@ export class PureDistributedNodesTable extends Component<
   DistributedNodesTableProps,
   DistributedNodesTableState
 > {
-  private filterableColumnIds = ['id'];
+  private filterableColumnIds = ['id', 'trust-level'];
   private columns: Column[] = [
     {
       id: 'id',
@@ -57,9 +57,11 @@ export class PureDistributedNodesTable extends Component<
       minWidth: 150,
     },
     {
+      id: 'trust-level',
       accessor: 'trust-level',
       Header: <Text>Trust level</Text>,
       Cell: TextCell,
+      Filter: NumericFilter,
       minWidth: 100,
     },
     {
