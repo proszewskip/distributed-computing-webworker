@@ -1,12 +1,13 @@
 import { Map } from 'immutable';
 
+import { WorkerThreadStatus } from 'features/worker/worker-thread';
+
 import { AssignNextResponseBody } from '../subtask-service';
 import {
   createComputeSubtaskMessagePayload,
   SubtaskWorker,
   WorkerComputationResult,
 } from '../worker';
-import { WorkerThreadStatus } from '../worker-thread';
 
 import {
   DistributedNodeRunningState,

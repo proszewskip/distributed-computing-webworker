@@ -1,7 +1,8 @@
 import { config } from 'product-specific';
 
+import { ComputeSubtaskMessagePayload } from 'features/worker/worker-thread';
+
 import { AssignNextResponseBody } from '../subtask-service';
-import { ComputeSubtaskMessagePayload } from '../worker-thread';
 
 export function createComputeSubtaskMessagePayload(
   assignNextResponse: AssignNextResponseBody,
