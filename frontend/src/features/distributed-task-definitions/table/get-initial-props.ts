@@ -4,6 +4,8 @@ import { DistributedTaskDefinition } from 'models';
 
 import { AppPageComponentType } from 'product-specific';
 
+import { transformRequestError } from 'error-handling';
+
 import { getEntities } from 'utils/table/get-entities';
 
 import { distributedTaskDefinitionModelName } from './common';
@@ -19,5 +21,13 @@ export const getDistributedTaskDefinitionsTableInitialProps = (
   return getEntities<DistributedTaskDefinition>(
     kitsu,
     distributedTaskDefinitionModelName,
-  ).catch(handleAuthenticationError);
+  )
+    .catch(handleAuthenticationError)
+    .catch(
+      (error): DistributedTaskDefinitionsTableOwnProps => ({
+        data: [],
+        totalRecordsCount: 0,
+        dataFetchingError: transformRequestError(error),
+      }),
+    );
 };
