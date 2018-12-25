@@ -17,6 +17,14 @@ export function transformRequestError(error: unknown): RequestError {
     };
   }
 
+  if (typeof error === 'string') {
+    return {
+      type: 'nativeError',
+      name: 'Unknown error',
+      message: error,
+    };
+  }
+
   return {
     type: 'nativeError',
     name: 'Unknown error',
