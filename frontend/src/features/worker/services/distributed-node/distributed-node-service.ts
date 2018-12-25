@@ -7,6 +7,7 @@ import {
   createComputeSubtaskMessagePayload,
   SubtaskWorker,
   WorkerComputationResult,
+  WorkerOptions,
 } from '../worker';
 
 import {
@@ -14,6 +15,7 @@ import {
   DistributedNodeServiceDependencies,
   DistributedNodeState,
   DistributedNodeStateWithData,
+  SubtaskWorkerInfo,
 } from './types';
 import { OnDistributedNodeStateUpdate } from './types/on-state-update';
 
@@ -103,7 +105,9 @@ export class DistributedNodeService {
     ) {
       clearTimeout(this.state.data.data.timeoutId);
     }
-    this.state.data.subtaskWorkers.forEach(cancelWorker);
+    this.state.data.subtaskWorkers.forEach(({ worker }) =>
+      cancelWorker(worker),
+    );
 
     this.setState({
       state: DistributedNodeState.Idle,
@@ -174,12 +178,14 @@ export class DistributedNodeService {
     const subtaskMessagePayload = createComputeSubtaskMessagePayload(
       assignNextSubtaskResponse,
     );
-    // TODO: add options to receive state updates
-    const subtaskWorker = this.dependencies.subtaskWorkerFactory(
-      subtaskMessagePayload,
-    );
     const subtaskWorkerId = this.nextWorkerId;
     this.nextWorkerId += 1;
+    const subtaskWorker = this.dependencies.subtaskWorkerFactory(
+      subtaskMessagePayload,
+      {
+        onWorkerUpdate: this.onWorkerUpdateFactory(subtaskWorkerId),
+      },
+    );
     subtaskWorker
       .start()
       .then(
@@ -191,7 +197,12 @@ export class DistributedNodeService {
 
     const updatedSubtaskWorkersMap = this.state.data.subtaskWorkers.set(
       subtaskWorkerId,
-      subtaskWorker,
+      {
+        worker: subtaskWorker,
+        state: {
+          status: WorkerThreadStatus.WaitingForSubtaskInfo,
+        },
+      },
     );
 
     if (updatedSubtaskWorkersMap.size < this.threadsCount) {
@@ -209,9 +220,34 @@ export class DistributedNodeService {
     this.onWorkersCountChanged();
   };
 
+  private onWorkerUpdateFactory = (
+    workerId: number,
+  ): WorkerOptions['onWorkerUpdate'] => (newWorkerState) => {
+    if (this.state.state !== DistributedNodeState.Running) {
+      return;
+    }
+
+    const { subtaskWorkers } = this.state.data;
+    const updatedSubtaskWorkers = subtaskWorkers.updateIn(
+      [workerId],
+      (workerInfo: SubtaskWorkerInfo): SubtaskWorkerInfo => ({
+        state: newWorkerState,
+        worker: workerInfo.worker,
+      }),
+    );
+
+    this.setState({
+      state: DistributedNodeState.Running,
+      data: {
+        ...this.state.data,
+        subtaskWorkers: updatedSubtaskWorkers,
+      },
+    });
+  };
+
   private startTimeout = (
     distributedNodeId: string,
-    subtaskWorkers: Map<number, SubtaskWorker>,
+    subtaskWorkers: Map<number, SubtaskWorkerInfo>,
   ) => {
     this.setState({
       state: DistributedNodeState.Running,
@@ -312,7 +348,7 @@ export class DistributedNodeService {
       const workersToCancel = runningStateData.subtaskWorkers.skip(
         this.threadsCount,
       );
-      workersToCancel.forEach(cancelWorker);
+      workersToCancel.forEach(({ worker }) => cancelWorker(worker));
 
       if (
         runningStateData.runningState ===
