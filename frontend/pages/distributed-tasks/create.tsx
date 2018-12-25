@@ -1,7 +1,10 @@
 import { Heading, majorScale, Pane } from 'evergreen-ui';
-import React, { PureComponent } from 'react';
+import React, { PureComponent, ReactNode } from 'react';
 
+import { ErrorPage, RequestErrorInfo } from 'components/errors';
 import { Layout, LayoutProps } from 'components/layout';
+import { Link } from 'components/link';
+import { RequestError, transformRequestError } from 'error-handling';
 
 import { CreateDistributedTaskForm } from 'features/distributed-tasks';
 
@@ -20,6 +23,7 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
 
 export interface CreatePageProps {
   distributedTaskDefinitionId: string;
+  dataFetchingError?: RequestError;
 }
 
 type GetInitialPropsFn = AppPageComponentType<
@@ -27,23 +31,30 @@ type GetInitialPropsFn = AppPageComponentType<
 >['getInitialProps'];
 
 export default class CreatePage extends PureComponent<CreatePageProps> {
-  public static getInitialProps: GetInitialPropsFn = async ({
+  public static getInitialProps: GetInitialPropsFn = ({
     query,
     fetch,
     redirect,
   }) => {
-    if (!(await isAuthenticated(fetch))) {
-      redirect(`${config.loginPageUrl}?unauthenticated`);
-    }
+    const distributedTaskDefinitionId = query.distributedTaskDefinitionId as string;
 
-    return {
-      distributedTaskDefinitionId: query.distributedTaskDefinitionId as string,
-    };
+    return isAuthenticated(fetch)
+      .then((authenticated) => {
+        if (!authenticated) {
+          redirect(`${config.loginPageUrl}?unauthenticated`);
+        }
+
+        return {
+          distributedTaskDefinitionId,
+        };
+      })
+      .catch((error) => ({
+        dataFetchingError: transformRequestError(error),
+        distributedTaskDefinitionId,
+      }));
   };
 
   public render() {
-    const { distributedTaskDefinitionId } = this.props;
-
     return (
       <>
         <Head />
@@ -54,13 +65,47 @@ export default class CreatePage extends PureComponent<CreatePageProps> {
               <Heading size={700} marginBottom={majorScale(1)}>
                 Create Distributed Task
               </Heading>
-              <CreateDistributedTaskForm
-                distributedTaskDefinitionId={distributedTaskDefinitionId}
-              />
+
+              {this.renderErrors()}
+              {this.renderForm()}
             </Pane>
           </Layout>
         </BaseDependenciesProvider>
       </>
     );
   }
+
+  private renderErrors = (): ReactNode => {
+    const { dataFetchingError, distributedTaskDefinitionId } = this.props;
+
+    if (!dataFetchingError) {
+      return;
+    }
+
+    return (
+      <ErrorPage>
+        <RequestErrorInfo error={dataFetchingError} />
+
+        <Link
+          route={`/distributed-task-definitions/${distributedTaskDefinitionId}`}
+        >
+          <a>Go back to the distributed task definition</a>
+        </Link>
+      </ErrorPage>
+    );
+  };
+
+  private renderForm = (): ReactNode => {
+    const { dataFetchingError, distributedTaskDefinitionId } = this.props;
+
+    if (dataFetchingError) {
+      return null;
+    }
+
+    return (
+      <CreateDistributedTaskForm
+        distributedTaskDefinitionId={distributedTaskDefinitionId}
+      />
+    );
+  };
 }
