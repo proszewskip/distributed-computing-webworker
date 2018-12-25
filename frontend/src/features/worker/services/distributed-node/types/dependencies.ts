@@ -1,8 +1,8 @@
 import fetch from 'isomorphic-unfetch';
 
 import {
+  CachedRegistrationService,
   KeepAliveService,
-  RegistrationService,
   SubtaskSerivce,
   SubtaskWorker,
   WorkerOptions,
@@ -14,11 +14,7 @@ export interface DistributedNodeServiceDependencies {
 
   keepAliveService: KeepAliveService;
 
-  /**
-   * TODO: use a service that saves the node's id locally after the initial registration
-   * and tries to reuse it next time.
-   */
-  registrationService: RegistrationService;
+  registrationService: CachedRegistrationService;
 
   subtaskService: SubtaskSerivce;
 
