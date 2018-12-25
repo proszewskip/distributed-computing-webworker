@@ -17,6 +17,7 @@ import {
   RefreshActionButton,
   ToggleFiltersActionButton,
 } from 'components/data-table/data-table-view/action-buttons';
+import { DataTableError } from 'components/data-table/errors';
 import { NumberFilter, TextFilter } from 'components/data-table/filters';
 import { TableWithSummaryProps } from 'components/data-table/styled-data-table/table-with-summary';
 import {
@@ -28,6 +29,8 @@ import {
   withDependencies,
 } from 'components/dependency-injection/with-dependencies';
 import { Link } from 'components/link';
+
+import { transformRequestError } from 'error-handling';
 
 import { BaseDependencies } from 'product-specific';
 
@@ -154,6 +157,7 @@ export class PureDistributedTasksTable extends Component<
       loading,
       selectedRowIds,
       filteringEnabled,
+      dataFetchingError,
     } = this.state;
 
     return (
@@ -161,6 +165,7 @@ export class PureDistributedTasksTable extends Component<
         header={<Heading size={600}>Distributed Tasks</Heading>}
         renderActionButtons={this.renderActionButtons}
       >
+        {dataFetchingError && <DataTableError error={dataFetchingError} />}
         <Table
           data={data}
           columns={this.columns}
@@ -187,35 +192,44 @@ export class PureDistributedTasksTable extends Component<
     </Text>
   );
 
-  private fetchData: DataTableProps['onFetchData'] = async ({
+  private fetchData: DataTableProps['onFetchData'] = ({
     filtered,
     pageSize,
     page,
   }) => {
     const { filteringEnabled } = this.state;
     const { kitsu } = this.props;
-    this.setState({ loading: true });
+    this.setState({ loading: true, dataFetchingError: undefined });
 
     if (!filteringEnabled) {
       filtered = [];
     }
 
-    const { data, totalRecordsCount } = await getEntities<
-      DistributedTaskWithDefinition
-    >(
+    return getEntities<DistributedTaskWithDefinition>(
       kitsu,
       distributedTaskModelName,
       filtered,
       page,
       pageSize,
       'distributed-task-definition',
-    );
-
-    this.setState({
-      data: List(data),
-      totalRecordsCount,
-      loading: false,
-    });
+    )
+      .then(({ data, totalRecordsCount }) => {
+        this.setState({
+          data: List(data),
+          totalRecordsCount,
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          data: List(),
+          dataFetchingError: transformRequestError(error),
+        });
+      })
+      .then(() => {
+        this.setState({
+          loading: false,
+        });
+      });
   };
 
   private onDeleteButtonClick = (id: string) => () => {
