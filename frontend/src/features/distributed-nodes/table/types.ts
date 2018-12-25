@@ -4,6 +4,8 @@ import { Omit } from 'ramda';
 
 import { ForceFetchData } from 'components/data-table/data-table';
 
+import { RequestError } from 'error-handling';
+
 import { DistributedNode } from 'models';
 
 export interface DistributedNodesTableDependencies {
@@ -13,6 +15,7 @@ export interface DistributedNodesTableDependencies {
 export interface DistributedNodesTableOwnProps {
   data: DistributedNode[];
   totalRecordsCount: number;
+  dataFetchingError?: RequestError;
 }
 
 export type DistributedNodesTableProps = DistributedNodesTableDependencies &
@@ -24,4 +27,5 @@ export interface DistributedNodesTableState
   loading: boolean;
   filteringEnabled: boolean;
   forceFetchDataCallback: ForceFetchData;
+  dataFetchingError?: RequestError;
 }
