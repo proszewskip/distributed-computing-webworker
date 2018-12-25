@@ -113,7 +113,6 @@ export class PureDistributedTaskDefinitionsTable extends Component<
       selectedRowIds: Set(),
       filteringEnabled: false,
       forceFetchDataCallback: () => null,
-      dataFetchingError: props.dataFetchingError,
     };
   }
 
