@@ -21,21 +21,15 @@ export const getDistributedTaskDefinitionDetailsInitialProps = (
     kitsu,
     distributedTaskDefinitionId,
   );
-  const detailsDataPromise = kitsu
-    .get<DistributedTaskDefinition>(
-      `distributed-task-definition/${distributedTaskDefinitionId}`,
-    )
-    .then(
-      (result): DistributedTaskDefinitionDetailsOwnProps => ({
-        id: distributedTaskDefinitionId,
-        detailsData: result.data as DistributedTaskDefinition,
-      }),
-    );
+  const detailsDataPromise = kitsu.get<DistributedTaskDefinition>(
+    `distributed-task-definition/${distributedTaskDefinitionId}`,
+  );
 
   return Promise.all([tableDataPromise, detailsDataPromise])
     .then(
       ([tableData, detailsData]): DistributedTaskDefinitionDetailsOwnProps => ({
-        ...detailsData,
+        id: distributedTaskDefinitionId,
+        detailsData: detailsData.data as DistributedTaskDefinition,
         tableData,
       }),
     )
@@ -43,7 +37,7 @@ export const getDistributedTaskDefinitionDetailsInitialProps = (
     .catch(
       (error): DistributedTaskDefinitionDetailsOwnProps => ({
         id: distributedTaskDefinitionId,
-        error: transformRequestError(error),
+        dataFetchingError: transformRequestError(error),
       }),
     );
 };
