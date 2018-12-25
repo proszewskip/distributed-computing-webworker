@@ -13,11 +13,18 @@ import {
   RefreshActionButton,
   ToggleFiltersActionButton,
 } from 'components/data-table/data-table-view/action-buttons';
+import { DataTableError } from 'components/data-table/errors';
 
 import {
   DependenciesExtractor,
   withDependencies,
 } from 'components/dependency-injection/with-dependencies';
+
+import { Subtask } from 'models';
+
+import { BaseDependencies } from 'product-specific';
+
+import { transformRequestError } from 'error-handling';
 
 import { getEntities } from 'utils/table/get-entities';
 
@@ -28,9 +35,6 @@ import {
   SubtasksTableProps,
   SubtasksTableState,
 } from './types';
-
-import { Subtask } from 'models';
-import { BaseDependencies } from 'product-specific';
 
 export class PureSubtasksTable extends Component<
   SubtasksTableProps,
@@ -69,13 +73,20 @@ export class PureSubtasksTable extends Component<
   }
 
   public render() {
-    const { data, totalRecordsCount, loading, filteringEnabled } = this.state;
+    const {
+      data,
+      totalRecordsCount,
+      loading,
+      filteringEnabled,
+      dataFetchingError,
+    } = this.state;
 
     return (
       <DataTableView
         header={<Heading size={600}>Distributed subtasks</Heading>}
         renderActionButtons={this.renderActionButtons}
       >
+        {dataFetchingError && <DataTableError error={dataFetchingError} />}
         <DataTable
           data={data}
           columns={this.columns}
@@ -92,12 +103,12 @@ export class PureSubtasksTable extends Component<
     );
   }
 
-  private fetchData: DataTableProps['onFetchData'] = async ({
+  private fetchData: DataTableProps['onFetchData'] = ({
     filtered,
     pageSize,
     page,
   }) => {
-    this.setState({ loading: true });
+    this.setState({ loading: true, dataFetchingError: undefined });
 
     const { kitsu, distributedTaskId } = this.props;
 
@@ -109,7 +120,7 @@ export class PureSubtasksTable extends Component<
       filtered.push({ id: 'distributed-task-id', value: distributedTaskId });
     }
 
-    const { data, totalRecordsCount } = await getEntities<Subtask>(
+    return getEntities<Subtask>(
       kitsu,
       'subtask',
       filtered,
@@ -117,13 +128,23 @@ export class PureSubtasksTable extends Component<
       pageSize,
       undefined,
       'sequence-number',
-    );
-
-    this.setState({
-      data: List(data),
-      totalRecordsCount,
-      loading: false,
-    });
+    )
+      .then(({ data, totalRecordsCount }) => {
+        this.setState({
+          data: List(data),
+          totalRecordsCount,
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          dataFetchingError: transformRequestError(error),
+        });
+      })
+      .then(() => {
+        this.setState({
+          loading: false,
+        });
+      });
   };
 
   private renderActionButtons: DataTableViewProps['renderActionButtons'] = () => (
