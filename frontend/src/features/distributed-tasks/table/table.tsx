@@ -173,7 +173,7 @@ export class PureDistributedTasksTable extends Component<
           totalRecordsCount={totalRecordsCount}
           onFetchData={this.fetchData}
           initialPage={1}
-          initialPageSize={20}
+          initialPageSize={10}
           getForceFetchData={this.getFetchDataCallback}
         />
       </DataTableView>
