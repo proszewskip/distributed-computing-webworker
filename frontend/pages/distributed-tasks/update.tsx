@@ -1,8 +1,9 @@
-import { Heading, Link, majorScale, Pane } from 'evergreen-ui';
+import { Heading, majorScale, Pane } from 'evergreen-ui';
 import React, { PureComponent, ReactNode } from 'react';
 
 import { ErrorPage, RequestErrorInfo } from 'components/errors';
 import { Layout, LayoutProps } from 'components/layout';
+import { Link } from 'components/link';
 import { withRouter, WithRouterProps } from 'components/router';
 
 import { RequestError, transformRequestError } from 'error-handling';
