@@ -3,7 +3,7 @@ import { List } from 'immutable';
 import React, { Component } from 'react';
 import { Column } from 'react-table';
 
-import { TextCell } from 'components/data-table/cells/text-cell';
+import { TextCell } from 'components/data-table/cells';
 import { DataTable, DataTableProps } from 'components/data-table/data-table';
 import {
   DataTableView,
