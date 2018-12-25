@@ -10,7 +10,7 @@ export interface DistributedTaskDetailsProps {
   distributedTaskDefinitionId: number;
   detailsData?: DistributedTask;
   tableData?: SubtasksTableOwnProps;
-  errors?: RequestError;
+  dataFetchingError?: RequestError;
 }
 
 export interface DistributedTaskDetailsDependencies {
