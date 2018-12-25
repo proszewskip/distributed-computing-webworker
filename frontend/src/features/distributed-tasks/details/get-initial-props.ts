@@ -28,28 +28,32 @@ export const getDistributedTaskDetailsInitialProps = (
       data.subtasks = sortBy(prop('sequence-number'))(data.subtasks);
       return data;
     })
-    .then((data) => {
-      return {
-        distributedTaskDefinitionId: id,
-        detailsData: {
-          id: data.id,
-          name: data.name,
-          description: data.description,
-          priority: data.priority,
-          'trust-level-to-complete': data['trust-level-to-complete'],
-          errors: data.errors,
-          status: data.status,
-        },
-        tableData: {
-          data: data.subtasks,
-          totalRecordsCount: data.subtasks.length,
-          distributedTaskId: data.id,
-        },
-      };
-    })
+    .then(
+      (data): DistributedTaskDetailsProps => {
+        return {
+          distributedTaskDefinitionId: id,
+          detailsData: {
+            id: data.id,
+            name: data.name,
+            description: data.description,
+            priority: data.priority,
+            'trust-level-to-complete': data['trust-level-to-complete'],
+            errors: data.errors,
+            status: data.status,
+          },
+          tableData: {
+            data: data.subtasks,
+            totalRecordsCount: data.subtasks.length,
+            distributedTaskId: data.id,
+          },
+        };
+      },
+    )
     .catch(handleAuthenticationError)
-    .catch((error) => ({
-      distributedTaskDefinitionId: id,
-      errors: transformRequestError(error),
-    }));
+    .catch(
+      (error): DistributedTaskDetailsProps => ({
+        distributedTaskDefinitionId: id,
+        dataFetchingError: transformRequestError(error),
+      }),
+    );
 };

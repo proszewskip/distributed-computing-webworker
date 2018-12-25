@@ -73,22 +73,21 @@ export class PureDistributedTaskDetails extends PureComponent<
           distributedTaskId={detailsData.id}
           data={data}
           totalRecordsCount={totalRecordsCount}
-          {...this.props}
         />
       </>
     );
   };
 
   private renderErrors = (): ReactNode => {
-    const { errors } = this.props;
+    const { dataFetchingError } = this.props;
 
-    if (!errors) {
+    if (!dataFetchingError) {
       return null;
     }
 
     return (
       <ErrorPage>
-        <RequestErrorInfo error={errors} />
+        <RequestErrorInfo error={dataFetchingError} />
 
         <Link route="/distributed-tasks">
           <a>Go back to the list of distributed tasks</a>
