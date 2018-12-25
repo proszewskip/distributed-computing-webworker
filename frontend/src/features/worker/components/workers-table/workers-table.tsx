@@ -9,6 +9,8 @@ import { StyledDataTable } from 'components/data-table/styled-data-table';
 import { SubtaskWorkerInfo } from 'features/worker/services';
 import { WorkerThreadStatus } from 'features/worker/worker-thread';
 
+import { WorkerStatusCell } from './worker-status-cell';
+
 export interface WorkersTableProps {
   subtaskWorkers: Map<number, SubtaskWorkerInfo>;
   maxWorkersCount: number;
@@ -25,15 +27,13 @@ const columns: Array<Column<WorkerTableItem>> = [
     accessor: 'id',
     Header: <Text>ID</Text>,
     Cell: TextCell,
-    width: 200,
+    width: 150,
   },
   {
     id: 'status',
     accessor: 'status',
     Header: <Text>Status</Text>,
-    // TODO: use a special cell to display the status
-    Cell: TextCell,
-    width: 200,
+    Cell: WorkerStatusCell,
   },
 ];
 
@@ -43,7 +43,7 @@ export const WorkersTable: StatelessComponent<WorkersTableProps> = ({
 }) => (
   <StyledDataTable
     columns={columns}
-    defaultPageSize={maxWorkersCount}
+    pageSize={maxWorkersCount}
     PaginationComponent={NullComponent}
     NoDataComponent={NullComponent}
     data={subtaskWorkers
