@@ -29,5 +29,4 @@ export interface DistributedTaskDefinitionsTableState
   selectedRowIds: WithSelectableRowsAdditionalProps['selectedRowIds'];
   filteringEnabled: boolean;
   forceFetchDataCallback: ForceFetchData;
-  dataFetchingError?: RequestError;
 }

@@ -22,10 +22,9 @@ export type DistributedNodesTableProps = DistributedNodesTableDependencies &
   DistributedNodesTableOwnProps;
 
 export interface DistributedNodesTableState
-  extends Omit<DistributedNodesTableProps, 'data'> {
+  extends Omit<DistributedNodesTableOwnProps, 'data'> {
   data: List<DistributedNode>;
   loading: boolean;
   filteringEnabled: boolean;
   forceFetchDataCallback: ForceFetchData;
-  dataFetchingError?: RequestError;
 }
