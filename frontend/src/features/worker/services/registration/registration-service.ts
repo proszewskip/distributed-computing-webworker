@@ -12,7 +12,7 @@ export class RegistrationService {
   /**
    * Registers the node and the newly received ID
    */
-  public registerNode() {
+  public registerNode(): Promise<string> {
     const { fetch } = this;
 
     return fetch(`${config.serverUrl}/distributed-nodes/register`, {

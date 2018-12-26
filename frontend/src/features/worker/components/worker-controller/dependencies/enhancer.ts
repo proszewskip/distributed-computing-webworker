@@ -3,6 +3,7 @@ import { DependenciesEnhancer } from 'components/dependency-injection/enhancer';
 import { BaseDependencies } from 'product-specific';
 
 import {
+  CachedRegistrationService,
   DistributedNodeService,
   KeepAliveService,
   RegistrationService,
@@ -30,6 +31,11 @@ export const dependenciesEnhancer: DependenciesEnhancer<
   const registrationService = new RegistrationService({
     fetch,
   });
+  const cachedRegistrationService = new CachedRegistrationService({
+    keepAliveService,
+    storageProvider: () => localStorage,
+    registrationService,
+  });
   const subtaskService = new SubtaskSerivce({
     fetch,
   });
@@ -41,7 +47,7 @@ export const dependenciesEnhancer: DependenciesEnhancer<
       {
         fetch,
         keepAliveService,
-        registrationService,
+        registrationService: cachedRegistrationService,
         subtaskService,
         subtaskWorkerFactory: (subtaskMetadata, options) =>
           new SubtaskWorker(
