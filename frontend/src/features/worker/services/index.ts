@@ -1,3 +1,4 @@
+export * from './cached-registration';
 export * from './distributed-node';
 export * from './keep-alive';
 export * from './registration';
