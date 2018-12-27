@@ -30,7 +30,6 @@ namespace Server.Controllers
             IResourceService<DistributedNode, Guid> distributedNodeResourceService,
             IResourceService<SubtaskInProgress> subtaskInProgressResourceService,
             DistributedComputingDbContext dbContext,
-            IJsonApiResponseFactory jsonApiResponseFactory,
             IGetNextSubtaskToComputeService getNextSubtaskToComputeService,
             IPathsProvider pathsProvider
         )
