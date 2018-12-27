@@ -10,7 +10,7 @@ namespace Server.Services
     public interface IJsonApiActionResultFactory
     {
         IActionResult Error(Error error);
-        IActionResult Errors(ErrorCollection errors);
+        IActionResult Errors(ErrorCollection errorsCollection);
     }
 
     public class JsonApiActionResultFactory : JsonApiControllerMixin, IJsonApiActionResultFactory 
@@ -20,9 +20,9 @@ namespace Server.Services
             return base.Error(error);
         }
 
-        public new IActionResult Errors(ErrorCollection errors)
+        public new IActionResult Errors(ErrorCollection errorsCollection)
         {
-            return base.Errors(errors);
+            return base.Errors(errorsCollection);
         }
     }
 }
