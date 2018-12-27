@@ -24,6 +24,12 @@ import { OnDistributedNodeStateUpdate } from './types/on-state-update';
  */
 const SUBTASK_GRACE_PERIOD_TIMEOUT = 1000;
 
+/**
+ * TODO: make the changes after
+ * https://github.com/proszewskip/distributed-computing-webworker/pull/100
+ * is merged. There may be merge conflicts because both PRs modify this file.
+ */
+
 export class DistributedNodeService {
   private readonly dependencies: DistributedNodeServiceDependencies;
   private readonly onStateUpdate: OnDistributedNodeStateUpdate;
@@ -275,6 +281,11 @@ export class DistributedNodeService {
 
     const { distributedNodeId } = this.state.data;
 
+    /**
+     * REFACTOR: extract the `switch` to a separate method
+     * TODO: handle errors and retry
+     */
+
     switch (result.status) {
       case WorkerThreadStatus.ComputationSuccess:
         await this.dependencies.subtaskService.sendComputationSuccess({
@@ -367,5 +378,9 @@ export class DistributedNodeService {
     }
   };
 }
+
+/**
+ * TODO: `sendComputationCancel` when the worker is cancelled
+ */
 
 const cancelWorker = (worker: SubtaskWorker) => worker.cancel();
