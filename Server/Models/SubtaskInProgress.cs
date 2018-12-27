@@ -26,7 +26,7 @@ namespace Server.Models
 
         [Required]
         [Attr("status", isImmutable: true)]
-        public SubtaskStatus Status { get; set; } = SubtaskStatus.Executing;
+        public SubtaskInProgressStatus Status { get; set; } = SubtaskInProgressStatus.Executing;
 
         /// <summary>
         /// Computation results

@@ -55,7 +55,7 @@ namespace Server.Tests.Services.Api
                     .ThenInclude(subtask => subtask.DistributedTask)
                     .FirstAsync(subtaskInProgress => subtaskInProgress.Id == 1);
 
-                Assert.AreEqual(SubtaskStatus.Done, foundSubtaskInProgress.Status);
+                Assert.AreEqual(SubtaskInProgressStatus.Done, foundSubtaskInProgress.Status);
                 Assert.AreEqual(SubtaskStatus.Done, foundSubtaskInProgress.Subtask.Status);
                 Assert.AreEqual(DistributedTaskStatus.Done, foundSubtaskInProgress.Subtask.DistributedTask.Status);
             }
@@ -97,7 +97,7 @@ namespace Server.Tests.Services.Api
                     .ThenInclude(subtask => subtask.DistributedTask)
                     .FirstAsync(subtaskInProgress => subtaskInProgress.Id == 1);
 
-                Assert.AreEqual(SubtaskStatus.Done, foundSubtaskInProgress.Status);
+                Assert.AreEqual(SubtaskInProgressStatus.Done, foundSubtaskInProgress.Status);
                 Assert.AreEqual(SubtaskStatus.Done, foundSubtaskInProgress.Subtask.Status);
                 Assert.AreEqual(DistributedTaskStatus.InProgress, foundSubtaskInProgress.Subtask.DistributedTask.Status);
             }
@@ -135,7 +135,7 @@ namespace Server.Tests.Services.Api
                     .ThenInclude(subtask => subtask.DistributedTask)
                     .FirstAsync(subtaskInProgress => subtaskInProgress.Id == 1);
 
-                Assert.AreEqual(SubtaskStatus.Done, foundSubtaskInProgress.Status);
+                Assert.AreEqual(SubtaskInProgressStatus.Done, foundSubtaskInProgress.Status);
                 Assert.AreEqual(SubtaskStatus.Executing, foundSubtaskInProgress.Subtask.Status);
                 Assert.AreEqual(DistributedTaskStatus.InProgress, foundSubtaskInProgress.Subtask.DistributedTask.Status);
             }
@@ -158,7 +158,7 @@ namespace Server.Tests.Services.Api
                                 {
                                     Id = 1,
                                     SubtaskId = 1,
-                                    Status = SubtaskStatus.Executing,
+                                    Status = SubtaskInProgressStatus.Executing,
                                     Node = new DistributedNode()
                                     {
                                         TrustLevel = 1
