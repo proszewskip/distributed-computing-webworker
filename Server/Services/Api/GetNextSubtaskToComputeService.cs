@@ -28,13 +28,14 @@ namespace Server.Services.Api
                     (subtask.Status == SubtaskStatus.WaitingForExecution ||
                      subtask.Status == SubtaskStatus.Executing) &&
                     subtask.DistributedTask.Status == DistributedTaskStatus.InProgress &&
-                    (!subtask.SubtasksInProgress.Any() ||
-                     subtask.SubtasksInProgress
-                         .Where(subtaskInProgress =>
-                             subtaskInProgress.Status == SubtaskInProgressStatus.Executing ||
-                             subtaskInProgress.Status == SubtaskInProgressStatus.Done)
-                         .Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel)
-                     < subtask.DistributedTask.TrustLevelToComplete)
+                    subtask.SubtasksInProgress
+                        .Where(subtaskInProgress =>
+                            subtaskInProgress.Status == SubtaskInProgressStatus.Executing ||
+                            subtaskInProgress.Status == SubtaskInProgressStatus.Done)
+                        .Select(subtaskInProgress => subtaskInProgress.Node.TrustLevel)
+                        .DefaultIfEmpty(0)
+                        .Sum()
+                    < subtask.DistributedTask.TrustLevelToComplete
                 );
         }
     }
