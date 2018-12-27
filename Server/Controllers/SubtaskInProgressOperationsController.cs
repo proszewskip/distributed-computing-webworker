@@ -37,7 +37,8 @@ namespace Server.Controllers
 
         [HttpPost("computation-success")]
         [ValidateModel]
-        public async Task<IActionResult> ReportComputationSuccessAsync([FromForm] ComputationSuccessDTO computationSuccessDto)
+        public async Task<IActionResult> ReportComputationSuccessAsync(
+            [FromForm] ComputationSuccessDTO computationSuccessDto)
         {
             if (!Guid.TryParse(computationSuccessDto.DistributedNodeId, out var distributedNodeId))
                 return BadRequest(); // TODO: specify the reason
@@ -46,8 +47,9 @@ namespace Server.Controllers
                 await _subtaskInProgressResourceService.GetAsync(computationSuccessDto.SubtaskInProgressId);
 
             if (!IsFinishableSubtaskInProgress(finishedSubtaskInProgress, distributedNodeId))
+                return NotFound();
 
-                using (var subtaskInProgressResultStream = computationSuccessDto.SubtaskResult.OpenReadStream())
+            using (var subtaskInProgressResultStream = computationSuccessDto.SubtaskResult.OpenReadStream())
             {
                 await _computationCompleteService.CompleteSubtaskInProgressAsync(
                     computationSuccessDto.SubtaskInProgressId, subtaskInProgressResultStream);
