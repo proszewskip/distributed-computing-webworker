@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace Server.Services.Api
     /// <summary>
     /// Service used for synchronizing completing the computation of subtasks.
     /// </summary>
-    public interface IFinishComputationService
+    public interface IComputationCompleteService
     {
         /// <summary>
         /// Marks a given SubtaskInProgress as complete, possibly also marking
@@ -25,21 +26,10 @@ namespace Server.Services.Api
         /// <param name="subtaskInProgressResult"></param>
         /// <returns></returns>
         Task CompleteSubtaskInProgressAsync(int subtaskInProgressId, Stream subtaskInProgressResult);
-
-        /// <summary>
-        /// Marks a given SubtaskInProgress as failed, also marking the Subtask
-        /// and DistributedTask as failed.
-        /// </summary>
-        /// <param name="subtaskInProgressId"></param>
-        /// <param name="computationErrors"></param>
-        /// <returns></returns>
-        Task FailSubtaskInProgressAsync(int subtaskInProgressId, string[] computationErrors);
     }
 
-    public class FinishComputationService : IFinishComputationService
+    public class ComputationCompleteService : IComputationCompleteService
     {
-        private static readonly int MaxSubtaskRetries = 2;
-
         private readonly IAssemblyLoader _assemblyLoader;
         private readonly DistributedComputingDbContext _dbContext;
         private readonly IPathsProvider _pathsProvider;
@@ -47,7 +37,7 @@ namespace Server.Services.Api
         private readonly IResourceService<SubtaskInProgress> _subtaskInProgressResourceService;
         private readonly IResourceService<Subtask> _subtaskResourceService;
 
-        public FinishComputationService(
+        public ComputationCompleteService(
             DistributedComputingDbContext dbContext,
             IPathsProvider pathsProvider,
             IAssemblyLoader assemblyLoader,
@@ -71,58 +61,6 @@ namespace Server.Services.Api
 
                 transaction.Commit();
             }
-        }
-
-        public async Task FailSubtaskInProgressAsync(int subtaskInProgressId, string[] computationErrors)
-        {
-            using (var transaction = await _dbContext.Database.BeginTransactionAsync())
-            {
-                await InternalFailSubtaskInProgressAsync(subtaskInProgressId, computationErrors);
-
-                transaction.Commit();
-            }
-        }
-
-        private async Task InternalFailSubtaskInProgressAsync(int subtaskInProgressId, string[] computationErrors)
-        {
-            var failedSubtaskInProgress = await _subtaskInProgressResourceService.GetAsync(subtaskInProgressId);
-
-            failedSubtaskInProgress.Status = SubtaskStatus.Error;
-            failedSubtaskInProgress.Errors = computationErrors;
-
-            await _subtaskInProgressResourceService.UpdateAsync(subtaskInProgressId, failedSubtaskInProgress);
-
-            var failedSubtasksCount = await _dbContext.SubtasksInProgress
-                .CountAsync(subtaskInProgress =>
-                    subtaskInProgress.SubtaskId == failedSubtaskInProgress.SubtaskId &&
-                    subtaskInProgress.Status == SubtaskStatus.Error
-                );
-
-            if (failedSubtasksCount >= MaxSubtaskRetries)
-            {
-                await FailSubtaskAsync(failedSubtaskInProgress);
-            }
-
-            await _dbContext.SaveChangesAsync();
-        }
-
-        private async Task FailSubtaskAsync(SubtaskInProgress failedSubtaskInProgress)
-        {
-            var subtask = await _subtaskResourceService.GetAsync(failedSubtaskInProgress.SubtaskId);
-            subtask.Status = SubtaskStatus.Error;
-
-            await _subtaskResourceService.UpdateAsync(failedSubtaskInProgress.SubtaskId, subtask);
-
-            await FailDistributedTask(subtask);
-        }
-
-        private async Task FailDistributedTask(Subtask subtask)
-        {
-            //TODO: Use IResourceService for updating DistributedTasks.
-            var finishedDistributedTask = await _dbContext.DistributedTasks.FirstAsync(distributedTask =>
-                distributedTask.Id == subtask.DistributedTaskId);
-
-            finishedDistributedTask.Status = DistributedTaskStatus.Error;
         }
 
         private async Task FinishSubtaskInProgressAsync(int subtaskInProgressId, Stream subtaskInProgressResultStream)
