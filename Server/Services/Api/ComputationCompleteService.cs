@@ -1,7 +1,6 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using JsonApiDotNetCore.Services;
 using Microsoft.EntityFrameworkCore;
 using Server.Exceptions;
 using Server.Models;
@@ -29,20 +28,14 @@ namespace Server.Services.Api
     public class ComputationCompleteService : IComputationCompleteService
     {
         private readonly DistributedComputingDbContext _dbContext;
-        private readonly IResourceService<SubtaskInProgress> _subtaskInProgressResourceService;
-        private readonly IResourceService<Subtask> _subtaskResourceService;
         private readonly IProblemPluginFacadeProvider _problemPluginFacadeProvider;
 
         public ComputationCompleteService(
             DistributedComputingDbContext dbContext,
-            IResourceService<SubtaskInProgress> subtaskInProgressResourceService,
-            IResourceService<Subtask> subtaskResourceService,
             IProblemPluginFacadeProvider problemPluginFacadeProvider
         )
         {
             _dbContext = dbContext;
-            _subtaskInProgressResourceService = subtaskInProgressResourceService;
-            _subtaskResourceService = subtaskResourceService;
             _problemPluginFacadeProvider = problemPluginFacadeProvider;
         }
 
@@ -64,11 +57,11 @@ namespace Server.Services.Api
             var memoryStream = new MemoryStream(subtaskInProgressResult);
             await subtaskInProgressResultStream.CopyToAsync(memoryStream);
 
-            var finishedSubtaskInProgress = await _subtaskInProgressResourceService.GetAsync(subtaskInProgressId);
+            var finishedSubtaskInProgress = await _dbContext.SubtasksInProgress.FindAsync(subtaskInProgressId);
             finishedSubtaskInProgress.Status = SubtaskStatus.Done;
             finishedSubtaskInProgress.Result = subtaskInProgressResult;
 
-            await _subtaskInProgressResourceService.UpdateAsync(subtaskInProgressId, finishedSubtaskInProgress);
+            await _dbContext.SaveChangesAsync();
 
             var isSubtaskFullyComputed = IsSubtaskFullyComputed(finishedSubtaskInProgress.SubtaskId);
 
@@ -96,12 +89,12 @@ namespace Server.Services.Api
             }
             else
             {
-                var finishedSubtask = await _subtaskResourceService.GetAsync(subtaskId);
+                var finishedSubtask = await _dbContext.Subtasks.FindAsync(subtaskId);
 
                 finishedSubtask.Result = sampleResult;
                 finishedSubtask.Status = SubtaskStatus.Done;
 
-                await _subtaskResourceService.UpdateAsync(subtaskId, finishedSubtask);
+                await _dbContext.SaveChangesAsync();
 
                 if (IsDistributedTaskFullyComputed(finishedSubtask.DistributedTaskId))
                     await FinishDistributedTaskAsync(finishedSubtask.DistributedTaskId);
@@ -123,7 +116,6 @@ namespace Server.Services.Api
 
         private async Task FinishDistributedTaskAsync(int distributedTaskId)
         {
-            //TODO: Use IResourceService for updating DistributedTasks.
             var finishedDistributedTask =
                 await _dbContext.DistributedTasks.Include(distributedTask => distributedTask.DistributedTaskDefinition)
                     .FirstAsync(distributedTask =>
