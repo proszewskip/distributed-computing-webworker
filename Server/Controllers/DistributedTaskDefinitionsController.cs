@@ -1,11 +1,9 @@
 using System;
-using System.Reflection;
 using System.Threading.Tasks;
 using JsonApiDotNetCore.Controllers;
 using JsonApiDotNetCore.Internal;
 using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyModel.Resolution;
 using Microsoft.Extensions.Logging;
 using Server.DTO;
 using Server.Exceptions;
@@ -23,8 +21,7 @@ namespace Server.Controllers
     [ServiceFilter(typeof(AuthorizationFilter))]
     public class DistributedTaskDefinitionsController : JsonApiController<DistributedTaskDefinition>
     {
-        private readonly IProblemPluginFacadeFactory _problemPluginFacadeFactory;
-        private readonly IAssemblyLoader _assemblyLoader;
+        private readonly IProblemPluginFacadeProvider _problemPluginFacadeProvider;
         private readonly IFileStorage _fileStorage;
         private readonly IPackager _packager;
         private readonly IJsonApiResponseFactory _jsonApiResponseFactory;
@@ -38,8 +35,7 @@ namespace Server.Controllers
             IResourceService<DistributedTaskDefinition> taskDefinitionResourceService,
             ILoggerFactory loggerFactory,
             IPathsProvider pathsProvider,
-            IProblemPluginFacadeFactory problemPluginFacadeFactory,
-            IAssemblyLoader assemblyLoader,
+            IProblemPluginFacadeProvider problemPluginFacadeProvider,
             IFileStorage fileStorage,
             IPackager packager,
             IJsonApiResponseFactory jsonApiResponseFactory
@@ -47,8 +43,7 @@ namespace Server.Controllers
         {
             _taskDefinitionResourceService = taskDefinitionResourceService;
             _pathsProvider = pathsProvider;
-            _problemPluginFacadeFactory = problemPluginFacadeFactory;
-            _assemblyLoader = assemblyLoader;
+            _problemPluginFacadeProvider = problemPluginFacadeProvider;
             _fileStorage = fileStorage;
             _packager = packager;
             _jsonApiResponseFactory = jsonApiResponseFactory;
@@ -61,13 +56,14 @@ namespace Server.Controllers
         public async Task<IActionResult> PostAsync([FromForm] CreateDistributedTaskDefinitionDTO body)
         {
             var taskDefinitionGuid = Guid.NewGuid();
-            var mainDllPath = await SaveDllsAsync(body, taskDefinitionGuid);
-            var mainDllAssembly = _assemblyLoader.LoadAssembly(mainDllPath);
+            var mainDllName = body.MainDll.FileName;
             ProblemPluginInfo problemPluginInfo;
+
+            await SaveDllsAsync(body, taskDefinitionGuid);
 
             try
             {
-                problemPluginInfo = AnalyzeAssembly(mainDllAssembly);
+                problemPluginInfo = AnalyzeAssembly(taskDefinitionGuid, mainDllName);
             }
             catch (InvalidAssemblyException exception)
             {
@@ -83,7 +79,7 @@ namespace Server.Controllers
 
 
             // TODO: handle packager errors and display them to the user
-            string packagerLogs = await PackAssemblyAsync(body, taskDefinitionGuid);
+            var packagerLogs = await PackAssemblyAsync(taskDefinitionGuid, mainDllName);
 
             var distributedTaskDefinition = new DistributedTaskDefinition
             {
@@ -91,7 +87,7 @@ namespace Server.Controllers
                 Description = body.Description ?? "",
                 DefinitionGuid = taskDefinitionGuid,
                 ProblemPluginInfo = problemPluginInfo,
-                MainDllName = body.MainDll.FileName,
+                MainDllName = mainDllName,
                 PackagerLogs = packagerLogs
             };
 
@@ -110,32 +106,32 @@ namespace Server.Controllers
             }
         }
 
-        private Task<string> PackAssemblyAsync(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
+        private Task<string> PackAssemblyAsync(Guid taskDefinitionGuid, string mainDllName)
         {
             string[] args =
             {
                 $"--prefix={_pathsProvider.GetTaskDefinitionDirectoryPath(taskDefinitionGuid)}",
                 $"--out={_pathsProvider.GetCompiledTaskDefinitionDirectoryPath(taskDefinitionGuid)}",
-                body.MainDll.FileName
+                mainDllName
             };
 
             return Task.Run(() => _packager.Run(args));
         }
 
-        private async Task<string> SaveDllsAsync(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
+        private Task SaveDllsAsync(CreateDistributedTaskDefinitionDTO body, Guid taskDefinitionGuid)
         {
             var taskDefinitionDirectoryPath = _pathsProvider.GetTaskDefinitionDirectoryPath(taskDefinitionGuid);
+
             var saveMainDllFileTask = _fileStorage.SaveFileAsync(taskDefinitionDirectoryPath, body.MainDll);
+            var saveAdditionalDllsTask = _fileStorage.SaveFilesAsync(taskDefinitionDirectoryPath, body.AdditionalDlls);
 
-            await Task.WhenAll(saveMainDllFileTask,
-                _fileStorage.SaveFilesAsync(taskDefinitionDirectoryPath, body.AdditionalDlls));
-
-            return saveMainDllFileTask.Result;
+            return Task.WhenAll(saveMainDllFileTask, saveAdditionalDllsTask);
         }
 
         private void DeleteSavedDlls(Guid taskDefinitionGuid)
         {
             var taskDefinitionDirectoryPath = _pathsProvider.GetTaskDefinitionDirectoryPath(taskDefinitionGuid);
+
             _fileStorage.DeleteDirectory(taskDefinitionDirectoryPath);
         }
 
@@ -143,12 +139,13 @@ namespace Server.Controllers
         {
             var packagerResultsDirectoryPath =
                 _pathsProvider.GetCompiledTaskDefinitionDirectoryPath(taskDefinitionGuid);
+
             _fileStorage.DeleteDirectory(packagerResultsDirectoryPath);
         }
 
-        private ProblemPluginInfo AnalyzeAssembly(Assembly assembly)
+        private ProblemPluginInfo AnalyzeAssembly(Guid taskDefinitionGuid, string mainDllName)
         {
-            var problemPluginFacade = _problemPluginFacadeFactory.Create(assembly);
+            var problemPluginFacade = _problemPluginFacadeProvider.Provide(taskDefinitionGuid, mainDllName);
 
             return problemPluginFacade.GetProblemPluginInfo();
         }
