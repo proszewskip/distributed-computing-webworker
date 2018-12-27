@@ -21,6 +21,7 @@ namespace Server.Tests.Services.Api
             using (var dbContext = new TestDbContext(dbContextOptions))
             {
                 await CreateMockData(dbContext);
+                await dbContext.SaveChangesAsync();
             }
 
             var problemPluginFacadeMock = new Mock<IProblemPluginFacade>();
@@ -36,7 +37,8 @@ namespace Server.Tests.Services.Api
 
             using (var dbContext = new TestDbContext(dbContextOptions))
             {
-                var computationCompleteService = new ComputationCompleteService(dbContext, problemPluginFacadeProviderMock.Object);
+                var computationCompleteService =
+                    new ComputationCompleteService(dbContext, problemPluginFacadeProviderMock.Object);
 
                 using (var stream = new MemoryStream(new byte[] {4, 5, 6}))
                 {
@@ -46,7 +48,8 @@ namespace Server.Tests.Services.Api
 
             problemPluginFacadeProviderMock.Verify(provider => provider.Provide(It.IsAny<DistributedTaskDefinition>()),
                 Times.Once);
-            problemPluginFacadeMock.Verify(facade => facade.JoinSubtaskResults(It.IsAny<IEnumerable<byte[]>>()), Times.Once);
+            problemPluginFacadeMock.Verify(facade => facade.JoinSubtaskResults(It.IsAny<IEnumerable<byte[]>>()),
+                Times.Once);
 
             using (var dbContext = new TestDbContext(dbContextOptions))
             {
@@ -82,9 +85,10 @@ namespace Server.Tests.Services.Api
 
             using (var dbContext = new TestDbContext(dbContextOptions))
             {
-                var computationCompleteService = new ComputationCompleteService(dbContext, problemPluginFacadeProviderMock.Object);
+                var computationCompleteService =
+                    new ComputationCompleteService(dbContext, problemPluginFacadeProviderMock.Object);
 
-                using (var stream = new MemoryStream(new byte[] { 4, 5, 6 }))
+                using (var stream = new MemoryStream(new byte[] {4, 5, 6}))
                 {
                     await computationCompleteService.CompleteSubtaskInProgressAsync(1, stream);
                 }
@@ -99,7 +103,8 @@ namespace Server.Tests.Services.Api
 
                 Assert.AreEqual(SubtaskInProgressStatus.Done, foundSubtaskInProgress.Status);
                 Assert.AreEqual(SubtaskStatus.Done, foundSubtaskInProgress.Subtask.Status);
-                Assert.AreEqual(DistributedTaskStatus.InProgress, foundSubtaskInProgress.Subtask.DistributedTask.Status);
+                Assert.AreEqual(DistributedTaskStatus.InProgress,
+                    foundSubtaskInProgress.Subtask.DistributedTask.Status);
             }
         }
 
@@ -120,9 +125,10 @@ namespace Server.Tests.Services.Api
 
             using (var dbContext = new TestDbContext(dbContextOptions))
             {
-                var computationCompleteService = new ComputationCompleteService(dbContext, problemPluginFacadeProviderMock.Object);
+                var computationCompleteService =
+                    new ComputationCompleteService(dbContext, problemPluginFacadeProviderMock.Object);
 
-                using (var stream = new MemoryStream(new byte[] { 4, 5, 6 }))
+                using (var stream = new MemoryStream(new byte[] {4, 5, 6}))
                 {
                     await computationCompleteService.CompleteSubtaskInProgressAsync(1, stream);
                 }
@@ -137,7 +143,68 @@ namespace Server.Tests.Services.Api
 
                 Assert.AreEqual(SubtaskInProgressStatus.Done, foundSubtaskInProgress.Status);
                 Assert.AreEqual(SubtaskStatus.Executing, foundSubtaskInProgress.Subtask.Status);
-                Assert.AreEqual(DistributedTaskStatus.InProgress, foundSubtaskInProgress.Subtask.DistributedTask.Status);
+                Assert.AreEqual(DistributedTaskStatus.InProgress,
+                    foundSubtaskInProgress.Subtask.DistributedTask.Status);
+            }
+        }
+
+        [Test]
+        public async Task CompleteSubtaskInProgressAsync_Should_SelectMostTrustedResult_When_TrustLevelReached()
+        {
+            var dbContextOptions = DbContextOptionsFactory.CreateOptions("Mark_subtask_as_done");
+            using (var dbContext = new TestDbContext(dbContextOptions))
+            {
+                await CreateMockData(dbContext);
+                dbContext.Subtasks.Add(new Subtask()
+                {
+                    DistributedTaskId = 1,
+                    Id = 2,
+                    SequenceNumber = 1,
+                });
+                dbContext.SubtasksInProgress.AddRange(new SubtaskInProgress()
+                {
+                    Id = 2,
+                    SubtaskId = 1,
+                    Node = new DistributedNode()
+                    {
+                        TrustLevel = 5,
+                    },
+                    Result = new byte[] {1, 2, 3},
+                    Status = SubtaskInProgressStatus.Done,
+                }, new SubtaskInProgress()
+                {
+                    Id = 3,
+                    SubtaskId = 1,
+                    Node = new DistributedNode()
+                    {
+                        TrustLevel = 3,
+                    },
+                    Result = new byte[] {4, 5, 6},
+                    Status = SubtaskInProgressStatus.Done,
+                });
+                await dbContext.SaveChangesAsync();
+            }
+
+
+            var problemPluginFacadeProviderMock = new Mock<IProblemPluginFacadeProvider>();
+
+            using (var dbContext = new TestDbContext(dbContextOptions))
+            {
+                var computationCompleteService =
+                    new ComputationCompleteService(dbContext, problemPluginFacadeProviderMock.Object);
+
+                using (var stream = new MemoryStream(new byte[] {4, 5, 6}))
+                {
+                    await computationCompleteService.CompleteSubtaskInProgressAsync(1, stream);
+                }
+            }
+
+            using (var dbContext = new TestDbContext(dbContextOptions))
+            {
+                var foundSubtask = await dbContext.Subtasks
+                    .FirstAsync(subtask => subtask.Id == 1);
+
+                Assert.AreEqual(new byte[] {1, 2, 3}, foundSubtask.Result);
             }
         }
 
@@ -146,28 +213,28 @@ namespace Server.Tests.Services.Api
             dbContext.DistributedTasks.Add(new DistributedTask()
             {
                 Subtasks = new List<Subtask>()
+                {
+                    new Subtask()
                     {
-                        new Subtask()
+                        DistributedTaskId = 1,
+                        Id = 1,
+                        SequenceNumber = 0,
+                        SubtasksInProgress = new List<SubtaskInProgress>()
                         {
-                            DistributedTaskId = 1,
-                            Id = 1,
-                            SequenceNumber = 0,
-                            SubtasksInProgress = new List<SubtaskInProgress>()
+                            new SubtaskInProgress()
                             {
-                                new SubtaskInProgress()
+                                Id = 1,
+                                SubtaskId = 1,
+                                Status = SubtaskInProgressStatus.Executing,
+                                Node = new DistributedNode()
                                 {
-                                    Id = 1,
-                                    SubtaskId = 1,
-                                    Status = SubtaskInProgressStatus.Executing,
-                                    Node = new DistributedNode()
-                                    {
-                                        TrustLevel = 1
-                                    }
+                                    TrustLevel = 1
                                 }
-                            },
-                            Status = SubtaskStatus.Executing
-                        }
-                    },
+                            }
+                        },
+                        Status = SubtaskStatus.Executing
+                    }
+                },
                 DistributedTaskDefinition = new DistributedTaskDefinition()
                 {
                     DefinitionGuid = Guid.NewGuid(),
