@@ -103,6 +103,7 @@ namespace Server
                 .AddScoped<IAssemblyLoader, AssemblyLoader>()
                 .AddScoped<IPackager, Packager>()
                 .AddScoped<IProblemPluginFacadeFactory, ProblemPluginFacadeFactory>()
+                .AddScoped<IProblemPluginFacadeProvider, ProblemPluginFacadeProvider>()
                 .AddScoped<IFileStorage, FileStorage>()
                 .AddScoped<IResourceService<DistributedTaskDefinition>, DistributedTaskDefinitionService>()
                 .AddScoped<IResourceService<DistributedTask>, DistributedTaskService>()
