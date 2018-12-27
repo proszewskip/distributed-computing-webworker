@@ -16,31 +16,7 @@ namespace Server.Tests.Services.Api
             var dbContextOptions = DbContextOptionsFactory.CreateOptions("Mark_subtask_as_error");
             using (var dbContext = new TestDbContext(dbContextOptions))
             {
-                dbContext.DistributedTasks.Add(new DistributedTask()
-                {
-                    Subtasks = new List<Subtask>()
-                    {
-                        new Subtask()
-                        {
-                            DistributedTaskId = 1,
-                            Id = 1,
-                            SequenceNumber = 0,
-                            SubtasksInProgress = new List<SubtaskInProgress>()
-                            {
-                                new SubtaskInProgress()
-                                {
-                                    Id = 1,
-                                    SubtaskId = 1,
-                                    Status = SubtaskStatus.Executing
-                                }
-                            },
-                            Status = SubtaskStatus.Executing
-                        }
-                    },
-                    Id = 1,
-                    Name = "Task",
-                    Status = DistributedTaskStatus.InProgress
-                });
+                CreateMockData(dbContext);
 
                 await dbContext.SaveChangesAsync();
             }
@@ -70,36 +46,12 @@ namespace Server.Tests.Services.Api
             var dbContextOptions = DbContextOptionsFactory.CreateOptions("Mark_distributed task_as_error");
             using (var dbContext = new TestDbContext(dbContextOptions))
             {
-                dbContext.DistributedTasks.Add(new DistributedTask()
+                CreateMockData(dbContext);
+                dbContext.SubtasksInProgress.Add(new SubtaskInProgress()
                 {
-                    Subtasks = new List<Subtask>()
-                    {
-                        new Subtask()
-                        {
-                            DistributedTaskId = 1,
-                            Id = 1,
-                            SequenceNumber = 0,
-                            SubtasksInProgress = new List<SubtaskInProgress>()
-                            {
-                                new SubtaskInProgress()
-                                {
-                                    Id = 1,
-                                    SubtaskId = 1,
-                                    Status = SubtaskStatus.Error
-                                },
-                                new SubtaskInProgress()
-                                {
-                                    Id = 2,
-                                    SubtaskId = 1,
-                                    Status = SubtaskStatus.Executing
-                                }
-                            },
-                            Status = SubtaskStatus.Executing
-                        },
-                    },
-                    Id = 1,
-                    Name = "Task",
-                    Status = DistributedTaskStatus.InProgress
+                    Id = 2,
+                    SubtaskId = 1,
+                    Status = SubtaskStatus.Executing
                 });
 
                 await dbContext.SaveChangesAsync();
@@ -123,6 +75,35 @@ namespace Server.Tests.Services.Api
                 Assert.AreEqual(SubtaskStatus.Error, foundSubtaskInProgress.Subtask.Status);
                 Assert.AreEqual(DistributedTaskStatus.Error, foundSubtaskInProgress.Subtask.DistributedTask.Status);
             }
+        }
+
+        private static void CreateMockData(TestDbContext dbContext)
+        {
+            dbContext.DistributedTasks.Add(new DistributedTask()
+            {
+                Subtasks = new List<Subtask>()
+                {
+                    new Subtask()
+                    {
+                        DistributedTaskId = 1,
+                        Id = 1,
+                        SequenceNumber = 0,
+                        SubtasksInProgress = new List<SubtaskInProgress>()
+                        {
+                            new SubtaskInProgress()
+                            {
+                                Id = 1,
+                                SubtaskId = 1,
+                                Status = SubtaskStatus.Error
+                            },
+                        },
+                        Status = SubtaskStatus.Executing
+                    },
+                },
+                Id = 1,
+                Name = "Task",
+                Status = DistributedTaskStatus.InProgress
+            });
         }
     }
 }
