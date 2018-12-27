@@ -42,7 +42,7 @@ namespace Server.Controllers
             var finishedSubtaskInProgress =
                 await _subtaskInProgressResourceService.GetAsync(computationSuccessDto.SubtaskInProgressId);
 
-            if (finishedSubtaskInProgress == null || finishedSubtaskInProgress.Status != SubtaskStatus.Executing ||
+            if (finishedSubtaskInProgress == null || finishedSubtaskInProgress.Status != SubtaskInProgressStatus.Executing ||
                 finishedSubtaskInProgress.NodeId != distributedNodeId)
                 return NotFound();
 
@@ -65,7 +65,7 @@ namespace Server.Controllers
             var faultySubtaskInProgress =
                 await _subtaskInProgressResourceService.GetAsync(computationErrorDto.SubtaskInProgressId);
 
-            if (faultySubtaskInProgress == null || faultySubtaskInProgress.Status != SubtaskStatus.Executing ||
+            if (faultySubtaskInProgress == null || faultySubtaskInProgress.Status != SubtaskInProgressStatus.Executing ||
                 faultySubtaskInProgress.NodeId != distributedNodeId)
                 return NotFound();
 

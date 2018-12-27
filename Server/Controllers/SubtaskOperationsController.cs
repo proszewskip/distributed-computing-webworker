@@ -61,7 +61,7 @@ namespace Server.Controllers
             var subtaskInProgress = new SubtaskInProgress
             {
                 Node = distributedNode,
-                Status = SubtaskStatus.Executing,
+                Status = SubtaskInProgressStatus.Executing,
                 Subtask = nextSubtask
             };
 
@@ -94,7 +94,9 @@ namespace Server.Controllers
                     subtask.DistributedTask.Status == DistributedTaskStatus.InProgress &&
                     (!subtask.SubtasksInProgress.Any() ||
                      subtask.SubtasksInProgress
-                         .Where(subtaskInProgress => subtaskInProgress.Status != SubtaskStatus.Error)
+                         .Where(subtaskInProgress =>
+                             subtaskInProgress.Status == SubtaskInProgressStatus.Executing ||
+                             subtaskInProgress.Status == SubtaskInProgressStatus.Done)
                          .Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel)
                      < subtask.DistributedTask.TrustLevelToComplete)
                 );
