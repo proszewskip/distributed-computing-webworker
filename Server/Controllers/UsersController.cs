@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using JsonApiDotNetCore.Internal;
 using Microsoft.AspNetCore.Http;
@@ -42,6 +43,22 @@ namespace Server.Controllers
             return Ok();
         }
 
+        [HttpPut("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO body)
+        {
+            var user = await _signInManager.UserManager.FindByNameAsync(body.Username);
+
+            var changePasswordResult = await _signInManager.UserManager.ChangePasswordAsync(user,
+             body.OldPassword, body.NewPassword);
+
+            if (!changePasswordResult.Succeeded)
+            {
+                return GetErrorsResult(changePasswordResult.Errors);
+            }
+
+            return Ok();
+        }
+
         [HttpGet("is-authenticated")]
         public IActionResult IsAuthenticated()
         {
@@ -51,6 +68,17 @@ namespace Server.Controllers
             {
                 isSignedIn
             });
+        }
+
+        private IActionResult GetErrorsResult(IEnumerable<IdentityError> errorsEnumerable)
+        {
+            var errorsList = new List<IdentityError>(errorsEnumerable);
+
+            var errorsCollection = new ErrorCollection();
+
+            errorsList.ForEach(error => errorsCollection.Add(new Error(StatusCodes.Status400BadRequest, error.Description)));
+
+            return _jsonApiActionResultFactory.Errors(errorsCollection);
         }
     }
 }
