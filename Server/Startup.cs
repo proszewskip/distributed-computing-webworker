@@ -18,6 +18,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Server.Filters;
 using Server.Services.Api;
+using Server.Services.Cleanup;
 
 namespace Server
 {
@@ -36,7 +37,8 @@ namespace Server
             AddMvc(services);
             ConfigureDependencyInjection(services);
             ConfigureDatabaseProvider(services);
-            services.AddJsonApi<DistributedComputingDbContext>(options => {
+            services.AddJsonApi<DistributedComputingDbContext>(options =>
+            {
                 options.IncludeTotalRecordCount = true;
                 options.DefaultPageSize = 25;
             });
@@ -44,14 +46,10 @@ namespace Server
                 .AddEntityFrameworkStores<DistributedComputingDbContext>();
 
             services.Configure<IdentityOptions>(options => { });
-            services.ConfigureApplicationCookie(options =>
-            {
-                options.ExpireTimeSpan = TimeSpan.FromDays(30);
-            });
+            services.ConfigureApplicationCookie(options => { options.ExpireTimeSpan = TimeSpan.FromDays(30); });
 
             services.Configure<ServerConfig>(Configuration.GetSection("ServerConfig"));
             services.AddCors();
-            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -99,6 +97,8 @@ namespace Server
 
         private static void ConfigureDependencyInjection(IServiceCollection services)
         {
+            var distributedNodeLifetime = TimeSpan.FromMinutes(60);
+
             services
                 .AddScoped<IAssemblyLoader, AssemblyLoader>()
                 .AddScoped<IPackager, Packager>()
@@ -113,8 +113,14 @@ namespace Server
                 .AddScoped<IGetNextSubtaskToComputeService, GetNextSubtaskToComputeService>()
                 .AddScoped<IJsonApiResponseFactory, JsonApiResponseFactory>()
                 .AddScoped<IJsonApiActionResultFactory, JsonApiActionResultFactory>()
+                .AddScoped<IDistributedNodesCleaner>(serviceProvider =>
+                    new DistributedNodesCleaner(serviceProvider.GetService<DistributedComputingDbContext>(),
+                        serviceProvider.GetService<IComputationCancelService>(),
+                        distributedNodeLifetime))
                 .AddScoped<FormatErrorActionFilter>()
                 .AddScoped<AuthorizationFilter>();
+
+            services.AddHostedService<CleanupHostedService>();
 
             services.AddSingleton<IPathsProvider, PathsProvider>();
         }
