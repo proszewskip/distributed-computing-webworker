@@ -151,7 +151,7 @@ namespace Server.Tests.Services.Api
         [Test]
         public async Task CompleteSubtaskInProgressAsync_Should_SelectMostTrustedResult_When_TrustLevelReached()
         {
-            var dbContextOptions = DbContextOptionsFactory.CreateOptions("Mark_subtask_as_done");
+            var dbContextOptions = DbContextOptionsFactory.CreateOptions("Select_most_trusted_result");
             using (var dbContext = new TestDbContext(dbContextOptions))
             {
                 await CreateMockData(dbContext);
