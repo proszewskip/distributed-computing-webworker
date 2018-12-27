@@ -38,6 +38,8 @@ namespace Server.Services.Api
 
     public class FinishComputationService : IFinishComputationService
     {
+        private static readonly int MaxSubtaskRetries = 2;
+
         private readonly IAssemblyLoader _assemblyLoader;
         private readonly DistributedComputingDbContext _dbContext;
         private readonly IPathsProvider _pathsProvider;
@@ -73,6 +75,16 @@ namespace Server.Services.Api
 
         public async Task FailSubtaskInProgressAsync(int subtaskInProgressId, string[] computationErrors)
         {
+            using (var transaction = await _dbContext.Database.BeginTransactionAsync())
+            {
+                await InternalFailSubtaskInProgressAsync(subtaskInProgressId, computationErrors);
+
+                transaction.Commit();
+            }
+        }
+
+        private async Task InternalFailSubtaskInProgressAsync(int subtaskInProgressId, string[] computationErrors)
+        {
             var failedSubtaskInProgress = await _subtaskInProgressResourceService.GetAsync(subtaskInProgressId);
 
             failedSubtaskInProgress.Status = SubtaskStatus.Error;
@@ -80,20 +92,37 @@ namespace Server.Services.Api
 
             await _subtaskInProgressResourceService.UpdateAsync(subtaskInProgressId, failedSubtaskInProgress);
 
-            //TODO: The task should not be marked as failed until single subtask fails at least 3 times.
+            var failedSubtasksCount = await _dbContext.SubtasksInProgress
+                .CountAsync(subtaskInProgress =>
+                    subtaskInProgress.SubtaskId == failedSubtaskInProgress.SubtaskId &&
+                    subtaskInProgress.Status == SubtaskStatus.Error
+                );
+
+            if (failedSubtasksCount >= MaxSubtaskRetries)
+            {
+                await FailSubtaskAsync(failedSubtaskInProgress);
+            }
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        private async Task FailSubtaskAsync(SubtaskInProgress failedSubtaskInProgress)
+        {
             var subtask = await _subtaskResourceService.GetAsync(failedSubtaskInProgress.SubtaskId);
             subtask.Status = SubtaskStatus.Error;
 
             await _subtaskResourceService.UpdateAsync(failedSubtaskInProgress.SubtaskId, subtask);
 
+            await FailDistributedTask(subtask);
+        }
+
+        private async Task FailDistributedTask(Subtask subtask)
+        {
             //TODO: Use IResourceService for updating DistributedTasks.
-            var finishedDistributedTask =
-                await _dbContext.DistributedTasks.FirstAsync(distributedTask =>
-                    distributedTask.Id == subtask.DistributedTaskId);
+            var finishedDistributedTask = await _dbContext.DistributedTasks.FirstAsync(distributedTask =>
+                distributedTask.Id == subtask.DistributedTaskId);
 
             finishedDistributedTask.Status = DistributedTaskStatus.Error;
-
-            await _dbContext.SaveChangesAsync();
         }
 
         private async Task FinishSubtaskInProgressAsync(int subtaskInProgressId, Stream subtaskInProgressResultStream)
