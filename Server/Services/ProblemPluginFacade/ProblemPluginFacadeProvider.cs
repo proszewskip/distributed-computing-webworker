@@ -1,4 +1,5 @@
 using System;
+using Server.Models;
 
 namespace Server.Services
 {
@@ -6,6 +7,8 @@ namespace Server.Services
     {
         IProblemPluginFacade Provide(Guid taskDefinitionGuid,
             string mainDllName);
+
+        IProblemPluginFacade Provide(DistributedTaskDefinition taskDefinition);
     }
 
     public class ProblemPluginFacadeProvider : IProblemPluginFacadeProvider
@@ -35,6 +38,11 @@ namespace Server.Services
             var taskAssembly = _assemblyLoader.LoadAssembly(assemblyPath);
 
             return _problemPluginFacadeFactory.Create(taskAssembly);
+        }
+
+        public IProblemPluginFacade Provide(DistributedTaskDefinition taskDefinition)
+        {
+            return Provide(taskDefinition.DefinitionGuid, taskDefinition.MainDllName);
         }
     }
 }

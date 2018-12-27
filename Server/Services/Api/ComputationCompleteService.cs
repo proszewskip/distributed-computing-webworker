@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,27 +28,22 @@ namespace Server.Services.Api
 
     public class ComputationCompleteService : IComputationCompleteService
     {
-        private readonly IAssemblyLoader _assemblyLoader;
         private readonly DistributedComputingDbContext _dbContext;
-        private readonly IPathsProvider _pathsProvider;
-        private readonly IProblemPluginFacadeFactory _problemPluginFacadeFactory;
         private readonly IResourceService<SubtaskInProgress> _subtaskInProgressResourceService;
         private readonly IResourceService<Subtask> _subtaskResourceService;
+        private readonly IProblemPluginFacadeProvider _problemPluginFacadeProvider;
 
         public ComputationCompleteService(
             DistributedComputingDbContext dbContext,
-            IPathsProvider pathsProvider,
-            IAssemblyLoader assemblyLoader,
             IResourceService<SubtaskInProgress> subtaskInProgressResourceService,
             IResourceService<Subtask> subtaskResourceService,
-            IProblemPluginFacadeFactory problemPluginFacadeFactory)
+            IProblemPluginFacadeProvider problemPluginFacadeProvider
+        )
         {
             _dbContext = dbContext;
-            _pathsProvider = pathsProvider;
-            _assemblyLoader = assemblyLoader;
-            _problemPluginFacadeFactory = problemPluginFacadeFactory;
             _subtaskInProgressResourceService = subtaskInProgressResourceService;
             _subtaskResourceService = subtaskResourceService;
+            _problemPluginFacadeProvider = problemPluginFacadeProvider;
         }
 
         public async Task CompleteSubtaskInProgressAsync(int subtaskInProgressId, Stream subtaskInProgressResult)
@@ -137,7 +130,7 @@ namespace Server.Services.Api
                         distributedTask.Id == distributedTaskId);
 
             var problemPluginFacade =
-                GetProblemPluginFacade(finishedDistributedTask.DistributedTaskDefinition);
+                _problemPluginFacadeProvider.Provide(finishedDistributedTask.DistributedTaskDefinition);
 
             var subtaskResults = _dbContext.Subtasks
                 .Where(subtask => subtask.DistributedTaskId == distributedTaskId)
@@ -163,16 +156,6 @@ namespace Server.Services.Api
         {
             return _dbContext.Subtasks.Where(subtask => subtask.DistributedTaskId == distributedTaskId)
                 .All(subtask => subtask.Status == SubtaskStatus.Done);
-        }
-
-        private IProblemPluginFacade GetProblemPluginFacade(DistributedTaskDefinition distributedTaskDefinition)
-        {
-            var assemblyPath =
-                _pathsProvider.GetTaskDefinitionMainAssemblyPath(distributedTaskDefinition.DefinitionGuid,
-                    distributedTaskDefinition.MainDllName);
-            var taskAssembly = _assemblyLoader.LoadAssembly(assemblyPath);
-
-            return _problemPluginFacadeFactory.Create(taskAssembly);
         }
     }
 }
