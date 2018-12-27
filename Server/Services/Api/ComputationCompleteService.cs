@@ -43,13 +43,13 @@ namespace Server.Services.Api
         {
             using (var transaction = await _dbContext.Database.BeginTransactionAsync())
             {
-                await FinishSubtaskInProgressAsync(subtaskInProgressId, subtaskInProgressResult);
+                await InternalCompleteSubtaskInProgressAsync(subtaskInProgressId, subtaskInProgressResult);
 
                 transaction.Commit();
             }
         }
 
-        private async Task FinishSubtaskInProgressAsync(int subtaskInProgressId, Stream subtaskInProgressResultStream)
+        private async Task InternalCompleteSubtaskInProgressAsync(int subtaskInProgressId, Stream subtaskInProgressResultStream)
         {
             var subtaskInProgressResult = new byte[subtaskInProgressResultStream.Length];
 
@@ -74,8 +74,8 @@ namespace Server.Services.Api
             var subtasksInProgress = _dbContext.SubtasksInProgress.Where(subtaskInProgress =>
                 subtaskInProgress.SubtaskId == subtaskId);
 
-            var sampleResult = subtasksInProgress.First().Result;
-            if (subtasksInProgress.Any(subtaskInProgress => subtaskInProgress.Result != sampleResult))
+            var sampleResult = await subtasksInProgress.Select(subtaskInProgress => subtaskInProgress.Result).FirstAsync();
+            if (await subtasksInProgress.AnyAsync(subtaskInProgress => subtaskInProgress.Result != sampleResult))
             {
                 //TODO: limit number of recomputing
                 await subtasksInProgress.ForEachAsync(subtaskInProgress =>
