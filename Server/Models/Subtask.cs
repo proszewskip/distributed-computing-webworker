@@ -23,7 +23,6 @@ namespace Server.Models
         [Attr("distributed-task-id", isImmutable: true)]
         public int DistributedTaskId { get; set; }
 
-        [Required]
         [HasOne("distributed-task")]
         public DistributedTask DistributedTask { get; set; }
 
