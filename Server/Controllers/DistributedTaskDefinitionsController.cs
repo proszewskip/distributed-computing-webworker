@@ -68,7 +68,7 @@ namespace Server.Controllers
             catch (InvalidAssemblyException exception)
             {
                 DeleteSavedDlls(taskDefinitionGuid);
-                return Error(new Error(400, exception.Message));
+                return Error(new Error(400, exception.Message, exception.InnerException?.Message));
             }
             catch (Exception exception)
             {
