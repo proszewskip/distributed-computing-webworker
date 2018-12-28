@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using JsonApiDotNetCore.Data;
@@ -20,28 +19,21 @@ namespace Server.Services.Api
     /// </summary>
     public class DistributedTaskService : EntityResourceService<DistributedTask>
     {
-        private readonly IAssemblyLoader _assemblyLoader;
         private readonly DistributedComputingDbContext _dbContext;
-        private readonly IPathsProvider _pathsProvider;
-        private readonly IProblemPluginFacadeFactory _problemPluginFacadeFactory;
+        private readonly IProblemPluginFacadeProvider _problemPluginFacadeProvider;
 
         public DistributedTaskService(
             IJsonApiContext jsonApiContext,
             IEntityRepository<DistributedTask> repository,
             ILoggerFactory loggerFactory,
             DistributedComputingDbContext dbContext,
-            IPathsProvider pathsProvider,
-            IAssemblyLoader assemblyLoader,
-            IProblemPluginFacadeFactory problemPluginFacadeFactory
+            IProblemPluginFacadeProvider problemPluginFacadeProvider
         ) : base(jsonApiContext, repository, loggerFactory)
         {
             _dbContext = dbContext;
-            _pathsProvider = pathsProvider;
-            _assemblyLoader = assemblyLoader;
-            _problemPluginFacadeFactory = problemPluginFacadeFactory;
+            _problemPluginFacadeProvider = problemPluginFacadeProvider;
         }
 
-        // TODO: handle InputData file uploads (or another way to send blobs, maybe base64)
         public override async Task<DistributedTask> CreateAsync(DistributedTask resource)
         {
             var taskDefinition = await GetTaskDefinitionById(resource.DistributedTaskDefinitionId);
@@ -108,13 +100,7 @@ namespace Server.Services.Api
         private IEnumerable<Subtask> CreateSubtasks(DistributedTaskDefinition taskDefinition,
             DistributedTask distributedTask)
         {
-            var distributedTaskDllPath = Path.Combine(
-                _pathsProvider.GetTaskDefinitionDirectoryPath(taskDefinition.DefinitionGuid),
-                taskDefinition.MainDllName
-            );
-
-            var taskAssembly = _assemblyLoader.LoadAssembly(distributedTaskDllPath);
-            var problemPluginFacade = _problemPluginFacadeFactory.Create(taskAssembly);
+            var problemPluginFacade = _problemPluginFacadeProvider.Provide(taskDefinition);
 
             var subtasksData = problemPluginFacade.GetSubtasksFromData(distributedTask.InputData);
 

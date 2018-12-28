@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,7 +11,7 @@ namespace Server.Services.Api
     /// <summary>
     /// Service used for synchronizing completing the computation of subtasks.
     /// </summary>
-    public interface IFinishComputationService
+    public interface IComputationCompleteService
     {
         /// <summary>
         /// Marks a given SubtaskInProgress as complete, possibly also marking
@@ -25,40 +24,26 @@ namespace Server.Services.Api
         /// <param name="subtaskInProgressResult"></param>
         /// <returns></returns>
         Task CompleteSubtaskInProgressAsync(int subtaskInProgressId, Stream subtaskInProgressResult);
-
-        /// <summary>
-        /// Marks a given SubtaskInProgress as failed, also marking the Subtask
-        /// and DistributedTask as failed.
-        /// </summary>
-        /// <param name="subtaskInProgressId"></param>
-        /// <param name="computationErrors"></param>
-        /// <returns></returns>
-        Task FailSubtaskInProgressAsync(int subtaskInProgressId, string[] computationErrors);
     }
 
-    public class FinishComputationService : IFinishComputationService
+    public class ComputationCompleteService : IComputationCompleteService
     {
-        private readonly IAssemblyLoader _assemblyLoader;
         private readonly DistributedComputingDbContext _dbContext;
-        private readonly IPathsProvider _pathsProvider;
-        private readonly IProblemPluginFacadeFactory _problemPluginFacadeFactory;
         private readonly IResourceService<SubtaskInProgress> _subtaskInProgressResourceService;
         private readonly IResourceService<Subtask> _subtaskResourceService;
+        private readonly IProblemPluginFacadeProvider _problemPluginFacadeProvider;
 
-        public FinishComputationService(
+        public ComputationCompleteService(
             DistributedComputingDbContext dbContext,
-            IPathsProvider pathsProvider,
-            IAssemblyLoader assemblyLoader,
             IResourceService<SubtaskInProgress> subtaskInProgressResourceService,
             IResourceService<Subtask> subtaskResourceService,
-            IProblemPluginFacadeFactory problemPluginFacadeFactory)
+            IProblemPluginFacadeProvider problemPluginFacadeProvider
+        )
         {
             _dbContext = dbContext;
-            _pathsProvider = pathsProvider;
-            _assemblyLoader = assemblyLoader;
-            _problemPluginFacadeFactory = problemPluginFacadeFactory;
             _subtaskInProgressResourceService = subtaskInProgressResourceService;
             _subtaskResourceService = subtaskResourceService;
+            _problemPluginFacadeProvider = problemPluginFacadeProvider;
         }
 
         public async Task CompleteSubtaskInProgressAsync(int subtaskInProgressId, Stream subtaskInProgressResult)
@@ -69,31 +54,6 @@ namespace Server.Services.Api
 
                 transaction.Commit();
             }
-        }
-
-        public async Task FailSubtaskInProgressAsync(int subtaskInProgressId, string[] computationErrors)
-        {
-            var failedSubtaskInProgress = await _subtaskInProgressResourceService.GetAsync(subtaskInProgressId);
-
-            failedSubtaskInProgress.Status = SubtaskStatus.Error;
-            failedSubtaskInProgress.Errors = computationErrors;
-
-            await _subtaskInProgressResourceService.UpdateAsync(subtaskInProgressId, failedSubtaskInProgress);
-
-            //TODO: The task should not be marked as failed until single subtask fails at least 3 times.
-            var subtask = await _subtaskResourceService.GetAsync(failedSubtaskInProgress.SubtaskId);
-            subtask.Status = SubtaskStatus.Error;
-
-            await _subtaskResourceService.UpdateAsync(failedSubtaskInProgress.SubtaskId, subtask);
-
-            //TODO: Use IResourceService for updating DistributedTasks.
-            var finishedDistributedTask =
-                await _dbContext.DistributedTasks.FirstAsync(distributedTask =>
-                    distributedTask.Id == subtask.DistributedTaskId);
-
-            finishedDistributedTask.Status = DistributedTaskStatus.Error;
-
-            await _dbContext.SaveChangesAsync();
         }
 
         private async Task FinishSubtaskInProgressAsync(int subtaskInProgressId, Stream subtaskInProgressResultStream)
@@ -170,7 +130,7 @@ namespace Server.Services.Api
                         distributedTask.Id == distributedTaskId);
 
             var problemPluginFacade =
-                GetProblemPluginFacade(finishedDistributedTask.DistributedTaskDefinition);
+                _problemPluginFacadeProvider.Provide(finishedDistributedTask.DistributedTaskDefinition);
 
             var subtaskResults = _dbContext.Subtasks
                 .Where(subtask => subtask.DistributedTaskId == distributedTaskId)
@@ -196,16 +156,6 @@ namespace Server.Services.Api
         {
             return _dbContext.Subtasks.Where(subtask => subtask.DistributedTaskId == distributedTaskId)
                 .All(subtask => subtask.Status == SubtaskStatus.Done);
-        }
-
-        private IProblemPluginFacade GetProblemPluginFacade(DistributedTaskDefinition distributedTaskDefinition)
-        {
-            var assemblyPath =
-                _pathsProvider.GetTaskDefinitionMainAssemblyPath(distributedTaskDefinition.DefinitionGuid,
-                    distributedTaskDefinition.MainDllName);
-            var taskAssembly = _assemblyLoader.LoadAssembly(assemblyPath);
-
-            return _problemPluginFacadeFactory.Create(taskAssembly);
         }
     }
 }
