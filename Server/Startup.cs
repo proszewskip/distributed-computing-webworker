@@ -94,7 +94,7 @@ namespace Server
                         ContractResolver = new CamelCasePropertyNamesContractResolver()
                     }, ArrayPool<char>.Shared));
                 })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         private static void ConfigureDependencyInjection(IServiceCollection services)
