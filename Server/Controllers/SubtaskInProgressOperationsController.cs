@@ -17,15 +17,18 @@ namespace Server.Controllers
     [ServiceFilter(typeof(FormatErrorActionFilter))]
     public class SubtaskInProgressOperationsController : Controller
     {
-        private readonly IFinishComputationService _finishComputationService;
+        private readonly IComputationFailService _computationFailService;
+        private readonly IComputationCompleteService _computationCompleteService;
         private readonly IResourceService<SubtaskInProgress> _subtaskInProgressResourceService;
 
         public SubtaskInProgressOperationsController(
-            IFinishComputationService finishComputationService,
+            IComputationFailService computationFailService,
+            IComputationCompleteService computationCompleteService,
             IResourceService<SubtaskInProgress> subtaskInProgressResourceService
         )
         {
-            _finishComputationService = finishComputationService;
+            _computationFailService = computationFailService;
+            _computationCompleteService = computationCompleteService;
             _subtaskInProgressResourceService = subtaskInProgressResourceService;
         }
 
@@ -45,7 +48,7 @@ namespace Server.Controllers
 
             using (var subtaskInProgressResultStream = computationSuccessDto.SubtaskResult.OpenReadStream())
             {
-                await _finishComputationService.CompleteSubtaskInProgressAsync(
+                await _computationCompleteService.CompleteSubtaskInProgressAsync(
                     computationSuccessDto.SubtaskInProgressId, subtaskInProgressResultStream);
             }
 
@@ -66,7 +69,7 @@ namespace Server.Controllers
                 faultySubtaskInProgress.NodeId != distributedNodeId)
                 return NotFound();
 
-            await _finishComputationService.FailSubtaskInProgressAsync(computationErrorDto.SubtaskInProgressId,
+            await _computationFailService.FailSubtaskInProgressAsync(computationErrorDto.SubtaskInProgressId,
                 computationErrorDto.Errors);
 
             return Ok();
