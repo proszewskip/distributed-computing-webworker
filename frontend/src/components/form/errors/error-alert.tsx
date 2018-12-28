@@ -1,7 +1,11 @@
 import { Alert, Pane } from 'evergreen-ui';
 import { FormikErrors, FormikTouched, FormikValues } from 'formik';
-import { Dictionary } from 'ramda';
 import React, { StatelessComponent } from 'react';
+
+interface FormError {
+  title: string;
+  message?: string | FormikErrors<any>;
+}
 
 interface ErrorAlertProps<V = any> {
   touched: FormikTouched<V>;
@@ -14,7 +18,7 @@ export const ErrorAlert: StatelessComponent<ErrorAlertProps> = (
 ) => {
   const errorsAlertVisible = hasFormErrors(errorAlertProps);
 
-  const errorsFromServer = getServerAlerts(errorAlertProps);
+  const errorsFromServer = getServerErrorAlerts(errorAlertProps);
 
   return (
     <>
@@ -26,12 +30,12 @@ export const ErrorAlert: StatelessComponent<ErrorAlertProps> = (
   );
 };
 
-const getServerAlerts = (errorAlertProps: ErrorAlertProps) => {
+const getServerErrorAlerts = (errorAlertProps: ErrorAlertProps) => {
   const errorsFromServer = getErrorsFromServer(errorAlertProps);
 
-  const alertsList = Object.keys(errorsFromServer).map((title, index) => (
-    <Alert key={index} title={title} intent="danger">
-      {errorsFromServer[title]}
+  const alertsList = errorsFromServer.map((error, index) => (
+    <Alert key={index} title={error.title} intent="danger">
+      {error.message}
     </Alert>
   ));
 
@@ -52,10 +56,10 @@ const getErrorsFromServer = ({ errors, values }: ErrorAlertProps) => {
 
   const serverErrorsKeys = errorKeys.filter((key) => !fieldNames.includes(key));
 
-  const serverErrors: Dictionary<string | undefined> = {};
+  const serverErrors: FormError[] = [];
 
   for (const key of serverErrorsKeys) {
-    serverErrors[key] = errors[key] as any;
+    serverErrors.push({ title: key, message: errors[key] });
   }
 
   return serverErrors;
