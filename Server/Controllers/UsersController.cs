@@ -1,15 +1,19 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using JsonApiDotNetCore.Internal;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Server.DTO;
+using Server.Filters;
 using Server.Services;
+using Server.Validation;
 
 namespace Server.Controllers
 {
     [Route("[controller]")]
+    [ServiceFilter(typeof(AuthorizationFilter))]
     public class UsersController : ControllerBase
     {
         private readonly SignInManager<IdentityUser> _signInManager;
@@ -21,6 +25,7 @@ namespace Server.Controllers
             _jsonApiActionResultFactory = jsonApiActionResultFactory;
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO body)
         {
@@ -43,10 +48,11 @@ namespace Server.Controllers
             return Ok();
         }
 
-        [HttpPut("change-password")]
+        [ValidateModel]
+        [HttpPost("change-password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO body)
         {
-            var user = await _signInManager.UserManager.FindByNameAsync(body.Username);
+            var user = await _signInManager.UserManager.GetUserAsync(HttpContext.User);
 
             var changePasswordResult = await _signInManager.UserManager.ChangePasswordAsync(user,
              body.OldPassword, body.NewPassword);
@@ -59,6 +65,7 @@ namespace Server.Controllers
             return Ok();
         }
 
+        [AllowAnonymous]
         [HttpGet("is-authenticated")]
         public IActionResult IsAuthenticated()
         {
@@ -72,11 +79,12 @@ namespace Server.Controllers
 
         private IActionResult GetErrorsResult(IEnumerable<IdentityError> errorsEnumerable)
         {
-            var errorsList = new List<IdentityError>(errorsEnumerable);
-
             var errorsCollection = new ErrorCollection();
 
-            errorsList.ForEach(error => errorsCollection.Add(new Error(StatusCodes.Status400BadRequest, error.Description)));
+            foreach (var error in errorsEnumerable)
+            {
+                errorsCollection.Add(new Error(StatusCodes.Status400BadRequest, error.Description));
+            }
 
             return _jsonApiActionResultFactory.Errors(errorsCollection);
         }
