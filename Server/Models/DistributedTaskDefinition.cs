@@ -37,8 +37,6 @@ namespace Server.Models
         /// Guid is used to prevent nodes from guessing the IDs of other
         /// tasks and potentially downloading task-related files.
         /// </summary>
-        // TODO: find out if DefintionGuid needs to be public
-        [Required]
         [Attr("definition-guid", isImmutable: true)]
         public Guid DefinitionGuid { get; set; }
 
@@ -46,8 +44,6 @@ namespace Server.Models
         /// The name of the DLL containing the class that implements
         /// ProblemPluginFactory.
         /// </summary>
-        // TODO: find out if MainDllName needs to be public
-        [Required]
         [Attr("main-dll-name", isImmutable: true)]
         public string MainDllName { get; set; }
 
@@ -56,7 +52,6 @@ namespace Server.Models
         /// of the class that implements ProblemPluginFactory.
         /// </summary>
         [Attr("problem-plugin-info", isImmutable: true)]
-        [Required]
         public ProblemPluginInfo ProblemPluginInfo { get; set; }
 
         /// <summary>

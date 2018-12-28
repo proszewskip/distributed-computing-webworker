@@ -1,26 +1,23 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 using JsonApiDotNetCore.Models;
 
 namespace Server.Models
 {
     public class SubtaskInProgress : Identifiable
     {
+        [Required]
         public int SubtaskId { get; set; }
 
-        [Required]
         [HasOne("subtask")]
         public virtual Subtask Subtask { get; set; }
 
         /// <summary>
         /// The ID of the distributed node that computes this subtask.
         /// </summary>
+        [Required]
         public Guid NodeId { get; set; }
 
-        [Required]
         [HasOne("node")]
         public virtual DistributedNode Node { get; set; }
 

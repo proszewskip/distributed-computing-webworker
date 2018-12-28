@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Server.DTO;
 using Server.Services;
+using Server.Validation;
 
 namespace Server.Controllers
 {
@@ -20,6 +21,7 @@ namespace Server.Controllers
             _jsonApiActionResultFactory = jsonApiActionResultFactory;
         }
 
+        [ValidateModel]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO body)
         {
