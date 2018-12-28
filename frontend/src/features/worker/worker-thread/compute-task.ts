@@ -7,7 +7,7 @@ export function computeTask(
   inputData: ArrayBuffer,
 ) {
   const computeTaskMethodBinding = workerContext.Module.mono_bind_static_method(
-    '[DistributedComputing] DistributedComputing.ProblemPluginFactory:ComputeTask',
+    '[DistributedComputingLibrary] DistributedComputing.ProblemPluginFactory:ComputeTask',
     'sso',
   );
 
