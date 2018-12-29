@@ -58,7 +58,7 @@ namespace Server.Tests.Services.Cleanup
                         new SubtaskInProgress()
                         {
                             Id = 4,
-                            Status = SubtaskInProgressStatus.Error
+                            Status = SubtaskInProgressStatus.Done
                         },
                     }
                 });
@@ -155,9 +155,9 @@ namespace Server.Tests.Services.Cleanup
         }
 
         [Test]
-        public async Task CleanAsync_Should_RemoveNode_When_OnlyCancelledTasks()
+        public async Task CleanAsync_Should_RemoveNode_When_StaleAndNoDoneTasks()
         {
-            var dbContextOptions = DbContextOptionsFactory.CreateOptions("Remove_node_when_only_cancelled_tasks");
+            var dbContextOptions = DbContextOptionsFactory.CreateOptions("Remove_node_when_stale_and_has_no_done_tasks");
 
             using (var dbContext = new TestDbContext(dbContextOptions))
             {
@@ -178,7 +178,7 @@ namespace Server.Tests.Services.Cleanup
                         {
                             Id = 2,
                             NodeId = distributedNodeId,
-                            Status = SubtaskInProgressStatus.Executing
+                            Status = SubtaskInProgressStatus.Error
                         },
                         new SubtaskInProgress()
                         {
