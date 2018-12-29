@@ -47,6 +47,7 @@ namespace Server.Services.Cleanup
                     ),
                     ShouldBeRemoved = distributedNode.SubtasksInProgress.All(subtaskInProgress =>
                         subtaskInProgress.Status == SubtaskInProgressStatus.Cancelled ||
+                        subtaskInProgress.Status == SubtaskInProgressStatus.Error ||
                         subtaskInProgress.Status == SubtaskInProgressStatus.Executing
                     )
                 })
