@@ -73,9 +73,9 @@ namespace Server.Services.Api
 
         private async Task FinishSubtaskAsync(int subtaskId)
         {
-            var subtasksInProgress = _dbContext.SubtasksInProgress.Where(subtaskInProgress =>
+            var finishedSubtasksInProgress = _dbContext.SubtasksInProgress.Where(subtaskInProgress =>
                 subtaskInProgress.SubtaskId == subtaskId && subtaskInProgress.Status == SubtaskInProgressStatus.Done);
-            var subtaskResult = await GetMostTrustedSubtaskResultAsync(subtasksInProgress);
+            var subtaskResult = await GetMostTrustedSubtaskResultAsync(finishedSubtasksInProgress);
 
             var finishedSubtask = await _dbContext.Subtasks.FindAsync(subtaskId);
 
