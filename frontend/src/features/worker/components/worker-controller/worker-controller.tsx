@@ -15,6 +15,7 @@ import {
   OnDistributedNodeStateUpdate,
 } from 'features/worker/services';
 
+import { WorkersTable } from '../workers-table';
 import { dependenciesExtractor } from './dependencies';
 import { PureWorkerControllerProps, WorkerControllerState } from './types';
 
@@ -65,9 +66,6 @@ export class PureWorkerController extends Component<
   private onDistributedNodeStateUpdate: OnDistributedNodeStateUpdate = (
     newState,
   ) => {
-    // tslint:disable-next-line:no-console
-    console.log(newState);
-
     this.setState({
       distributedNodeState: newState,
     });
@@ -96,7 +94,6 @@ export class PureWorkerController extends Component<
         <>
           <Paragraph>Running.</Paragraph>
           <Button onClick={this.stopNode}>Stop</Button>
-          <Paragraph>For now, open the console to see the state.</Paragraph>
 
           <Pane>
             Threads count: {this.state.threadsCount}
@@ -106,6 +103,13 @@ export class PureWorkerController extends Component<
 
           <Pane>
             Workers count: {distributedNodeState.data.subtaskWorkers.size}
+          </Pane>
+
+          <Pane maxWidth={400}>
+            <WorkersTable
+              subtaskWorkers={distributedNodeState.data.subtaskWorkers}
+              maxWorkersCount={this.state.threadsCount}
+            />
           </Pane>
 
           <Pane>{distributedNodeState.data.runningState}</Pane>

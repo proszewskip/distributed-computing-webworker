@@ -25,7 +25,10 @@ export const getDistributedTaskDetailsInitialProps = (
     .then((jsonApiResponse) => jsonApiResponse.data as any)
     .then((data) => {
       // NOTE: API does not allow to sort included elements
-      data.subtasks = sortBy(prop('sequence-number'))(data.subtasks);
+      data.subtasks = sortBy(prop('sequence-number'))(data.subtasks).slice(
+        0,
+        10,
+      );
       return data;
     })
     .then((data) => {
