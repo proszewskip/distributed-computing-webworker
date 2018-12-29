@@ -94,7 +94,6 @@ export class PureWorkerController extends Component<
         <>
           <Paragraph>Running.</Paragraph>
           <Button onClick={this.stopNode}>Stop</Button>
-          <Paragraph>For now, open the console to see the state.</Paragraph>
 
           <Pane>
             Threads count: {this.state.threadsCount}
