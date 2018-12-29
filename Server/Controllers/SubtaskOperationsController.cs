@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using JsonApiDotNetCore.Models;
 using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +8,7 @@ using Server.DTO;
 using Server.Filters;
 using Server.Models;
 using Server.Services;
+using Server.Services.Api;
 using Server.Validation;
 
 namespace Server.Controllers
@@ -21,23 +21,23 @@ namespace Server.Controllers
     public class SubtaskOperationsController : Controller
     {
         private readonly DistributedComputingDbContext _dbContext;
+        private readonly IGetNextSubtaskToComputeService _getNextSubtaskToComputeService;
         private readonly IResourceService<DistributedNode, Guid> _distributedNodeResourceService;
         private readonly IResourceService<SubtaskInProgress> _subtaskInProgressResourceService;
-        private readonly IJsonApiResponseFactory _jsonApiResponseFactory;
         private readonly IPathsProvider _pathsProvider;
 
         public SubtaskOperationsController(
             IResourceService<DistributedNode, Guid> distributedNodeResourceService,
             IResourceService<SubtaskInProgress> subtaskInProgressResourceService,
             DistributedComputingDbContext dbContext,
-            IJsonApiResponseFactory jsonApiResponseFactory,
+            IGetNextSubtaskToComputeService getNextSubtaskToComputeService,
             IPathsProvider pathsProvider
         )
         {
             _distributedNodeResourceService = distributedNodeResourceService;
             _subtaskInProgressResourceService = subtaskInProgressResourceService;
             _dbContext = dbContext;
-            _jsonApiResponseFactory = jsonApiResponseFactory;
+            _getNextSubtaskToComputeService = getNextSubtaskToComputeService;
             _pathsProvider = pathsProvider;
         }
 
@@ -53,7 +53,7 @@ namespace Server.Controllers
             if (distributedNode == null)
                 return NotFound(); // TODO: specify the reason
 
-            var nextSubtask = await GetNextSubtaskAsync();
+            var nextSubtask = await _getNextSubtaskToComputeService.GetNextSubtaskAsync();
 
             if (nextSubtask == null)
                 return NotFound(); // TODO: specify the reason
@@ -61,7 +61,7 @@ namespace Server.Controllers
             var subtaskInProgress = new SubtaskInProgress
             {
                 Node = distributedNode,
-                Status = SubtaskStatus.Executing,
+                Status = SubtaskInProgressStatus.Executing,
                 Subtask = nextSubtask
             };
 
@@ -83,21 +83,6 @@ namespace Server.Controllers
             };
 
             return Created($"/subtasks-in-progress/{createdSubtaskInProgress.Id}", response);
-        }
-
-        private Task<Subtask> GetNextSubtaskAsync()
-        {
-            return _dbContext.Subtasks.OrderByDescending(subtask => subtask.DistributedTask.Priority)
-                .FirstOrDefaultAsync(subtask =>
-                    (subtask.Status == SubtaskStatus.WaitingForExecution ||
-                     subtask.Status == SubtaskStatus.Executing) &&
-                    subtask.DistributedTask.Status == DistributedTaskStatus.InProgress &&
-                    (!subtask.SubtasksInProgress.Any() ||
-                     subtask.SubtasksInProgress
-                         .Where(subtaskInProgress => subtaskInProgress.Status != SubtaskStatus.Error)
-                         .Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel)
-                     < subtask.DistributedTask.TrustLevelToComplete)
-                );
         }
 
         private Task<DistributedTaskDefinition> GetSubtasksDistributedTaskDefinition(Subtask subtask)

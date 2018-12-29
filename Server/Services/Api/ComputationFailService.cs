@@ -45,7 +45,7 @@ namespace Server.Services.Api
         {
             var failedSubtaskInProgress = await _dbContext.SubtasksInProgress.FindAsync(subtaskInProgressId);
 
-            failedSubtaskInProgress.Status = SubtaskStatus.Error;
+            failedSubtaskInProgress.Status = SubtaskInProgressStatus.Error;
             failedSubtaskInProgress.Errors = computationErrors;
 
             await _dbContext.SaveChangesAsync();
@@ -53,7 +53,7 @@ namespace Server.Services.Api
             var failedSubtasksCount = await _dbContext.SubtasksInProgress
                 .CountAsync(subtaskInProgress =>
                     subtaskInProgress.SubtaskId == failedSubtaskInProgress.SubtaskId &&
-                    subtaskInProgress.Status == SubtaskStatus.Error
+                    subtaskInProgress.Status == SubtaskInProgressStatus.Error
                 );
 
             if (failedSubtasksCount >= MaxSubtaskRetries)

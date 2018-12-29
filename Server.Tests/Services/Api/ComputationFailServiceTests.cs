@@ -34,7 +34,7 @@ namespace Server.Tests.Services.Api
                     .Include(subtaskInProgress => subtaskInProgress.Subtask)
                     .FirstAsync(subtaskInProgress => subtaskInProgress.Id == 1);
 
-                Assert.AreEqual(SubtaskStatus.Error, foundSubtaskInProgress.Status);
+                Assert.AreEqual(SubtaskInProgressStatus.Error, foundSubtaskInProgress.Status);
                 Assert.AreEqual(SubtaskStatus.Executing, foundSubtaskInProgress.Subtask.Status);
             }
         }
@@ -51,7 +51,7 @@ namespace Server.Tests.Services.Api
                 {
                     Id = 2,
                     SubtaskId = 1,
-                    Status = SubtaskStatus.Executing
+                    Status = SubtaskInProgressStatus.Executing
                 });
 
                 await dbContext.SaveChangesAsync();
@@ -71,7 +71,7 @@ namespace Server.Tests.Services.Api
                     .ThenInclude(subtask => subtask.DistributedTask)
                     .FirstAsync(subtaskInProgress => subtaskInProgress.Id == 1);
 
-                Assert.AreEqual(SubtaskStatus.Error, foundSubtaskInProgress.Status);
+                Assert.AreEqual(SubtaskInProgressStatus.Error, foundSubtaskInProgress.Status);
                 Assert.AreEqual(SubtaskStatus.Error, foundSubtaskInProgress.Subtask.Status);
                 Assert.AreEqual(DistributedTaskStatus.Error, foundSubtaskInProgress.Subtask.DistributedTask.Status);
             }
@@ -94,7 +94,7 @@ namespace Server.Tests.Services.Api
                             {
                                 Id = 1,
                                 SubtaskId = 1,
-                                Status = SubtaskStatus.Error
+                                Status = SubtaskInProgressStatus.Error
                             },
                         },
                         Status = SubtaskStatus.Executing

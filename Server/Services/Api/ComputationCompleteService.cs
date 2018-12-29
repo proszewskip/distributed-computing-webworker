@@ -58,7 +58,7 @@ namespace Server.Services.Api
             await subtaskInProgressResultStream.CopyToAsync(memoryStream);
 
             var finishedSubtaskInProgress = await _dbContext.SubtasksInProgress.FindAsync(subtaskInProgressId);
-            finishedSubtaskInProgress.Status = SubtaskStatus.Done;
+            finishedSubtaskInProgress.Status = SubtaskInProgressStatus.Done;
             finishedSubtaskInProgress.Result = subtaskInProgressResult;
 
             await _dbContext.SaveChangesAsync();
@@ -82,7 +82,7 @@ namespace Server.Services.Api
                 {
                     subtaskInProgress.Errors = subtaskInProgress.Errors
                         .Append("Divergent results detected. Subtask must be computed again.").ToArray();
-                    subtaskInProgress.Status = SubtaskStatus.Error;
+                    subtaskInProgress.Status = SubtaskInProgressStatus.Error;
                 });
 
                 await _dbContext.SaveChangesAsync();
@@ -105,7 +105,7 @@ namespace Server.Services.Api
         {
             var currentTrustLevel = _dbContext.SubtasksInProgress.Where(subtaskInProgress =>
                     subtaskInProgress.SubtaskId == subtaskId
-                    && subtaskInProgress.Status == SubtaskStatus.Done)
+                    && subtaskInProgress.Status == SubtaskInProgressStatus.Done)
                 .Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel);
 
             var trustLevelToComplete = _dbContext.Subtasks.Where(subtask => subtask.Id == subtaskId)
