@@ -2,7 +2,10 @@ import { Map } from 'immutable';
 
 import { WorkerThreadStatus } from 'features/worker/worker-thread';
 
-import { AssignNextResponseBody } from '../subtask-service';
+import {
+  AssignNextResponseBody,
+  ComputationCancelRequestBody,
+} from '../subtask-service';
 import {
   createComputeSubtaskMessagePayload,
   SubtaskWorker,
@@ -23,12 +26,6 @@ import { OnDistributedNodeStateUpdate } from './types/on-state-update';
  * The timeout between assigning next subtask
  */
 const SUBTASK_GRACE_PERIOD_TIMEOUT = 1000;
-
-/**
- * TODO: make the changes after
- * https://github.com/proszewskip/distributed-computing-webworker/pull/100
- * is merged. There may be merge conflicts because both PRs modify this file.
- */
 
 export class DistributedNodeService {
   private readonly dependencies: DistributedNodeServiceDependencies;
@@ -199,6 +196,13 @@ export class DistributedNodeService {
           subtaskWorkerId,
           assignNextSubtaskResponse['subtask-in-progress-id'],
         ),
+      )
+      .catch(
+        this.cancelWorkerComputation({
+          'distributed-node-id': distributedNodeId,
+          'subtask-in-progress-id':
+            assignNextSubtaskResponse['subtask-in-progress-id'],
+        }),
       );
 
     const updatedSubtaskWorkersMap = this.state.data.subtaskWorkers.set(
@@ -326,6 +330,10 @@ export class DistributedNodeService {
     this.onWorkersCountChanged();
   };
 
+  private cancelWorkerComputation = (
+    params: ComputationCancelRequestBody,
+  ) => () => this.dependencies.subtaskService.sendComputationCancel(params);
+
   private onWorkersCountChanged = () => {
     if (this.state.state !== DistributedNodeState.Running) {
       return;
@@ -378,9 +386,5 @@ export class DistributedNodeService {
     }
   };
 }
-
-/**
- * TODO: `sendComputationCancel` when the worker is cancelled
- */
 
 const cancelWorker = (worker: SubtaskWorker) => worker.cancel();
