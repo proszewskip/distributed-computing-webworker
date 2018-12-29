@@ -45,10 +45,10 @@ namespace Server.Models
         ///
         /// Exposed to allow for server-side filtering.
         /// </summary>
+        [Required]
         [Attr("distributed-task-definition-id", isImmutable: true)]
         public int DistributedTaskDefinitionId { get; set; }
 
-        [Required]
         [HasOne("distributed-task-definition")]
         public virtual DistributedTaskDefinition DistributedTaskDefinition { get; set; }
 
@@ -58,7 +58,6 @@ namespace Server.Models
         /// These are raw bytes read from the file received from the user while
         /// creating the task.
         /// </summary>
-        [Required]
         public byte[] InputData { get; set; }
 
         [Attr("status", isImmutable: true)]

@@ -39,6 +39,7 @@ namespace Server
             services.AddJsonApi<DistributedComputingDbContext>(options => {
                 options.IncludeTotalRecordCount = true;
                 options.DefaultPageSize = 25;
+                options.ValidateModelState = true;
             });
             services.AddDefaultIdentity<IdentityUser>()
                 .AddEntityFrameworkStores<DistributedComputingDbContext>();
