@@ -4,7 +4,7 @@ import React, { StatelessComponent } from 'react';
 
 interface FormError {
   title: string;
-  message?: string | FormikErrors<any>;
+  message?: string;
 }
 
 interface ErrorAlertProps<V = any> {
@@ -59,7 +59,7 @@ const getErrorsFromServer = ({ errors, values }: ErrorAlertProps) => {
   const serverErrors: FormError[] = [];
 
   for (const key of serverErrorsKeys) {
-    serverErrors.push({ title: key, message: errors[key] });
+    serverErrors.push({ title: key, message: errors[key] as string });
   }
 
   return serverErrors;
