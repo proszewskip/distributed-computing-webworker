@@ -19,22 +19,26 @@ namespace Server.Controllers
     {
         private readonly IComputationFailService _computationFailService;
         private readonly IComputationCompleteService _computationCompleteService;
+        private readonly IComputationCancelService _computationCancelService;
         private readonly IResourceService<SubtaskInProgress> _subtaskInProgressResourceService;
 
         public SubtaskInProgressOperationsController(
             IComputationFailService computationFailService,
             IComputationCompleteService computationCompleteService,
+            IComputationCancelService computationCancelService,
             IResourceService<SubtaskInProgress> subtaskInProgressResourceService
         )
         {
             _computationFailService = computationFailService;
             _computationCompleteService = computationCompleteService;
+            _computationCancelService = computationCancelService;
             _subtaskInProgressResourceService = subtaskInProgressResourceService;
         }
 
         [HttpPost("computation-success")]
         [ValidateModel]
-        public async Task<IActionResult> ReportComputationSuccessAsync([FromForm] ComputationSuccessDTO computationSuccessDto)
+        public async Task<IActionResult> ReportComputationSuccessAsync(
+            [FromForm] ComputationSuccessDTO computationSuccessDto)
         {
             if (!Guid.TryParse(computationSuccessDto.DistributedNodeId, out var distributedNodeId))
                 return BadRequest(); // TODO: specify the reason
@@ -42,8 +46,7 @@ namespace Server.Controllers
             var finishedSubtaskInProgress =
                 await _subtaskInProgressResourceService.GetAsync(computationSuccessDto.SubtaskInProgressId);
 
-            if (finishedSubtaskInProgress == null || finishedSubtaskInProgress.Status != SubtaskStatus.Executing ||
-                finishedSubtaskInProgress.NodeId != distributedNodeId)
+            if (!IsFinishableSubtaskInProgress(finishedSubtaskInProgress, distributedNodeId))
                 return NotFound();
 
             using (var subtaskInProgressResultStream = computationSuccessDto.SubtaskResult.OpenReadStream())
@@ -65,14 +68,37 @@ namespace Server.Controllers
             var faultySubtaskInProgress =
                 await _subtaskInProgressResourceService.GetAsync(computationErrorDto.SubtaskInProgressId);
 
-            if (faultySubtaskInProgress == null || faultySubtaskInProgress.Status != SubtaskStatus.Executing ||
-                faultySubtaskInProgress.NodeId != distributedNodeId)
+            if (!IsFinishableSubtaskInProgress(faultySubtaskInProgress, distributedNodeId))
                 return NotFound();
 
             await _computationFailService.FailSubtaskInProgressAsync(computationErrorDto.SubtaskInProgressId,
                 computationErrorDto.Errors);
 
             return Ok();
+        }
+
+        [HttpPost("computation-cancel")]
+        [ValidateModel]
+        public async Task<IActionResult> CancelComputationAsync([FromBody] ComputationCancelDTO computationCancelDto)
+        {
+            if (!Guid.TryParse(computationCancelDto.DistributedNodeId, out var distributedNodeId))
+                return BadRequest(); // TODO: specify the reason
+
+            var subtaskInProgress =
+                await _subtaskInProgressResourceService.GetAsync(computationCancelDto.SubtaskInProgressId);
+
+            if (!IsFinishableSubtaskInProgress(subtaskInProgress, distributedNodeId))
+                return NotFound();
+
+            await _computationCancelService.CancelSubtaskInProgressAsync(computationCancelDto.SubtaskInProgressId);
+
+            return Ok();
+        }
+
+        private bool IsFinishableSubtaskInProgress(SubtaskInProgress subtaskInProgress, Guid distributedNodeId)
+        {
+            return subtaskInProgress != null && subtaskInProgress.Status == SubtaskInProgressStatus.Executing &&
+                   subtaskInProgress.NodeId == distributedNodeId;
         }
     }
 }

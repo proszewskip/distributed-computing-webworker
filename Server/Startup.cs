@@ -109,6 +109,8 @@ namespace Server
                 .AddScoped<IResourceService<DistributedTask>, DistributedTaskService>()
                 .AddScoped<IComputationFailService, ComputationFailService>()
                 .AddScoped<IComputationCompleteService, ComputationCompleteService>()
+                .AddScoped<IComputationCancelService, ComputationCancelService>()
+                .AddScoped<IGetNextSubtaskToComputeService, GetNextSubtaskToComputeService>()
                 .AddScoped<IJsonApiResponseFactory, JsonApiResponseFactory>()
                 .AddScoped<IJsonApiActionResultFactory, JsonApiActionResultFactory>()
                 .AddScoped<FormatErrorActionFilter>()
