@@ -49,13 +49,15 @@ namespace Server.Services.Api
             }
         }
 
-        private async Task InternalCompleteSubtaskInProgressAsync(int subtaskInProgressId, Stream subtaskInProgressResultStream)
+        private async Task InternalCompleteSubtaskInProgressAsync(int subtaskInProgressId,
+            Stream subtaskInProgressResultStream)
         {
             var subtaskInProgressResult = new byte[subtaskInProgressResultStream.Length];
 
-
-            var memoryStream = new MemoryStream(subtaskInProgressResult);
-            await subtaskInProgressResultStream.CopyToAsync(memoryStream);
+            using (var memoryStream = new MemoryStream(subtaskInProgressResult))
+            {
+                await subtaskInProgressResultStream.CopyToAsync(memoryStream);
+            }
 
             var finishedSubtaskInProgress = await _dbContext.SubtasksInProgress.FindAsync(subtaskInProgressId);
             finishedSubtaskInProgress.Status = SubtaskInProgressStatus.Done;
@@ -71,34 +73,27 @@ namespace Server.Services.Api
 
         private async Task FinishSubtaskAsync(int subtaskId)
         {
-            var subtasksInProgress = _dbContext.SubtasksInProgress.Where(subtaskInProgress =>
-                subtaskInProgress.SubtaskId == subtaskId);
+            var finishedSubtasksInProgress = _dbContext.SubtasksInProgress.Where(subtaskInProgress =>
+                subtaskInProgress.SubtaskId == subtaskId && subtaskInProgress.Status == SubtaskInProgressStatus.Done);
+            var subtaskResult = await GetMostTrustedSubtaskResultAsync(finishedSubtasksInProgress);
 
-            var sampleResult = await subtasksInProgress.Select(subtaskInProgress => subtaskInProgress.Result).FirstAsync();
-            if (await subtasksInProgress.AnyAsync(subtaskInProgress => subtaskInProgress.Result != sampleResult))
-            {
-                //TODO: limit number of recomputing
-                await subtasksInProgress.ForEachAsync(subtaskInProgress =>
-                {
-                    subtaskInProgress.Errors = subtaskInProgress.Errors
-                        .Append("Divergent results detected. Subtask must be computed again.").ToArray();
-                    subtaskInProgress.Status = SubtaskInProgressStatus.Error;
-                });
+            var finishedSubtask = await _dbContext.Subtasks.FindAsync(subtaskId);
 
-                await _dbContext.SaveChangesAsync();
-            }
-            else
-            {
-                var finishedSubtask = await _dbContext.Subtasks.FindAsync(subtaskId);
+            finishedSubtask.Result = subtaskResult;
+            finishedSubtask.Status = SubtaskStatus.Done;
 
-                finishedSubtask.Result = sampleResult;
-                finishedSubtask.Status = SubtaskStatus.Done;
+            await _dbContext.SaveChangesAsync();
 
-                await _dbContext.SaveChangesAsync();
+            if (IsDistributedTaskFullyComputed(finishedSubtask.DistributedTaskId))
+                await FinishDistributedTaskAsync(finishedSubtask.DistributedTaskId);
+        }
 
-                if (IsDistributedTaskFullyComputed(finishedSubtask.DistributedTaskId))
-                    await FinishDistributedTaskAsync(finishedSubtask.DistributedTaskId);
-            }
+        private Task<byte[]> GetMostTrustedSubtaskResultAsync(IQueryable<SubtaskInProgress> subtasksInProgress)
+        {
+            return subtasksInProgress.GroupBy(subtaskInProgress => subtaskInProgress.Result)
+                .OrderByDescending(group => group.Sum(subtaskInProgress => subtaskInProgress.Node.TrustLevel))
+                .Select(group => group.Key)
+                .FirstAsync();
         }
 
         private bool IsSubtaskFullyComputed(int subtaskId)
