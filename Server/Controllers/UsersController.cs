@@ -13,7 +13,6 @@ using Server.Validation;
 namespace Server.Controllers
 {
     [Route("[controller]")]
-    [ServiceFilter(typeof(AuthorizationFilter))]
     public class UsersController : ControllerBase
     {
         private readonly SignInManager<IdentityUser> _signInManager;
@@ -25,7 +24,6 @@ namespace Server.Controllers
             _jsonApiActionResultFactory = jsonApiActionResultFactory;
         }
 
-        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO body)
         {
@@ -48,6 +46,7 @@ namespace Server.Controllers
             return Ok();
         }
 
+        [ServiceFilter(typeof(AuthorizationFilter))]
         [ValidateModel]
         [HttpPost("change-password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO body)
@@ -55,7 +54,7 @@ namespace Server.Controllers
             var user = await _signInManager.UserManager.GetUserAsync(HttpContext.User);
 
             var changePasswordResult = await _signInManager.UserManager.ChangePasswordAsync(user,
-             body.OldPassword, body.NewPassword);
+                body.OldPassword, body.NewPassword);
 
             if (!changePasswordResult.Succeeded)
             {
@@ -65,7 +64,6 @@ namespace Server.Controllers
             return Ok();
         }
 
-        [AllowAnonymous]
         [HttpGet("is-authenticated")]
         public IActionResult IsAuthenticated()
         {
