@@ -30,5 +30,5 @@ export const validationSchema = Yup.object<ChangePasswordFields>().shape({
     .required('Required'),
   'confirm-new-password': Yup.string()
     .oneOf([Yup.ref('new-password'), null], 'Passwords must match')
-    .required('Password confirm is required'),
+    .required('Required'),
 });
