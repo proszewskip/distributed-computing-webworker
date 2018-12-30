@@ -4,6 +4,8 @@ import { Omit } from 'lodash';
 
 import { DistributedTask, DistributedTaskDefinition } from 'models';
 
+import { RequestError } from 'error-handling';
+
 import { ForceFetchData } from 'components/data-table/data-table';
 import { WithSelectableRowsAdditionalProps } from 'components/data-table/with-selectable-rows';
 
@@ -19,6 +21,8 @@ export interface DistributedTasksTableOwnProps {
    * If set, the table will only display distributed tasks for a given distributed task definition.
    */
   bindDistributedTaskDefinitionId?: number;
+
+  dataFetchingError?: RequestError;
 }
 
 export interface DistributedTasksTableDependencies {

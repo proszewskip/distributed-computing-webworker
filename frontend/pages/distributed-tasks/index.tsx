@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 
 import { Layout, LayoutProps } from 'components/layout';
 
+import { transformRequestError } from 'error-handling';
+
 import {
   AppPageComponentType,
   AuthenticatedSidebar,
@@ -30,9 +32,15 @@ class DistributedTasksTablePage extends Component<
   >['getInitialProps'] = ({ kitsuFactory, handleAuthenticationError }) => {
     const kitsu = kitsuFactory();
 
-    return fetchDistributedTasksWithDefinitions(kitsu).catch(
-      handleAuthenticationError,
-    );
+    return fetchDistributedTasksWithDefinitions(kitsu)
+      .catch(handleAuthenticationError)
+      .catch(
+        (error): DistributedTasksTablePageProps => ({
+          data: [],
+          totalRecordsCount: 0,
+          dataFetchingError: transformRequestError(error),
+        }),
+      );
   };
 
   public render() {

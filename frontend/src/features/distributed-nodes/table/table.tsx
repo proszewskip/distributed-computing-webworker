@@ -13,6 +13,7 @@ import {
   RefreshActionButton,
   ToggleFiltersActionButton,
 } from 'components/data-table/data-table-view/action-buttons';
+import { DataTableError } from 'components/data-table/errors';
 import { TextFilter } from 'components/data-table/filters';
 
 import {
@@ -23,16 +24,17 @@ import {
 import { getEntities } from 'utils/table/get-entities';
 import { preventPropagationHandler } from 'utils/table/prevent-propagation-handler';
 
+import { transformRequestError } from 'error-handling';
+import { DistributedNode } from 'models';
+import { BaseDependencies } from 'product-specific';
+
 import { DateCell } from './date-cell';
-import { EditNodeButton } from './edit-node-cell';
+import { EditNodeButton } from './edit-node-button';
 import {
   DistributedNodesTableDependencies,
   DistributedNodesTableProps,
   DistributedNodesTableState,
 } from './types';
-
-import { DistributedNode } from 'models';
-import { BaseDependencies } from 'product-specific';
 
 export class PureDistributedNodesTable extends Component<
   DistributedNodesTableProps,
@@ -90,13 +92,20 @@ export class PureDistributedNodesTable extends Component<
   }
 
   public render() {
-    const { data, totalRecordsCount, loading, filteringEnabled } = this.state;
+    const {
+      data,
+      totalRecordsCount,
+      loading,
+      filteringEnabled,
+      dataFetchingError,
+    } = this.state;
 
     return (
       <DataTableView
         header={<Heading size={600}>Distributed Nodes</Heading>}
         renderActionButtons={this.renderActionButtons}
       >
+        {dataFetchingError && <DataTableError error={dataFetchingError} />}
         <DataTable
           data={data}
           columns={this.columns}
@@ -113,28 +122,39 @@ export class PureDistributedNodesTable extends Component<
     );
   }
 
-  private fetchData: DataTableProps['onFetchData'] = async ({
+  private fetchData: DataTableProps['onFetchData'] = ({
     filtered,
     pageSize,
     page,
   }) => {
-    this.setState({ loading: true });
+    this.setState({ loading: true, dataFetchingError: undefined });
 
     const { kitsu } = this.props;
 
-    const { data, totalRecordsCount } = await getEntities<DistributedNode>(
+    return getEntities<DistributedNode>(
       kitsu,
       'distributed-node',
       filtered,
       page,
       pageSize,
-    );
-
-    this.setState({
-      data: List(data),
-      totalRecordsCount,
-      loading: false,
-    });
+    )
+      .then(({ data, totalRecordsCount }) => {
+        this.setState({
+          data: List(data),
+          totalRecordsCount,
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          data: List(),
+          dataFetchingError: transformRequestError(error),
+        });
+      })
+      .then(() => {
+        this.setState({
+          loading: false,
+        });
+      });
   };
 
   private renderActionButtons: DataTableViewProps['renderActionButtons'] = () => (

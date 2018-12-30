@@ -10,6 +10,7 @@ import {
 
 import { getEntities } from 'utils/table/get-entities';
 
+import { transformRequestError } from 'error-handling';
 import { DistributedNode } from 'models';
 import {
   AppPageComponentType,
@@ -37,9 +38,15 @@ export default class DistributedNodesPage extends Component<
   }) => {
     const kitsu = kitsuFactory();
 
-    return getEntities<DistributedNode>(kitsu, 'distributed-node').catch(
-      handleAuthenticationError,
-    );
+    return getEntities<DistributedNode>(kitsu, 'distributed-node')
+      .catch(handleAuthenticationError)
+      .catch(
+        (error): DistributedNodesPageProps => ({
+          data: [],
+          totalRecordsCount: 0,
+          dataFetchingError: transformRequestError(error),
+        }),
+      );
   };
 
   public render() {

@@ -3,12 +3,31 @@ import { RequestError } from './types';
 
 export function transformRequestError(error: unknown): RequestError {
   if (isJsonApiErrorResponse(error)) {
-    return error.errors;
+    return {
+      type: 'jsonApiErrors',
+      errors: error.errors,
+    };
   }
 
   if (isNativeError(error)) {
-    return error;
+    return {
+      type: 'nativeError',
+      name: error.name,
+      message: error.message,
+    };
   }
 
-  return new Error('Unknown error');
+  if (typeof error === 'string') {
+    return {
+      type: 'nativeError',
+      name: 'Unknown error',
+      message: error,
+    };
+  }
+
+  return {
+    type: 'nativeError',
+    name: 'Unknown error',
+    message: 'An unexpected error occurred',
+  };
 }

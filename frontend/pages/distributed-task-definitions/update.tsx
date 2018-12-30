@@ -1,8 +1,9 @@
-import { Heading, Link, majorScale, Pane } from 'evergreen-ui';
+import { Heading, majorScale, Pane } from 'evergreen-ui';
 import React, { PureComponent, ReactNode } from 'react';
 
 import { ErrorPage, RequestErrorInfo } from 'components/errors';
 import { Layout, LayoutProps } from 'components/layout';
+import { Link } from 'components/link';
 import { withRouter, WithRouterProps } from 'components/router';
 
 import {
@@ -23,7 +24,7 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
 );
 
 export interface UpdatePageProps {
-  errors?: RequestError;
+  dataFetchingError?: RequestError;
   modelData?: UpdateDistributedTaskDefinitionModel;
 }
 
@@ -59,9 +60,11 @@ class UpdatePage extends PureComponent<UpdatePageProps & WithRouterProps> {
         }),
       )
       .catch(handleAuthenticationError)
-      .catch((error) => ({
-        errors: transformRequestError(error),
-      }));
+      .catch(
+        (error): UpdatePageProps => ({
+          dataFetchingError: transformRequestError(error),
+        }),
+      );
   };
 
   public render() {
@@ -75,6 +78,7 @@ class UpdatePage extends PureComponent<UpdatePageProps & WithRouterProps> {
               <Heading size={700} marginBottom={majorScale(1)}>
                 Update Distributed Task Definition
               </Heading>
+
               {this.renderErrors()}
               {this.renderForm()}
             </Pane>
@@ -95,15 +99,15 @@ class UpdatePage extends PureComponent<UpdatePageProps & WithRouterProps> {
   };
 
   private renderErrors = (): ReactNode => {
-    const { errors } = this.props;
+    const { dataFetchingError } = this.props;
 
-    if (!errors) {
+    if (!dataFetchingError) {
       return null;
     }
 
     return (
       <ErrorPage>
-        <RequestErrorInfo error={errors} />
+        <RequestErrorInfo error={dataFetchingError} />
 
         <Link route="/distributed-task-definitions">
           <a>Go back to the list of distributed task definitions</a>
