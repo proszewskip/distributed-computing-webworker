@@ -1,11 +1,4 @@
-import {
-  Button,
-  Heading,
-  IconButton,
-  majorScale,
-  Pane,
-  Paragraph,
-} from 'evergreen-ui';
+import { Heading, majorScale, Pane, Paragraph } from 'evergreen-ui';
 import React, { Component, ReactNode } from 'react';
 
 import { withDependencies } from 'components/dependency-injection/with-dependencies';
@@ -15,6 +8,14 @@ import {
   OnDistributedNodeStateUpdate,
 } from 'features/worker/services';
 
+import { DistributedNodeIdInfo } from '../distributed-node-id-info';
+import {
+  IdleWorkerPage,
+  PristineWorkerPage,
+  RegisteringWorkerPage,
+  RunningWorkerPage,
+} from '../pages-by-status';
+import { UsedThreadsCard, UsedThreadsCardProps } from '../used-threads-card';
 import { WorkersTable } from '../workers-table';
 import { dependenciesExtractor } from './dependencies';
 import { PureWorkerControllerProps, WorkerControllerState } from './types';
@@ -50,15 +51,10 @@ export class PureWorkerController extends Component<
     return (
       <Pane margin={majorScale(1)}>
         <Heading size={700} marginBottom={majorScale(1)}>
-          Worker node
+          Worker Node
         </Heading>
 
-        <Paragraph>
-          State:{' '}
-          {this.state.distributedNodeState &&
-            this.state.distributedNodeState.state}
-        </Paragraph>
-        {this.renderContent()}
+        <Pane maxWidth={600}>{this.renderContent()}</Pane>
       </Pane>
     );
   }
@@ -72,69 +68,65 @@ export class PureWorkerController extends Component<
   };
 
   private renderContent = (): ReactNode => {
-    const { distributedNodeState } = this.state;
+    const { distributedNodeState, threadsCount } = this.state;
 
     if (
       !distributedNodeState ||
       distributedNodeState.state === DistributedNodeState.Pristine
     ) {
-      return 'Initializing the worker';
-    }
-
-    if (distributedNodeState.state === DistributedNodeState.Idle) {
-      return <Button onClick={this.startNode}>Start</Button>;
+      return <PristineWorkerPage />;
     }
 
     if (distributedNodeState.state === DistributedNodeState.Registering) {
-      return 'Registering the node';
+      return <RegisteringWorkerPage />;
     }
 
-    if (distributedNodeState.state === DistributedNodeState.Running) {
+    const distributedNodeIdInfo = (
+      <DistributedNodeIdInfo id={distributedNodeState.data.distributedNodeId} />
+    );
+    const usedThreadsCard = (
+      <UsedThreadsCard
+        threadsCount={threadsCount}
+        onChange={this.onChangeThreadsCount}
+      />
+    );
+
+    if (distributedNodeState.state === DistributedNodeState.Idle) {
       return (
-        <>
-          <Paragraph>Running.</Paragraph>
-          <Button onClick={this.stopNode}>Stop</Button>
-
-          <Pane>
-            Threads count: {this.state.threadsCount}
-            <IconButton icon="plus" onClick={this.incrementThreadsCount} />
-            <IconButton icon="minus" onClick={this.decrementThreadsCount} />
-          </Pane>
-
-          <Pane>
-            Workers count: {distributedNodeState.data.subtaskWorkers.size}
-          </Pane>
-
-          <Pane maxWidth={400}>
-            <WorkersTable
-              subtaskWorkers={distributedNodeState.data.subtaskWorkers}
-              maxWorkersCount={this.state.threadsCount}
-            />
-          </Pane>
-
-          <Pane>{distributedNodeState.data.runningState}</Pane>
-        </>
+        <IdleWorkerPage
+          onStartWorker={this.startNode}
+          distributedNodeIdInfo={distributedNodeIdInfo}
+          usedThreadsCard={usedThreadsCard}
+        />
       );
     }
 
-    return 'Unknown state. Something is broken :(';
-  };
+    if (distributedNodeState.state === DistributedNodeState.Running) {
+      const workersTable = (
+        <WorkersTable
+          subtaskWorkers={distributedNodeState.data.subtaskWorkers}
+          maxWorkersCount={threadsCount}
+        />
+      );
 
-  private incrementThreadsCount = () => {
-    const newThreadsCount = this.state.threadsCount + 1;
-
-    this.setState({
-      threadsCount: newThreadsCount,
-    });
-
-    if (this.state.distributedNodeService) {
-      this.state.distributedNodeService.setThreadsCount(newThreadsCount);
+      return (
+        <RunningWorkerPage
+          distributedNodeIdInfo={distributedNodeIdInfo}
+          onStopWorker={this.stopNode}
+          runningState={distributedNodeState.data.runningState}
+          usedThreadsCard={usedThreadsCard}
+          workersTable={workersTable}
+          activeThreadsCount={distributedNodeState.data.subtaskWorkers.size}
+        />
+      );
     }
+
+    return <Paragraph>Unknown state. Something is broken :(</Paragraph>;
   };
 
-  private decrementThreadsCount = () => {
-    const newThreadsCount = this.state.threadsCount - 1;
-
+  private onChangeThreadsCount: UsedThreadsCardProps['onChange'] = (
+    newThreadsCount,
+  ) => {
     this.setState({
       threadsCount: newThreadsCount,
     });

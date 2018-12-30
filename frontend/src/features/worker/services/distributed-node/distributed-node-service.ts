@@ -67,7 +67,9 @@ export class DistributedNodeService {
       throw new Error('DistributedNode was not initialized');
     }
 
-    this.dependencies.keepAliveService.stopPolling();
+    if (this.dependencies.keepAliveService.isPolling) {
+      this.dependencies.keepAliveService.stopPolling();
+    }
 
     if (this.state.state === DistributedNodeState.Running) {
       this.stop();
