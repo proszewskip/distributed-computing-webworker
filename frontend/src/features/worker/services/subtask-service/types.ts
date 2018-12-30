@@ -46,3 +46,8 @@ export interface ComputationErrorRequestBody {
   distributedNodeId: string;
   errors: string[];
 }
+
+export interface ComputationCancelRequestBody {
+  'subtask-in-progress-id': string;
+  'distributed-node-id': string;
+}

@@ -56,8 +56,8 @@ export class SubtaskWorker {
       throw new Error('Worker thread is not running');
     }
 
-    this.destroyWorkerThread();
     this.rejectComputationPromise();
+    this.destroyWorkerThread();
   }
 
   private destroyWorkerThread = () => {
