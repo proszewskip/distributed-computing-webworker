@@ -22,6 +22,10 @@ export const authenticatedSidebarMenuItems: ConnectedMenuItem[] = [
     title: 'Worker',
   },
   {
+    route: '/authentication/change-password',
+    title: 'Change password',
+  },
+  {
     route: '/authentication/logout',
     title: 'Logout',
   },
