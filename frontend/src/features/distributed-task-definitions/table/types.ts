@@ -7,9 +7,12 @@ import { DistributedTaskDefinition } from 'models';
 import { ForceFetchData } from 'components/data-table/data-table';
 import { WithSelectableRowsAdditionalProps } from 'components/data-table/with-selectable-rows';
 
+import { RequestError } from 'error-handling';
+
 export interface DistributedTaskDefinitionsTableOwnProps {
   data: DistributedTaskDefinition[];
   totalRecordsCount: number;
+  dataFetchingError?: RequestError;
 }
 
 export interface DistributedTaskDefinitionsTableDependencies {

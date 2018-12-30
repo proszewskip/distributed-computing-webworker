@@ -47,20 +47,21 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
       <>
         {this.renderErrors()}
         {this.renderDetails()}
+        {this.renderDistributedTasksTable()}
       </>
     );
   }
 
   private renderDetails = (): ReactNode => {
-    const { detailsData: data, id } = this.props;
+    const { detailsData, id } = this.props;
 
-    if (!data) {
+    if (!detailsData) {
       return null;
     }
 
     const { deleteRequestPending } = this.state;
 
-    const problemPluginInfo = data['problem-plugin-info'];
+    const problemPluginInfo = detailsData['problem-plugin-info'];
 
     return (
       <>
@@ -99,28 +100,28 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
             <Text>ID</Text>
           </Pane>
           <Pane>
-            <Text>{data.id}</Text>
+            <Text>{detailsData.id}</Text>
           </Pane>
 
           <Pane>
             <Text>Name</Text>
           </Pane>
           <Pane>
-            <Text>{data.name}</Text>
+            <Text>{detailsData.name}</Text>
           </Pane>
 
           <Pane>
             <Text>Description</Text>
           </Pane>
           <Pane>
-            <Text>{data.description}</Text>
+            <Text>{detailsData.description}</Text>
           </Pane>
 
           <Pane>
             <Text>Main DLL name</Text>
           </Pane>
           <Pane>
-            <Text>{data['main-dll-name']}</Text>
+            <Text>{detailsData['main-dll-name']}</Text>
           </Pane>
 
           <Pane>
@@ -133,24 +134,30 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
             </Text>
           </Pane>
         </Card>
-
-        {this.props.tableData && (
-          <DistributedTasksTable {...this.props.tableData} />
-        )}
       </>
     );
   };
 
-  private renderErrors = (): ReactNode => {
-    const { error } = this.props;
+  private renderDistributedTasksTable = (): ReactNode => {
+    const { tableData } = this.props;
 
-    if (!error) {
+    if (!tableData) {
+      return null;
+    }
+
+    return <DistributedTasksTable {...tableData} />;
+  };
+
+  private renderErrors = (): ReactNode => {
+    const { dataFetchingError } = this.props;
+
+    if (!dataFetchingError) {
       return null;
     }
 
     return (
       <ErrorPage>
-        <RequestErrorInfo error={error} />
+        <RequestErrorInfo error={dataFetchingError} />
 
         <Link route="/distributed-task-definitions">
           <a>Go back to the list of distributed task definitions</a>

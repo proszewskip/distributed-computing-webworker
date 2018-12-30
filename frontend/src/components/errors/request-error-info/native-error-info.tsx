@@ -1,9 +1,11 @@
 import React, { StatelessComponent } from 'react';
 
+import { NativeError } from 'error-handling';
+
 import { ErrorInfo } from './error-info';
 
 export interface NativeErrorInfoProps {
-  error: Error;
+  error: NativeError;
 }
 
 export const NativeErrorInfo: StatelessComponent<NativeErrorInfoProps> = ({

@@ -1,9 +1,13 @@
 import { Heading, majorScale, Pane } from 'evergreen-ui';
-import React, { PureComponent } from 'react';
+import React, { PureComponent, ReactNode } from 'react';
 
+import { ErrorPage, RequestErrorInfo } from 'components/errors';
 import { Layout, LayoutProps } from 'components/layout';
+import { Link } from 'components/link';
 
 import { CreateDistributedTaskDefinitionForm } from 'features/distributed-task-definitions/create';
+
+import { RequestError, transformRequestError } from 'error-handling';
 
 import {
   AppContext,
@@ -18,13 +22,26 @@ const renderSidebar: LayoutProps['renderSidebar'] = () => (
   <AuthenticatedSidebar />
 );
 
-export default class CreatePage extends PureComponent {
-  public static getInitialProps = async ({ fetch, redirect }: AppContext) => {
-    if (!(await isAuthenticated(fetch))) {
-      redirect(`${config.loginPageUrl}?unauthenticated`);
-    }
+interface CreatePageProps {
+  dataFetchingError?: RequestError;
+}
 
-    return {};
+export default class CreatePage extends PureComponent<CreatePageProps> {
+  public static getInitialProps = ({
+    fetch,
+    redirect,
+  }: AppContext): Promise<CreatePageProps> => {
+    return isAuthenticated(fetch)
+      .then((authenticated) => {
+        if (!authenticated) {
+          redirect(`${config.loginPageUrl}?unauthenticated`);
+        }
+
+        return {};
+      })
+      .catch((error) => ({
+        dataFetchingError: transformRequestError(error),
+      }));
   };
 
   public render() {
@@ -38,11 +55,41 @@ export default class CreatePage extends PureComponent {
               <Heading size={700} marginBottom={majorScale(1)}>
                 Create Distributed Task Definition
               </Heading>
-              <CreateDistributedTaskDefinitionForm />
+
+              {this.renderErrors()}
+              {this.renderForm()}
             </Pane>
           </Layout>
         </BaseDependenciesProvider>
       </>
     );
   }
+
+  private renderErrors = (): ReactNode => {
+    const { dataFetchingError } = this.props;
+
+    if (!dataFetchingError) {
+      return;
+    }
+
+    return (
+      <ErrorPage>
+        <RequestErrorInfo error={dataFetchingError} />
+
+        <Link route="/distributed-task-definitions">
+          <a>Go back to the list of distributed task definitions</a>
+        </Link>
+      </ErrorPage>
+    );
+  };
+
+  private renderForm = (): ReactNode => {
+    const { dataFetchingError } = this.props;
+
+    if (dataFetchingError) {
+      return null;
+    }
+
+    return <CreateDistributedTaskDefinitionForm />;
+  };
 }

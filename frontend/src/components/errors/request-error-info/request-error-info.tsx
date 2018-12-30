@@ -16,5 +16,5 @@ export const RequestErrorInfo: React.SFC<RequestErrorInfoProps> = ({
     return <NativeErrorInfo error={error} />;
   }
 
-  return <JsonApiErrorsInfo errors={error} />;
+  return <JsonApiErrorsInfo errors={error.errors} />;
 };
