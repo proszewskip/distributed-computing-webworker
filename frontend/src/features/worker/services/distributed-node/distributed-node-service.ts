@@ -2,7 +2,10 @@ import { Map } from 'immutable';
 
 import { WorkerThreadStatus } from 'features/worker/worker-thread';
 
-import { AssignNextResponseBody } from '../subtask-service';
+import {
+  AssignNextResponseBody,
+  ComputationCancelRequestBody,
+} from '../subtask-service';
 import {
   createComputeSubtaskMessagePayload,
   SubtaskWorker,
@@ -195,6 +198,13 @@ export class DistributedNodeService {
           subtaskWorkerId,
           assignNextSubtaskResponse['subtask-in-progress-id'],
         ),
+      )
+      .catch(
+        this.cancelWorkerComputation({
+          'distributed-node-id': distributedNodeId,
+          'subtask-in-progress-id':
+            assignNextSubtaskResponse['subtask-in-progress-id'],
+        }),
       );
 
     const updatedSubtaskWorkersMap = this.state.data.subtaskWorkers.set(
@@ -277,6 +287,11 @@ export class DistributedNodeService {
 
     const { distributedNodeId } = this.state.data;
 
+    /**
+     * REFACTOR: extract the `switch` to a separate method
+     * TODO: handle errors and retry
+     */
+
     switch (result.status) {
       case WorkerThreadStatus.ComputationSuccess:
         await this.dependencies.subtaskService.sendComputationSuccess({
@@ -316,6 +331,10 @@ export class DistributedNodeService {
     });
     this.onWorkersCountChanged();
   };
+
+  private cancelWorkerComputation = (
+    params: ComputationCancelRequestBody,
+  ) => () => this.dependencies.subtaskService.sendComputationCancel(params);
 
   private onWorkersCountChanged = () => {
     if (this.state.state !== DistributedNodeState.Running) {

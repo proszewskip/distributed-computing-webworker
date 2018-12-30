@@ -2,6 +2,7 @@ import { config } from 'product-specific';
 
 import {
   AssignNextResponseBody,
+  ComputationCancelRequestBody,
   ComputationErrorRequestBody,
   ComputationSuccessRequestBody,
   SubtaskServiceDependencies,
@@ -67,6 +68,23 @@ export class SubtaskSerivce {
       method: 'POST',
       body: formData,
     }).then(this.rejectIfNotOk('Cannot report subtask computation error'));
+  };
+
+  public sendComputationCancel = (
+    requestBody: ComputationCancelRequestBody,
+  ) => {
+    const { fetch } = this;
+
+    return fetch(
+      `${config.serverUrl}/subtasks-in-progress/computation-cancel`,
+      {
+        method: 'POST',
+        body: JSON.stringify(requestBody),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    ).then(this.rejectIfNotOk('Cannot report subtask computation cancel'));
   };
 
   private rejectIfNotOk = (errorMessage: string) => (response: Response) => {
