@@ -2,18 +2,15 @@ import { Component } from 'react';
 
 import { withRouter, WithRouterProps } from 'components/router';
 
-export interface WarnOnUnsavedDataProps {
+export interface WarnOnLeavingProps {
   warn: boolean;
   leaveMessage?: string;
 }
 
-type WarnOnUnsavedDataPropsWithRouter = WarnOnUnsavedDataProps &
-  WithRouterProps;
+type WarnOnLeavingPropsWithRouter = WarnOnLeavingProps & WithRouterProps;
 
-class PureWarnOnUnsavedData extends Component<
-  WarnOnUnsavedDataPropsWithRouter
-> {
-  public static defaultProps: Partial<WarnOnUnsavedDataPropsWithRouter> = {
+class PureWarnOnLeaving extends Component<WarnOnLeavingPropsWithRouter> {
+  public static defaultProps: Partial<WarnOnLeavingPropsWithRouter> = {
     leaveMessage: 'You have unsaved changes, are you sure you want to leave?',
   };
 
@@ -63,4 +60,4 @@ class PureWarnOnUnsavedData extends Component<
   };
 }
 
-export const WarnOnUnsavedData = withRouter(PureWarnOnUnsavedData);
+export const WarnOnLeaving = withRouter(PureWarnOnLeaving);

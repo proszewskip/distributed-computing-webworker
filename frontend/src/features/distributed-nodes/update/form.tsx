@@ -11,7 +11,8 @@ import {
 import { ErrorAlert } from 'components/form/errors/error-alert';
 import { FormButtons } from 'components/form/form-buttons';
 import { TextInputWithLabel } from 'components/form/text-input';
-import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
+
+import { WarnOnLeaving } from 'components/warn-on-leaving';
 
 import { getErrorsDictionary } from 'utils/forms/get-errors-dictionary';
 
@@ -74,7 +75,7 @@ class PureUpdateDistributedTaskForm extends Component<
 
           <ClipLoader loading={isSubmitting} />
         </Form>
-        <WarnOnUnsavedData warn={dirty} />
+        <WarnOnLeaving warn={dirty} />
       </Pane>
     );
   };

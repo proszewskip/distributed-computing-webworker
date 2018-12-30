@@ -11,6 +11,8 @@ import React, { ReactNode, StatelessComponent } from 'react';
 
 import { DistributedNodeRunningState } from 'features/worker/services';
 
+import { WarnOnLeaving } from 'components/warn-on-leaving';
+
 export interface RunningWorkerPageProps {
   onStopWorker: () => void;
   distributedNodeIdInfo: ReactNode;
@@ -60,6 +62,7 @@ export const RunningWorkerPage: StatelessComponent<RunningWorkerPageProps> = ({
 
       {workersTable}
     </Card>
+    <WarnOnLeaving warn={true} leaveMessage="Are you sure you want to leave?" />
   </>
 );
 
