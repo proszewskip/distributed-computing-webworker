@@ -9,7 +9,8 @@ import { FilePickerWithLabel } from 'components/form/file-picker';
 import { FormButtons } from 'components/form/form-buttons';
 import { TextInputWithLabel } from 'components/form/text-input';
 import { Textarea } from 'components/form/textarea';
-import { WarnOnUnsavedData } from 'components/form/warn-on-unsaved-data';
+
+import { WarnOnLeaving } from 'components/warn-on-leaving';
 
 import { withRouter, WithRouterProps } from 'components/router';
 
@@ -95,7 +96,7 @@ export class PureCreateDistributedTaskDefinitionForm extends Component<
 
           <ClipLoader loading={isSubmitting} />
         </Form>
-        <WarnOnUnsavedData warn={dirty} />
+        <WarnOnLeaving warn={dirty} />
       </Pane>
     );
   };
