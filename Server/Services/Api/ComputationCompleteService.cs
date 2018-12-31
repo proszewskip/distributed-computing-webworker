@@ -136,12 +136,17 @@ namespace Server.Services.Api
                 finishedDistributedTask.Errors = finishedDistributedTask.Errors.Append(exception.ToString()).ToArray();
             }
 
+            RemoveSubtasksInProgress(distributedTaskId);
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        private void RemoveSubtasksInProgress(int distributedTaskId)
+        {
             var subtasksInProgress = _dbContext.SubtasksInProgress.Where(subtaskInProgress =>
                 subtaskInProgress.Subtask.DistributedTaskId == distributedTaskId);
 
             _dbContext.SubtasksInProgress.RemoveRange(subtasksInProgress);
-
-            await _dbContext.SaveChangesAsync();
         }
 
         private bool IsDistributedTaskFullyComputed(int distributedTaskId)
