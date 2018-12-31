@@ -6,7 +6,7 @@ import { FilterComponentWithTooltip } from './filter-component-with-tooltip';
 export const NumericFilter: FilterRender = (params) => (
   <FilterComponentWithTooltip
     {...params}
-    tooltipMessage="For greater than search `gt:value` or `lt:value` for less than."
+    tooltipMessage="For greater than search 'gt:value' or 'lt:value' for less than."
     isFilterInvalid={isNumericFilterInvalid}
   />
 );
@@ -18,11 +18,7 @@ export const isNumericFilterValid = (value: string) => {
     value = value.substring(3);
   }
 
-  const parsedNumber = parseInt(value, 10);
+  const parsedNumber = Number(value);
 
-  if (!Number.isNaN(parsedNumber)) {
-    return true;
-  }
-
-  return false;
+  return !Number.isNaN(parsedNumber);
 };
