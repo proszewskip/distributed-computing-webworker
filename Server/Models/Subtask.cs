@@ -38,6 +38,11 @@ namespace Server.Models
         /// </summary>
         public byte[] Result { get; set; }
 
+        /// <summary>
+        /// Possible errors that occurred during computation
+        /// </summary>
+        public string[] Errors { get; set; } = { };
+
         [Required]
         [Attr("subtask-status", isImmutable: true)]
         public SubtaskStatus Status { get; set; }
