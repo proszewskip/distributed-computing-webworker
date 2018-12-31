@@ -136,6 +136,11 @@ namespace Server.Services.Api
                 finishedDistributedTask.Errors = finishedDistributedTask.Errors.Append(exception.ToString()).ToArray();
             }
 
+            var subtasksInProgress = _dbContext.SubtasksInProgress.Where(subtaskInProgress =>
+                subtaskInProgress.Subtask.DistributedTaskId == distributedTaskId);
+
+            _dbContext.SubtasksInProgress.RemoveRange(subtasksInProgress);
+
             await _dbContext.SaveChangesAsync();
         }
 
