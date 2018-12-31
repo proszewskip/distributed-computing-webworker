@@ -2,7 +2,7 @@ import { Button, Heading, minorScale, Pane, Text, toaster } from 'evergreen-ui';
 import { List, Set } from 'immutable';
 import { compose, filter, isNil, not } from 'ramda';
 import React, { Component } from 'react';
-import { Column } from 'react-table';
+import { Column, Filter } from 'react-table';
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
 
 import { LongTextCell, TextCell } from 'components/data-table/cells';
@@ -18,7 +18,11 @@ import {
   ToggleFiltersActionButton,
 } from 'components/data-table/data-table-view/action-buttons';
 import { DataTableError } from 'components/data-table/errors';
-import { NumberFilter, TextFilter } from 'components/data-table/filters';
+import {
+  isNumericFilterValid,
+  NumericFilter,
+  TextFilter,
+} from 'components/data-table/filters';
 import { TableWithSummaryProps } from 'components/data-table/styled-data-table/table-with-summary';
 import {
   withSelectableRows,
@@ -87,7 +91,7 @@ export class PureDistributedTasksTable extends Component<
       accessor: 'priority',
       Header: <Text>Priority</Text>,
       Cell: TextCell,
-      Filter: NumberFilter,
+      Filter: NumericFilter,
       minWidth: 100,
     },
     {
@@ -205,6 +209,8 @@ export class PureDistributedTasksTable extends Component<
       filtered = [];
     }
 
+    filtered = this.removeInvalidFilters(filtered);
+
     return getEntities<DistributedTaskWithDefinition>(
       kitsu,
       distributedTaskModelName,
@@ -319,6 +325,16 @@ export class PureDistributedTasksTable extends Component<
   ) => {
     this.setState({
       forceFetchDataCallback: fetchData,
+    });
+  };
+
+  private removeInvalidFilters = (filtered: Filter[]) => {
+    return filtered.filter((filterObject) => {
+      if (filterObject.id === 'priority') {
+        return isNumericFilterValid(filterObject.value);
+      }
+
+      return true;
     });
   };
 }

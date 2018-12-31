@@ -1,7 +1,7 @@
 import { Heading, Pane, Text } from 'evergreen-ui';
 import { List } from 'immutable';
 import React, { Component } from 'react';
-import { Column } from 'react-table';
+import { Column, Filter } from 'react-table';
 
 import { LongTextCell, TextCell } from 'components/data-table/cells';
 import { DataTable, DataTableProps } from 'components/data-table/data-table';
@@ -14,7 +14,11 @@ import {
   ToggleFiltersActionButton,
 } from 'components/data-table/data-table-view/action-buttons';
 import { DataTableError } from 'components/data-table/errors';
-import { NumericFilter, TextFilter } from 'components/data-table/filters';
+import {
+  isNumericFilterValid,
+  NumericFilter,
+  TextFilter,
+} from 'components/data-table/filters';
 
 import {
   DependenciesExtractor,
@@ -131,6 +135,8 @@ export class PureDistributedNodesTable extends Component<
   }) => {
     this.setState({ loading: true, dataFetchingError: undefined });
 
+    filtered = this.removeInvalidFilters(filtered);
+
     const { kitsu } = this.props;
 
     return getEntities<DistributedNode>(
@@ -188,6 +194,16 @@ export class PureDistributedNodesTable extends Component<
       forceFetchDataCallback: fetchData,
       // NOTE: data is reassigned in order to re-render table so that forceFetchDataCallback is propagated
       data: List(this.state.data.toArray()),
+    });
+  };
+
+  private removeInvalidFilters = (filtered: Filter[]) => {
+    return filtered.filter((filterObject) => {
+      if (filterObject.id === 'trust-level') {
+        return isNumericFilterValid(filterObject.value);
+      }
+
+      return true;
     });
   };
 }
