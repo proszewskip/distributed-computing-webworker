@@ -27,6 +27,7 @@ namespace Server.Tests
             // Ignore string[] properties as those are not supported when using InMemoryDatabase
             modelBuilder.Entity<DistributedTask>().Ignore(distributedTask => distributedTask.Errors);
             modelBuilder.Entity<SubtaskInProgress>().Ignore(subtaskInProgress => subtaskInProgress.Errors);
+            modelBuilder.Entity<Subtask>().Ignore(subtask => subtask.Errors);
         }
     }
 }

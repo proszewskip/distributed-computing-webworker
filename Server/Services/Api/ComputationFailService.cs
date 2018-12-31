@@ -67,6 +67,7 @@ namespace Server.Services.Api
         {
             var subtask = await _dbContext.Subtasks.FindAsync(failedSubtaskInProgress.SubtaskId);
             subtask.Status = SubtaskStatus.Error;
+            subtask.Errors = failedSubtaskInProgress.Errors;
 
             await FailDistributedTask(subtask);
         }
@@ -76,6 +77,7 @@ namespace Server.Services.Api
             var finishedDistributedTask = await _dbContext.DistributedTasks.FindAsync(subtask.DistributedTaskId);
 
             finishedDistributedTask.Status = DistributedTaskStatus.Error;
+            finishedDistributedTask.Errors = subtask.Errors;
         }
     }
 }
