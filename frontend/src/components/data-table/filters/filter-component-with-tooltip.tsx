@@ -3,13 +3,10 @@ import React, { PureComponent } from 'react';
 
 type OnChange = (value: string) => any;
 
-const onChangeFactory = (originalOnChange: OnChange) => (event: any) =>
-  originalOnChange(event.target.value);
-
 export interface FilterComponentWithTooltipProps {
   filter: any;
   tooltipMessage: string;
-  onChange: () => void;
+  onChange: OnChange;
   isFilterInvalid: (filter: string) => boolean;
 }
 
@@ -30,7 +27,7 @@ export class FilterComponentWithTooltip extends PureComponent<
   };
 
   public render() {
-    const { filter, onChange, tooltipMessage, isFilterInvalid } = this.props;
+    const { filter, tooltipMessage, isFilterInvalid } = this.props;
 
     return (
       <Tooltip
@@ -42,7 +39,7 @@ export class FilterComponentWithTooltip extends PureComponent<
           isInvalid={filter ? isFilterInvalid(filter.value) : false}
           width="100%"
           value={filter ? filter.value : ''}
-          onChange={onChangeFactory(onChange)}
+          onChange={this.onChange}
           onFocus={this.onFocus}
           onBlur={this.onBlur}
         />
@@ -54,6 +51,11 @@ export class FilterComponentWithTooltip extends PureComponent<
     this.setState({
       isTooltipShown: true,
     });
+  };
+
+  private onChange = (event: any) => {
+    const { onChange } = this.props;
+    onChange(event.target.value);
   };
 
   private onBlur = () => {
