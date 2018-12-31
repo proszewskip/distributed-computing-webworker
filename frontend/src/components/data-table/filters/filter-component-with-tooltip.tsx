@@ -10,6 +10,7 @@ export interface FilterComponentWithTooltipProps {
   filter: any;
   tooltipMessage: string;
   onChange: () => void;
+  isFilterInvalid: (filter: string) => boolean;
 }
 
 interface FilterComponentWithTooltipState {
@@ -20,12 +21,16 @@ export class FilterComponentWithTooltip extends PureComponent<
   FilterComponentWithTooltipProps,
   FilterComponentWithTooltipState
 > {
+  public static defaultProps: Partial<FilterComponentWithTooltipProps> = {
+    isFilterInvalid: () => false,
+  };
+
   public state: FilterComponentWithTooltipState = {
     isTooltipShown: null,
   };
 
   public render() {
-    const { filter, onChange, tooltipMessage } = this.props;
+    const { filter, onChange, tooltipMessage, isFilterInvalid } = this.props;
 
     return (
       <Tooltip
@@ -34,6 +39,7 @@ export class FilterComponentWithTooltip extends PureComponent<
         isShown={this.state.isTooltipShown}
       >
         <TextInput
+          isInvalid={filter ? isFilterInvalid(filter.value) : false}
           width="100%"
           value={filter ? filter.value : ''}
           onChange={onChangeFactory(onChange)}
