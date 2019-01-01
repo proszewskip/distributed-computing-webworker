@@ -28,19 +28,6 @@ export const DetailsGrid: StatelessComponent<DetailsGridProps> = ({
       marginBottom={majorScale(2)}
     >
       <Pane>
-        <Text>Distributed Task Definition</Text>
-      </Pane>
-      <Pane>
-        <Link
-          route={`/distributed-task-definitions/${
-            distributedTaskDefinition.id
-          }`}
-        >
-          <a>{distributedTaskDefinition.name}</a>
-        </Link>
-      </Pane>
-
-      <Pane>
         <Text>ID</Text>
       </Pane>
       <Pane>
@@ -81,6 +68,20 @@ export const DetailsGrid: StatelessComponent<DetailsGridProps> = ({
       <Pane>
         <Text>{formatDistributedTaskStatus(details.status)}</Text>
       </Pane>
+
+      <Pane>
+        <Text>Distributed Task Definition</Text>
+      </Pane>
+      <Pane>
+        <Link
+          route={`/distributed-task-definitions/${
+            distributedTaskDefinition.id
+          }`}
+        >
+          <a>{distributedTaskDefinition.name}</a>
+        </Link>
+      </Pane>
+
       {details.errors.length > 0 && (
         <>
           <Pane>
