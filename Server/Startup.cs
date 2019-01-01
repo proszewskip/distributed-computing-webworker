@@ -50,7 +50,6 @@ namespace Server
             services.ConfigureApplicationCookie(options => { options.ExpireTimeSpan = TimeSpan.FromDays(30); });
 
             services.Configure<ServerConfig>(Configuration.GetSection("ServerConfig"));
-            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -64,17 +63,10 @@ namespace Server
             }
             else
             {
-                app.UseHsts();
+                // app.UseHsts();
             }
 
             // app.UseHttpsRedirection();
-            app.UseCors(builder =>
-                builder
-                    .WithOrigins("http://localhost:3000")
-                    .AllowCredentials()
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-            );
             ConfigureCompiledTaskDefinitionsHosting(app);
 
             app.UseAuthentication();
