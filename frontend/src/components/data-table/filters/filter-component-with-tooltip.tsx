@@ -18,7 +18,10 @@ export class FilterComponentWithTooltip extends PureComponent<
   FilterComponentWithTooltipProps,
   FilterComponentWithTooltipState
 > {
-  public static defaultProps: Partial<FilterComponentWithTooltipProps> = {
+  public static defaultProps: Pick<
+    FilterComponentWithTooltipProps,
+    'isFilterInvalid'
+  > = {
     isFilterInvalid: () => false,
   };
 
