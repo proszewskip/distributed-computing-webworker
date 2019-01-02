@@ -3,16 +3,21 @@ import { WithRouterProps } from 'components/router';
 import { SubtasksTableOwnProps } from 'features/subtasks/table';
 
 import { RequestError } from 'error-handling';
-import { DistributedTask, Subtask } from 'models';
+import { DistributedTask, DistributedTaskDefinition, Subtask } from 'models';
 import { BaseDependencies } from 'product-specific';
 
-export interface DistributedTaskWithSubtasks extends DistributedTask {
+export interface DistributedTaskWithDefinition extends DistributedTask {
+  'distributed-task-definition': DistributedTaskDefinition;
+}
+
+export interface DistributedTaskWithSubtasksAndDefinition
+  extends DistributedTaskWithDefinition {
   subtasks: Subtask[];
 }
 
 export interface DistributedTaskDetailsProps {
   distributedTaskDefinitionId: number;
-  detailsData?: DistributedTask;
+  detailsData?: DistributedTaskWithDefinition;
   tableData?: SubtasksTableOwnProps;
   dataFetchingError?: RequestError;
 }
