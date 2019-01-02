@@ -9,8 +9,14 @@ export interface LinkCellProps {
   text: string;
 }
 
-export const LinkCell = (row: { value: LinkCellProps }) => (
-  <Link route={row.value.route}>
-    <a onClick={preventPropagationHandler}>{row.value.text}</a>
-  </Link>
-);
+export const LinkCell = (row: { value: LinkCellProps }) => {
+  const { value } = row;
+
+  return (
+    <Link route={row.value.route}>
+      <a onClick={preventPropagationHandler} title={value.text}>
+        {value.text}
+      </a>
+    </Link>
+  );
+};
