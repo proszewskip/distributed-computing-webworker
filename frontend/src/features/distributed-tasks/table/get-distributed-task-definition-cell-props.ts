@@ -10,6 +10,6 @@ export function getDistributedTaskDefinitionCellProps(
 
   return {
     route: `/distributed-task-definitions/${distributedTaskDefinition.id}`,
-    text: `${distributedTaskDefinition.name}`,
+    text: distributedTaskDefinition.name,
   };
 }
