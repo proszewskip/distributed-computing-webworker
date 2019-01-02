@@ -4,7 +4,7 @@ import { prop, sortBy } from 'ramda';
 
 import {
   DistributedTaskDetailsProps,
-  DistributedTaskWithSubtasks,
+  DistributedTaskWithSubtasksAndDefinition,
 } from './types';
 
 import { AppPageComponentType } from 'product-specific';
@@ -19,13 +19,17 @@ export const getDistributedTaskDetailsInitialProps = (
   const id = parseInt(query.id as string, 10);
 
   const getParams: GetParams = {
-    include: 'subtasks',
+    include: 'subtasks,distributed-task-definition',
   };
 
   return kitsu
-    .get<DistributedTaskWithSubtasks>(`distributed-task/${id}`, getParams)
+    .get<DistributedTaskWithSubtasksAndDefinition>(
+      `distributed-task/${id}`,
+      getParams,
+    )
     .then(
-      (jsonApiResponse) => jsonApiResponse.data as DistributedTaskWithSubtasks,
+      (jsonApiResponse) =>
+        jsonApiResponse.data as DistributedTaskWithSubtasksAndDefinition,
     )
     .then((data) => {
       // NOTE: API does not allow to sort included elements
@@ -47,6 +51,7 @@ export const getDistributedTaskDetailsInitialProps = (
             'trust-level-to-complete': data['trust-level-to-complete'],
             errors: data.errors,
             status: data.status,
+            'distributed-task-definition': data['distributed-task-definition'],
           },
           tableData: {
             data: data.subtasks,

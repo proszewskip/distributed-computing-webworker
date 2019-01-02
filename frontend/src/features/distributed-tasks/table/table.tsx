@@ -5,7 +5,7 @@ import React, { Component } from 'react';
 import { Column, Filter } from 'react-table';
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
 
-import { LongTextCell, TextCell } from 'components/data-table/cells';
+import { LinkCell, LongTextCell, TextCell } from 'components/data-table/cells';
 import { DataTable, DataTableProps } from 'components/data-table/data-table';
 import {
   DataTableView,
@@ -43,6 +43,7 @@ import { preventPropagationHandler } from 'utils/table/prevent-propagation-handl
 
 import { distributedTaskModelName } from './common';
 import { DistributedTaskStatusCell } from './distributed-task-status-cell';
+import { getDistributedTaskDefinitionCellProps } from './get-distributed-task-definition-cell-props';
 import { DistributedTaskStatusFilter } from './status-filter';
 import {
   DistributedTasksTableDependencies,
@@ -77,10 +78,9 @@ export class PureDistributedTasksTable extends Component<
     this.props.bindDistributedTaskDefinitionId === undefined
       ? {
           id: 'distributed-task-definition-name',
-          accessor: (distributedTask) =>
-            distributedTask['distributed-task-definition'].name,
+          accessor: getDistributedTaskDefinitionCellProps,
           Header: <Text>Distributed Task Definition</Text>,
-          Cell: LongTextCell,
+          Cell: LinkCell,
           Filter: TextFilter,
           minWidth: 150,
         }
