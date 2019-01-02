@@ -1,5 +1,6 @@
 import { Heading, Text } from 'evergreen-ui';
 import { List } from 'immutable';
+import { identity } from 'ramda';
 import React, { Component } from 'react';
 import { Column } from 'react-table';
 
@@ -50,7 +51,7 @@ export class PureSubtasksTable extends Component<
     },
     {
       id: 'subtask-status',
-      accessor: 'subtask-status',
+      accessor: identity,
       Header: <Text>Status</Text>,
       Filter: SubtaskStatusFilter,
       Cell: SubtaskStatusCell,
