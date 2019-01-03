@@ -1,0 +1,5 @@
+-10;10;10;10 2 1;
+
+Find local minimum for x in <-10,10>.
+Task will be divided 10 times
+Polynomial is: x^2+2x+10
