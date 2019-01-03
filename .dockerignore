@@ -1,0 +1,7 @@
+.vs/
+*/bin/
+*/obj/
+*/out/
+*/node_modules/
+compiled-task-definitions/
+task-definitions/

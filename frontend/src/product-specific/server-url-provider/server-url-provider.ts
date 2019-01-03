@@ -5,11 +5,22 @@ import { config } from 'product-specific/config';
 export const serverUrlProvider = (req?: IncomingMessage) => {
   const { serverUrl } = config;
 
-  const isClientSide = !req;
+  const isClientside = !req;
   const serverUrlIsAbsolute = !serverUrl.startsWith('/');
 
-  if (isClientSide || serverUrlIsAbsolute) {
+  if (isClientside || serverUrlIsAbsolute) {
     return serverUrl;
+  }
+
+  /**
+   * NOTE: Typescript does not detect that `req` must be defined as checked in the `if` above
+   */
+  return getServersideServerUrl(req as IncomingMessage);
+};
+
+const getServersideServerUrl = (req: IncomingMessage) => {
+  if (process.env.NODE_ENV === 'production') {
+    return config.productionServerUrl;
   }
 
   /**
@@ -17,5 +28,5 @@ export const serverUrlProvider = (req?: IncomingMessage) => {
    * but the base type does not.
    */
   // @ts-ignore
-  return `${req.protocol}://${req.get('Host')}${serverUrl}`;
+  return `${req.protocol}://${req.get('Host')}${config.serverUrl}`;
 };
