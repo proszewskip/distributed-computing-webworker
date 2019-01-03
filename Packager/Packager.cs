@@ -663,7 +663,7 @@ public class Packager : IPackager
 
                 break;
             default:
-                File.Copy(sourceFileName, destFileName);
+                File.Copy(sourceFileName, destFileName, true);
                 break;
         }
     }
