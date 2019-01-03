@@ -623,7 +623,7 @@ public class Packager : IPackager
             {
                 resolved = image.AssemblyResolver.Resolve(ar, rp);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message, ex.InnerException);
             }
@@ -692,7 +692,8 @@ public class Packager : IPackager
 
                 break;
             default:
-                File.Copy(sourceFileName, destFileName, true);
+                if (!File.Exists(destFileName))
+                    File.Copy(sourceFileName, destFileName);
                 break;
         }
     }
