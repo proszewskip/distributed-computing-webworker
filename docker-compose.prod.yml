@@ -1,0 +1,25 @@
+version: "3.1"
+
+services:
+  db:
+    environment:
+      POSTGRES_PASSWORD: m0JSPNiCQI5Yj5s2
+
+  backend:
+    build:
+      context: ./
+      dockerfile: ./Server/Dockerfile
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
+
+  proxy:
+    volumes:
+      - ./nginx.prod.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+      - frontend
