@@ -90,7 +90,9 @@ export const DetailsGrid: StatelessComponent<DetailsGridProps> = ({
           <Pane>
             <Text>
               {details.errors.map((error, index) => (
-                <Alert title={error} key={index} intent="danger" />
+                <Alert key={index} intent="danger">
+                  <Text wordBreak="break-all">{error}</Text>
+                </Alert>
               ))}
             </Text>
           </Pane>
