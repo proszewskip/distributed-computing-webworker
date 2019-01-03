@@ -28,7 +28,15 @@ public class Packager : IPackager
     private const string BINDINGS_ASM_NAME = "WebAssembly.Bindings";
     private const string BINDINGS_RUNTIME_CLASS_NAME = "WebAssembly.Runtime";
     private static bool enable_debug, enable_linker;
-    private static string app_prefix, framework_prefix, bcl_prefix, bcl_tools_prefix, bcl_facades_prefix, out_prefix;
+
+    private static string app_prefix,
+        framework_prefix,
+        bcl_prefix,
+        bcl_tools_prefix,
+        bcl_facades_prefix,
+        out_prefix,
+        core_prefix;
+
     private static readonly HashSet<string> asm_map = new HashSet<string>();
     private static readonly List<string> file_list = new List<string>();
     private static readonly List<string> root_search_paths = new List<string>();
@@ -107,6 +115,7 @@ public class Packager : IPackager
 
 
         var tool_prefix = Path.Combine(Directory.GetCurrentDirectory(), "../mono-wasm-sdk/");
+        core_prefix = @"/usr/share/dotnet/shared/Microsoft.NETCore.App/2.2.0/";
 
         //are we working from the tree?
         if (sdkdir != null)
@@ -530,6 +539,11 @@ public class Packager : IPackager
         return ResolveWithExtension(framework_prefix, asm_name);
     }
 
+    private static string ResolveCore(string asm_name)
+    {
+        return ResolveWithExtension(core_prefix, asm_name);
+    }
+
     private static string ResolveBcl(string asm_name)
     {
         return ResolveWithExtension(bcl_prefix, asm_name);
@@ -560,6 +574,11 @@ public class Packager : IPackager
             return asm;
 
         kind = AssemblyKind.None;
+
+        asm = ResolveCore(asm_name);
+        if (asm != null)
+            return asm;
+
         throw new Exception($"Could not resolve {asm_name}");
     }
 
@@ -581,6 +600,7 @@ public class Packager : IPackager
         root_search_paths.ForEach(resolver.AddSearchDirectory);
         resolver.AddSearchDirectory(bcl_facades_prefix);
         resolver.AddSearchDirectory(bcl_prefix);
+        resolver.AddSearchDirectory(core_prefix);
         rp.AssemblyResolver = resolver;
 
         rp.InMemory = true;
@@ -597,7 +617,16 @@ public class Packager : IPackager
         foreach (var ar in image.AssemblyReferences)
         {
             // Resolve using root search paths first
-            var resolved = image.AssemblyResolver.Resolve(ar, rp);
+            AssemblyDefinition resolved = null;
+
+            try
+            {
+                resolved = image.AssemblyResolver.Resolve(ar, rp);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message, ex.InnerException);
+            }
 
             var searchName = resolved?.MainModule.FileName ?? ar.Name;
 
@@ -663,7 +692,8 @@ public class Packager : IPackager
 
                 break;
             default:
-                File.Copy(sourceFileName, destFileName);
+                if (!File.Exists(destFileName))
+                    File.Copy(sourceFileName, destFileName);
                 break;
         }
     }
