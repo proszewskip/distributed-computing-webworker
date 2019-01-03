@@ -1,34 +1,60 @@
-# Distributed Computing WebWorker frontend
+# Distributed Computing WebWorker frontend server
 
-Uses [next.js](https://github.com/zeit/next.js/) for static site rendering.
+This project serves the administrator dashboard and the distributed node dashboard to users.
+
+It uses [next.js](https://github.com/zeit/next.js/) for building the pages and for server-side
+rendering.
 
 ## Prerequisites
 
-- Install [node](https://nodejs.org/en/) >= 11.0
-  - Verify version with `node --version` afterwards.
-  - Verify if `npm` is installed correctly by running `npm --version`.
-- Install all required packages from `package.json` with `npm install`, command should be called from `frontend` directory.
+- Install [node](https://nodejs.org/en/) >= 10.11.0
+  - On Linux, [nvm](https://github.com/creationix/nvm) is recommended as an installation tool.
+  - Verify that `node --version` prints out a version greater than 10.11.0.
+  - Verify that `npm` is installed correctly by running `npm --version`. It should print out a
+    version higher than 5.0.0.
 
-## Building
+## Installation
 
-```bash
-npm run build
-```
+Install the dependencies using the following command:
 
-## Running on production
-
-First, [build the project](#building).
-
-Then, run:
-
-```bash
-npm start
+```sh
+npm install
 ```
 
 ## Development
 
-Run:
+To run the server in development mode, run the following command:
 
-```bash
+```sh
 npm run dev
 ```
+
+The server will be available on [http://localhost:3000](http://localhost:3000), although for it to
+work properly it needs to be accessed using the proxy created in [the main project's
+README](../README.md) ([http://localhost](http://localhost)).
+
+## Component gallery
+
+To view the components used in the project in isolation, run the following command:
+
+```sh
+npm run storybook
+```
+
+## Testing
+
+Run the following command to run unit tests:
+
+```sh
+npm run test
+```
+
+## Linting
+
+To lint the codebase, run the following command:
+
+```sh
+npm run lint
+```
+
+This will verify that the code style matches the configured one.
