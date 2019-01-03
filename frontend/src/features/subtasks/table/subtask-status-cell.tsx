@@ -1,5 +1,14 @@
-import { Alert, Button, Dialog, Pane, Text } from 'evergreen-ui';
-import React, { Component, ReactNode } from 'react';
+import {
+  Alert,
+  Dialog,
+  Pane,
+  Text,
+  IconButton,
+  Paragraph,
+  majorScale,
+  Button,
+} from 'evergreen-ui';
+import React, { PureComponent, ReactNode } from 'react';
 
 import { Subtask, SubtaskStatus } from 'models';
 
@@ -9,19 +18,19 @@ export const SubtaskStatusCell = (row: { value: Subtask }) => {
   return <SubtaskStatusCellContent subtask={row.value} />;
 };
 
-interface ErrorsDialogState {
+interface SubtaskStatusCellContentState {
   isShown: boolean;
 }
 
-interface ErrorsDialogProps {
+interface SubtaskStatusCellContentProps {
   subtask: Subtask;
 }
 
-class SubtaskStatusCellContent extends Component<
-  ErrorsDialogProps,
-  ErrorsDialogState
+class SubtaskStatusCellContent extends PureComponent<
+  SubtaskStatusCellContentProps,
+  SubtaskStatusCellContentState
 > {
-  public state: ErrorsDialogState = {
+  public state: SubtaskStatusCellContentState = {
     isShown: false,
   };
 
@@ -42,9 +51,17 @@ class SubtaskStatusCellContent extends Component<
         return <Text>In progress</Text>;
       case SubtaskStatus.Error:
         return (
-          <Button intent="danger" onClick={this.onStatusClick}>
-            Error
-          </Button>
+          <Pane display="flex" alignItems="center">
+            <Text color="danger">Error</Text>
+            <Button
+              appearance="minimal"
+              icon="more"
+              onClick={this.onStatusClick}
+              marginLeft={majorScale(1)}
+            >
+              Show details
+            </Button>
+          </Pane>
         );
       case SubtaskStatus.WaitingForExecution:
         return <Text>Waiting for execution</Text>;
@@ -67,12 +84,11 @@ class SubtaskStatusCellContent extends Component<
         title="Subtask errors"
         onCloseComplete={this.onCloseComplete}
         hasFooter={false}
-        white-space="normal"
       >
         <Pane>
           {subtask.errors.map((error, index) => (
             <Alert key={index} intent="danger">
-              <Text>{error}</Text>
+              <Text wordBreak="break-all">{error}</Text>
             </Alert>
           ))}
         </Pane>
