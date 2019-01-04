@@ -32,7 +32,7 @@ namespace PolynomialMinimumProblem
 
         public string JoinSubtaskResults(IEnumerable<SubtaskResult> subtaskResults)
         {
-            return subtaskResults.First().ToString();
+            return subtaskResults.OrderBy(subtaskResult => subtaskResult.Value).First().ToString();
         }
 
         public SubtaskResult Compute(SubtaskInput subtask)
