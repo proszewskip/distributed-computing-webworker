@@ -8,19 +8,14 @@ namespace GraphMaximumDistance
 {
     public class GraphMaximumDistancePlugin : IProblemPlugin<Graph, string, SubtaskInput, NodesDistance>
     {
-        private readonly GraphDataFormatter _graphDataFormatter = new GraphDataFormatter();
-        private readonly NodesDistanceDataFormatter _nodesDistanceDataFormatter = new NodesDistanceDataFormatter();
-        private readonly StringDataFormatter _stringDataFormatter = new StringDataFormatter();
-        private readonly SubtaskInputDataFormatter _subtaskInputDataFormatter = new SubtaskInputDataFormatter();
+        public IDataFormatter<Graph> TaskDataFormatter => new GraphDataFormatter();
 
+        public IDataFormatter<string> TaskResultDataFormatter => new StringDataFormatter();
 
-        public IDataFormatter<Graph> TaskDataFormatter => _graphDataFormatter;
+        public IDataFormatter<SubtaskInput> SubtaskDataFormatter => new UniversalDataFormatter<SubtaskInput>();
 
-        public IDataFormatter<string> TaskResultDataFormatter => _stringDataFormatter;
-
-        public IDataFormatter<SubtaskInput> SubtaskDataFormatter => _subtaskInputDataFormatter;
-
-        public IDataFormatter<NodesDistance> SubtaskResultDataFormatter => _nodesDistanceDataFormatter;
+        public IDataFormatter<NodesDistance> SubtaskResultDataFormatter =>
+            new XmlSerializerDataFormatter<NodesDistance>();
 
         public NodesDistance Compute(SubtaskInput subtask)
         {
