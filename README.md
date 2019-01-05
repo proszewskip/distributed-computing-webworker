@@ -120,7 +120,8 @@ your PC).
 - Install latest [mono](https://www.mono-project.com/docs/getting-started/install/).
 - Set an enviroment variable with the path to the `mono` compiler
   - `export FrameworkPathOverride=/usr/lib/mono/4.5/`
-  - it is recommended to add the line above to `~/.bashrc`
+  - it is recommended to persist this environment variable in the system (e.g. add it to
+    `~/.bash_profile` on Ubuntu or the equivalent on other operating systems)
 
 ### Post-installation steps
 
