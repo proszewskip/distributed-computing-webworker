@@ -45,7 +45,13 @@ export const withDependencies = <
         allDependencies as Dependencies,
       );
 
-      return <WrappedComponent {...extractedDependencies} {...this.props} />;
+      /**
+       * TODO: remove the `as Props` assertion after Typescript fixes its bug
+       * https://github.com/Microsoft/TypeScript/issues/28938
+       */
+      return (
+        <WrappedComponent {...extractedDependencies} {...this.props as Props} />
+      );
     };
   }
 
