@@ -6,6 +6,11 @@ export interface FormButtonsProps {
   isSubmitting: boolean;
 }
 
+/**
+ * The _Cancel_ and _Submit_ buttons that should be used in forms.
+ *
+ * @param props
+ */
 export const FormButtons: StatelessComponent<FormButtonsProps> = (props) => {
   return (
     <Pane marginTop={majorScale(1)}>

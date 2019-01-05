@@ -7,6 +7,9 @@ interface HeadProps {
   title?: string;
 }
 
+/**
+ * Modifies the `head` of the HTML document sent by next.js.
+ */
 export const Head: StatelessComponent<HeadProps> = ({ title, children }) => {
   return (
     <NextHead>

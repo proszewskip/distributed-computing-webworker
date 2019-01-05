@@ -2,6 +2,13 @@ import { config } from 'product-specific';
 
 import { RegisterResponseBody, RegistrationServiceDependencies } from './types';
 
+/**
+ * A service that allows for registering the node.
+ *
+ * Does not try to reuse a previously received ID.
+ *
+ * @see CachedRegistrationService
+ */
 export class RegistrationService {
   private readonly fetch: RegistrationServiceDependencies['fetch'];
 

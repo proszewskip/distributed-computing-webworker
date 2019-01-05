@@ -16,6 +16,10 @@ import { isSimpleMenuItem } from './utils';
 type PureConnectedSidebarMenuProps = ConnectedSidebarMenuProps &
   WithRouterProps;
 
+/**
+ * A sidebar menu that supplies that allows for highlighting currently active items (based on the
+ * URL)
+ */
 export class PureConnectedSidebarMenu extends PureComponent<
   PureConnectedSidebarMenuProps
 > {

@@ -1,3 +1,10 @@
+/**
+ * Returns FormData for a specific object.
+ *
+ * The keys and values are kept unchanged.
+ *
+ * @param model
+ */
 export function getFormData(model: object) {
   const formData = new FormData();
 

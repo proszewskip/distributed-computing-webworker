@@ -3,6 +3,14 @@ import { computeTask } from './compute-task';
 import { ComputeSubtaskMessagePayload, WorkerThreadStatus } from './types';
 import { workerContext } from './worker-context';
 
+/**
+ * Returns a function that
+ * * downloads the input data for a given subtask
+ * * computes the subtask
+ * * sends the results back to the main thread
+ *
+ * @param payload
+ */
 export const appInitFactory = (
   payload: ComputeSubtaskMessagePayload,
 ) => async () => {

@@ -22,11 +22,27 @@ type StyledDataTableLeftProps = Omit<
 >;
 
 interface DataTableOwnProps {
+  /**
+   * The initial filters to be applied.
+   */
   initialFiltered?: StyledDataTableProps['filtered'];
+
+  /**
+   * The initial page number.
+   */
   initialPage: number;
   initialPageSize: number;
   totalRecordsCount: number;
+  /**
+   * The callback that will be invoked when more data should be called.
+   */
   onFetchData?: FetchDataCallback;
+
+  /**
+   * A callback that will be called with a function that when called, forces refetching the data.
+   * Useful for implementing the _refresh_ functionality in tables.
+   * @param forceFetchData
+   */
   getForceFetchData?(forceFetchData: ForceFetchData): any;
 }
 
@@ -34,6 +50,9 @@ type DataTableProps = StyledDataTableLeftProps & DataTableOwnProps;
 
 type DataTableState = DataFetchingParams;
 
+/**
+ * A table that supports filtering, pagination and fetching the data.
+ */
 class DataTable extends PureComponent<DataTableProps, DataTableState> {
   private debouncedFetchData: () => any;
 

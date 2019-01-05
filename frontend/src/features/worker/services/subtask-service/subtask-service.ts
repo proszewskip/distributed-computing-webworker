@@ -8,6 +8,11 @@ import {
   SubtaskServiceDependencies,
 } from './types';
 
+/**
+ * A service that manages communication with the server regarding subtasks.
+ *
+ * Allows for fetching a next subtask to compute and sending computation results.
+ */
 export class SubtaskSerivce {
   private readonly fetch: SubtaskServiceDependencies['fetch'];
 

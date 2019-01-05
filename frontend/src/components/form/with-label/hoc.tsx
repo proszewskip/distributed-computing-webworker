@@ -9,6 +9,11 @@ interface WithLabelAdditionalProps {
   isRequired?: boolean;
 }
 
+/**
+ * A higher order component that displays a label for a given Formik field.
+ *
+ * @param WrappedComponent
+ */
 export function withLabel<Props extends FieldProps>(
   WrappedComponent: ComponentType<Props>,
 ) {

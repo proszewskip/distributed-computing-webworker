@@ -13,6 +13,9 @@ export interface ComputeSubtaskMessagePayload {
   inputDataURL: string;
 }
 
+/**
+ * The message that signals the worker to start the computation.
+ */
 export type ComputeSubtaskMessage = BaseWorkerThreadMessage<
   'COMPUTE_SUBTASK',
   ComputeSubtaskMessagePayload
@@ -56,6 +59,9 @@ export type BaseWorkerUpdatedMessagePayload<
   status: Status;
 } & ExtractNonNeverProperties<{ data: WorkerUpdatedStatusData[Status] }>;
 
+/**
+ * A possible payload sent by the worker when it updates its status.
+ */
 export type WorkerUpdatedMessagePayload =
   | BaseWorkerUpdatedMessagePayload<WorkerThreadStatus.WaitingForSubtaskInfo>
   | BaseWorkerUpdatedMessagePayload<WorkerThreadStatus.LoadingTaskDefinition>

@@ -3,6 +3,11 @@ import { FilterRender } from 'react-table';
 
 import { FilterComponentWithTooltip } from './filter-component-with-tooltip';
 
+/**
+ * A filter for numeric values.
+ *
+ * Allows for filtering _lesser than_ or _greater than_ values.
+ */
 export const NumericFilter: FilterRender = (params) => (
   <FilterComponentWithTooltip
     {...params}

@@ -9,6 +9,11 @@ export interface RequestErrorInfoProps {
   error: RequestError;
 }
 
+/**
+ * Displays information about an error that could occur in the system.
+ *
+ * Handles native and JSON API errors.
+ */
 export const RequestErrorInfo: React.SFC<RequestErrorInfoProps> = ({
   error,
 }) => {

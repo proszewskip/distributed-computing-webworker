@@ -9,6 +9,13 @@ export interface WarnOnLeavingProps {
 
 type WarnOnLeavingPropsWithRouter = WarnOnLeavingProps & WithRouterProps;
 
+/**
+ * A component that warns the user when navigating away from the site.
+ *
+ * Useful when there are unsaved changes in the form or some process is in progress.
+ *
+ * Does not render any content.
+ */
 class PureWarnOnLeaving extends Component<WarnOnLeavingPropsWithRouter> {
   public static defaultProps: Partial<WarnOnLeavingPropsWithRouter> = {
     leaveMessage: 'You have unsaved changes, are you sure you want to leave?',
