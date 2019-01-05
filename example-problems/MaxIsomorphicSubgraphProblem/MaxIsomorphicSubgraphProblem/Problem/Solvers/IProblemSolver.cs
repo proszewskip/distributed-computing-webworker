@@ -1,4 +1,4 @@
-﻿using MaxIsomorphicSubgraphProblem.Problem.Models;
+﻿using MaxIsomorphicSubgraphProblem.Models;
 
 namespace MaxIsomorphicSubgraphProblem.Problem.Solvers
 {
