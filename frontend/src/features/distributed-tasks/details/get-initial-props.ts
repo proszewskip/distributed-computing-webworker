@@ -31,14 +31,6 @@ export const getDistributedTaskDetailsInitialProps = (
       (jsonApiResponse) =>
         jsonApiResponse.data as DistributedTaskWithSubtasksAndDefinition,
     )
-    .then((data) => {
-      // NOTE: API does not allow to sort included elements
-      data.subtasks = sortBy(prop('sequence-number'))(data.subtasks).slice(
-        0,
-        10,
-      );
-      return data;
-    })
     .then(
       (data): DistributedTaskDetailsProps => {
         return {
@@ -54,7 +46,8 @@ export const getDistributedTaskDetailsInitialProps = (
             'distributed-task-definition': data['distributed-task-definition'],
           },
           tableData: {
-            data: data.subtasks,
+            // NOTE: API does not allow to sort included elements
+            data: sortBy(prop('sequence-number'))(data.subtasks).slice(0, 10),
             totalRecordsCount: data.subtasks.length,
             distributedTaskId: data.id,
           },
