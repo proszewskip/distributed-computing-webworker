@@ -54,9 +54,13 @@ export function withSelectableRows<
     }
 
     public render() {
+      /**
+       * TODO: remove the `as unknown as Props` assertion after Typescript fixes its bug
+       * https://github.com/Microsoft/TypeScript/issues/28938
+       */
       return (
         <WrappedComponent
-          {...this.props}
+          {...(this.props as unknown) as Props}
           keyField="id"
           selectType="checkbox"
           isSelected={this.isSelected}
