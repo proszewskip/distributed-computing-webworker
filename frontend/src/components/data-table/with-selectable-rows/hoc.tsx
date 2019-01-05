@@ -24,6 +24,11 @@ export interface WithSelectableRowsOptionalProps {
   getTrProps?: TableProps['getTrProps'];
 }
 
+/**
+ * A higher order component that handles selecting rows.
+ *
+ * @param WrappedComponent
+ */
 export function withSelectableRows<
   Props extends SelectTableAdditionalProps & WithSelectableRowsOptionalProps
 >(WrappedComponent: ComponentType<Props>) {

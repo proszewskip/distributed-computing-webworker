@@ -21,6 +21,12 @@ export interface FormFilePickerProps {
   onChange?: (arg: FileList) => any;
 }
 
+/**
+ * A base component for a file picker. Should not be used directly in Formik forms.
+ *
+ * @see FilePicker
+ * @see FilePickerWithLabel
+ */
 export default class FormFilePicker extends PureComponent<
   FormFilePickerProps,
   FilePickerState

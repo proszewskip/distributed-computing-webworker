@@ -2,6 +2,13 @@ import { ProblemPluginInfo } from 'models';
 
 import { workerContext } from './worker-context';
 
+/**
+ * Computes the subtask using WebAssembly.
+ *
+ * @param problemPluginInfo Information about a class that implements `IProblemPlugin` in the
+ * project.
+ * @param inputData
+ */
 export function computeTask(
   problemPluginInfo: ProblemPluginInfo,
   inputData: ArrayBuffer,

@@ -11,6 +11,10 @@ export interface DependencyInjectionEnhancerProps {
   enhanceDependencies: DependenciesEnhancer<any, any>;
 }
 
+/**
+ * A component that modifies (enhances) the dependency injection context with possibly other
+ * dependencies.
+ */
 export class DependencyInjectionEnhancer extends Component<
   DependencyInjectionEnhancerProps
 > {

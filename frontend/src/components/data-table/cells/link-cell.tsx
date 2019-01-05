@@ -5,10 +5,22 @@ import { Link } from 'components/link';
 import { preventPropagationHandler } from 'utils/table/prevent-propagation-handler';
 
 export interface LinkCellProps {
+  /**
+   * URL
+   */
   route: string;
+
+  /**
+   * Text to be displayed
+   */
   text: string;
 }
 
+/**
+ * A link as a table cell.
+ *
+ * @param row
+ */
 export const LinkCell = (row: { value: LinkCellProps }) => {
   const { value } = row;
 

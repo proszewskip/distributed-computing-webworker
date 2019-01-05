@@ -4,6 +4,11 @@ import React, { ComponentType, PureComponent } from 'react';
 
 import { getDisplayName } from 'utils/get-display-name';
 
+/**
+ * A higher order component that displays validation errors for a given Formik field.
+ *
+ * @param WrappedComponent
+ */
 export function withValidation<Props extends FieldProps>(
   WrappedComponent: ComponentType<Props>,
 ) {

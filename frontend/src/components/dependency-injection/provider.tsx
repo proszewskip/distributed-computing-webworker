@@ -10,6 +10,11 @@ export interface DependencyInjectionProviderProps {
   provideDependencies: DependenciesProvider<any>;
 }
 
+/**
+ * A provider of the dependency injection context. Injects some initial dependencies into the
+ * context. The initial dependencies to be provided are customizable by the `provideDependencies`
+ * property.
+ */
 export class DependencyInjectionProvider extends Component<
   DependencyInjectionProviderProps
 > {

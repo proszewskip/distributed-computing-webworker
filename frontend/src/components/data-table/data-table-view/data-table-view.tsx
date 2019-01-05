@@ -6,6 +6,10 @@ export interface DataTableViewProps {
   renderActionButtons?(): ReactNode;
 }
 
+/**
+ * Displays a header with user-defined action buttons next to it, along with the children provided
+ * to this component.
+ */
 export const DataTableView: StatelessComponent<DataTableViewProps> = ({
   header,
   renderActionButtons,

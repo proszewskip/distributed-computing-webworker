@@ -14,6 +14,13 @@ interface LayoutState {
   isSidebarShown: boolean;
 }
 
+/**
+ * The main application layout.
+ *
+ * Allows for customizing the sidebar and main content.
+ *
+ * Handles collapsing the sidebar on mobile.
+ */
 export class Layout extends PureComponent<LayoutProps, LayoutState> {
   public state: LayoutState = {
     isSidebarShown: false,

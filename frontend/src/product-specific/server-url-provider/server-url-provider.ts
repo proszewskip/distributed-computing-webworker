@@ -2,6 +2,11 @@ import { IncomingMessage } from 'http';
 
 import { config } from 'product-specific/config';
 
+/**
+ * Returns the URL of the application server.
+ *
+ * @param req
+ */
 export const serverUrlProvider = (req?: IncomingMessage) => {
   const { serverUrl } = config;
 
