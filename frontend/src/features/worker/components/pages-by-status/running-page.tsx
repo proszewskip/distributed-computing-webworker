@@ -48,9 +48,7 @@ export const RunningWorkerPage: StatelessComponent<RunningWorkerPageProps> = ({
     <Card border="default" padding={majorScale(2)} marginTop={majorScale(2)}>
       <Heading marginBottom="default">Worker information</Heading>
 
-      <Paragraph>
-        Status: <RunningStateInfo runningState={runningState} />
-      </Paragraph>
+      <RunningStateInfo runningState={runningState} />
     </Card>
 
     <Card border="default" padding={majorScale(2)} marginTop={majorScale(2)}>
@@ -71,12 +69,35 @@ const RunningStateInfo: StatelessComponent<
 > = ({ runningState }) => {
   switch (runningState) {
     case DistributedNodeRunningState.AskingForNewTask:
-      return <Text>Asking for a new task</Text>;
+      return (
+        <Status>
+          <Text>Asking for a new task</Text>
+        </Status>
+      );
 
     case DistributedNodeRunningState.WaitingForEmptyThread:
-      return <Text>Waiting for a free thread</Text>;
+      return (
+        <Status>
+          <Text>Waiting for a free thread</Text>
+        </Status>
+      );
 
     case DistributedNodeRunningState.WaitingForTimeout:
-      return <Text>Waiting for a timeout</Text>;
+      return (
+        <>
+          <Status>
+            <Text>Waiting...</Text>
+          </Status>
+
+          <Text>
+            There are no pending tasks in the system. The worker will retry to
+            ask for a task in a while.
+          </Text>
+        </>
+      );
   }
 };
+
+const Status: StatelessComponent = ({ children }) => (
+  <Paragraph>Status: {children}</Paragraph>
+);
