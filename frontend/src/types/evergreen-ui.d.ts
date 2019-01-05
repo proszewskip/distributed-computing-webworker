@@ -1,3 +1,7 @@
+/**
+ * Missing evergreen-ui types
+ */
+
 declare module 'evergreen-ui' {
   type Component = any;
 

@@ -13,6 +13,11 @@ interface ErrorAlertProps<V = any> {
   values: FormikValues;
 }
 
+/**
+ * An alter that displays form errors (both validation-related and server-side).
+ *
+ * @param errorAlertProps
+ */
 export const ErrorAlert: StatelessComponent<ErrorAlertProps> = (
   errorAlertProps,
 ) => {

@@ -20,6 +20,13 @@ export interface StyledDataTableProps
   renderSummary?(): ReactNode;
 }
 
+/**
+ * A base data table with custom styles applied.
+ *
+ * Handles ImmutableJS data.
+ *
+ * Allows for a summary in the footer.
+ */
 export class StyledDataTable extends PureComponent<StyledDataTableProps> {
   public static defaultProps: Partial<StyledDataTableProps> = {
     NextComponent: PaginationButton,

@@ -5,6 +5,9 @@ export interface SidebarProps {
   title: ReactNode;
 }
 
+/**
+ * The layout for the sidebar.
+ */
 export const Sidebar: StatelessComponent<SidebarProps> = ({
   title,
   children,

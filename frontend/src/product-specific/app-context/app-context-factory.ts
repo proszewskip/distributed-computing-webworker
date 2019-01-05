@@ -14,6 +14,13 @@ import { AppContext } from './types';
 
 import { routes } from '../../../routes';
 
+/**
+ * Enhances the original appContext with application-specific services.
+ *
+ * The services will be used by some pages.
+ *
+ * @param nextContext The original appContext
+ */
 export const appContextFactory = (
   nextContext: NextContext<any>,
 ): AppContext<any> => {

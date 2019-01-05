@@ -5,6 +5,10 @@ import { CachedRegistrationServiceDependencies } from './types';
  */
 const DISTRIBUTED_NODE_ID_KEY = 'distributedNodeId';
 
+/**
+ * A service that registers the distributed node worker, possibly using a previously cached ID when
+ * it is still valid.
+ */
 export class CachedRegistrationService {
   private readonly dependencies: CachedRegistrationServiceDependencies;
 

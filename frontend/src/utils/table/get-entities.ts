@@ -7,6 +7,16 @@ import { Entity } from 'models';
 
 import { extractDataAndRecordsCount } from './extract-data-and-records-count';
 
+/**
+ * Fetches entities from the server.
+ * @param kitsu
+ * @param modelName
+ * @param filters
+ * @param page
+ * @param pageSize
+ * @param relationshipsToInclude
+ * @param sort
+ */
 export async function getEntities<Model extends Entity>(
   kitsu: Kitsu,
   modelName: string,

@@ -10,6 +10,9 @@ import { FileList } from 'models';
 
 export type BaseFilePickerProps = FormFilePickerProps & FieldProps;
 
+/**
+ * A file picker component that should be used in Formik forms.
+ */
 export class BaseFilePicker extends PureComponent<BaseFilePickerProps> {
   public render() {
     const { field, form, ...props } = this.props;

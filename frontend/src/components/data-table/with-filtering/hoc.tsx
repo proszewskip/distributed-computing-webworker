@@ -14,6 +14,11 @@ export interface WithFilteringAdditionalProps {
   filteringEnabled: boolean;
 }
 
+/**
+ * A higher order component that allows the table to properly display filters on top of the columns.
+ *
+ * @param WrappedComponent
+ */
 export function withFiltering<Props extends WithFilteringRequiredProps>(
   WrappedComponent: ComponentType<Props>,
 ) {

@@ -15,6 +15,9 @@ const provideDependencies: DependenciesProvider<BaseDependencies> = () => ({
   fetch: unfetch,
 });
 
+/**
+ * Provides base dependencies used throughout the application.
+ */
 export const BaseDependenciesProvider: StatelessComponent = ({ children }) => (
   <DependencyInjectionProvider provideDependencies={provideDependencies}>
     {children}
