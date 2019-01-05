@@ -15,5 +15,7 @@ export const forwardCookies = (
     return;
   }
 
-  headers.cookie = req.headers.cookie as string;
+  if (req.headers.cookie) {
+    headers.cookie = req.headers.cookie as string;
+  }
 };
