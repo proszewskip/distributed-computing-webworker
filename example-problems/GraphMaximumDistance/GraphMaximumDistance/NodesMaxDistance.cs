@@ -25,8 +25,6 @@ namespace GraphMaximumDistance
             }
 
 
-
-
             var highestDistance = distances.Max(distance => distance == int.MaxValue ? int.MinValue : distance);
             var mostDistantNode = Array.IndexOf(distances, highestDistance);
 

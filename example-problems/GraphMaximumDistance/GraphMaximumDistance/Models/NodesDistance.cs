@@ -1,5 +1,3 @@
-using System;
-
 namespace GraphMaximumDistance.Models
 {
     public class NodesDistance
