@@ -41,6 +41,7 @@ namespace Server.Models
         /// <summary>
         /// Possible errors that occurred during computation
         /// </summary>
+        [Attr("errors", isImmutable: true)]
         public string[] Errors { get; set; } = { };
 
         [Required]
