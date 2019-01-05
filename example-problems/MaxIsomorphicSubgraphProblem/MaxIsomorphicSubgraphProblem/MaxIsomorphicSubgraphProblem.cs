@@ -5,7 +5,6 @@ using MaxIsomorphicSubgraphProblem.DataFormatters;
 using MaxIsomorphicSubgraphProblem.Models;
 using MaxIsomorphicSubgraphProblem.Problem.Comparators;
 using MaxIsomorphicSubgraphProblem.Problem.Factories;
-using MaxIsomorphicSubgraphProblem.Problem.Models;
 
 namespace MaxIsomorphicSubgraphProblem
 {
@@ -25,16 +24,16 @@ namespace MaxIsomorphicSubgraphProblem
 
         public string JoinSubtaskResults(IEnumerable<ProblemResult> subtaskResults)
         {
-            return subtaskResults.OrderBy(subtaskResult => subtaskResult.CV.Count).First().ToString();
+            return subtaskResults.OrderByDescending(subtaskResult => subtaskResult.CV.Count).First().ToString();
         }
 
         public ProblemResult Compute(SubtaskInput subtask)
         {
-            var problemSolverFacotry = new ExactProblemSolverFactory();
+            var problemSolverFactory = new ExactProblemSolverFactory();
 
             var resultsComparator = new VertexCountResultsComparator();
 
-            var problemSolver = problemSolverFacotry.Create(subtask, resultsComparator);
+            var problemSolver = problemSolverFactory.Create(subtask, resultsComparator);
 
             return problemSolver.Solve();
         }

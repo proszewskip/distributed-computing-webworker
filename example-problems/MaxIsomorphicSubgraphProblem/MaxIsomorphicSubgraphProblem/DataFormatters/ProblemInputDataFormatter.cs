@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using DistributedComputing;
 using MaxIsomorphicSubgraphProblem.Models;
-using MaxIsomorphicSubgraphProblem.Problem.Models;
 
 namespace MaxIsomorphicSubgraphProblem.DataFormatters
 {

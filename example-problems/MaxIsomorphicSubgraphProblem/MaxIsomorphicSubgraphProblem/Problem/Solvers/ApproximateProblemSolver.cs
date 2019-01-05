@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using MaxIsomorphicSubgraphProblem.Models;
 using MaxIsomorphicSubgraphProblem.Problem.Comparators;
-using MaxIsomorphicSubgraphProblem.Problem.Models;
 
 namespace MaxIsomorphicSubgraphProblem.Problem.Solvers
 {

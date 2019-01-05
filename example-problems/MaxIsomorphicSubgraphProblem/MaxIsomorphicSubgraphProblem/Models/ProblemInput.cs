@@ -1,6 +1,4 @@
-using MaxIsomorphicSubgraphProblem.Models;
-
-namespace MaxIsomorphicSubgraphProblem.Problem.Models
+namespace MaxIsomorphicSubgraphProblem.Models
 {
     public class ProblemInput
     {
