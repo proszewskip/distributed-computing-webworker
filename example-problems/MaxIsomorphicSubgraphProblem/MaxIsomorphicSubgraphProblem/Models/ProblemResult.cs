@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MaxIsomorphicSubgraphProblem.Problem.Models
+namespace MaxIsomorphicSubgraphProblem.Models
 {
     public class ProblemResult
     {
@@ -21,8 +21,8 @@ namespace MaxIsomorphicSubgraphProblem.Problem.Models
 
         public override string ToString()
         {
-            var cv = CV.Aggregate(string.Empty, (str, vertice) => $"{str}{vertice},");
-            var cu = CU.Aggregate(string.Empty, (str, vertice) => $"{str}{vertice},");
+            var cv = string.Join(",", CV);
+            var cu = string.Join(",", CU);
 
             return $"CV mapping: {cv} CU mapping: {cu} Edges count: {SubgraphEdges}";
         }
