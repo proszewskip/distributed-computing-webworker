@@ -49,6 +49,16 @@ Run the following command to run unit tests:
 npm run test
 ```
 
+## Generating the documentation
+
+Run the following command to generate the documentation for the project:
+
+```sh
+npm run generate-documentation
+```
+
+[The documentation](docs/index.html) will be generated in the `docs` directory.
+
 ## Linting
 
 To lint the codebase, run the following command:
