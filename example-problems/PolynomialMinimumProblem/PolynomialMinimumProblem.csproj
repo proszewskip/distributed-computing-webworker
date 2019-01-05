@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <Reference Include="DistributedComputingLibrary">
-      <HintPath>..\..\..\DistributedComputingLibrary\bin\Debug\netstandard2.0\DistributedComputingLibrary.dll</HintPath>
+      <HintPath>..\..\DistributedComputingLibrary\bin\Debug\netstandard2.0\DistributedComputingLibrary.dll</HintPath>
     </Reference>
   </ItemGroup>
 
