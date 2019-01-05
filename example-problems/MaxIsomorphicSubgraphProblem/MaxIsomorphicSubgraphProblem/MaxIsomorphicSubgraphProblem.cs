@@ -11,11 +11,6 @@ namespace MaxIsomorphicSubgraphProblem
 {
     public class MaxIsomorphicSubgraphProblem : IProblemPlugin<ProblemInput, string, SubtaskInput, ProblemResult>
     {
-        private readonly  StringDataFormatter _stringDataFormatter = new StringDataFormatter();
-        private readonly SubtaskInputDataFormatter _subtaskInputDataFormatter = new SubtaskInputDataFormatter();
-        private readonly ProblemInputDataFormatter _problemInputDataFormatter = new ProblemInputDataFormatter();
-        private readonly  ProblemResultDataFormatter _problemResultDataFormatter = new ProblemResultDataFormatter();
-
         public IEnumerable<SubtaskInput> DivideTask(ProblemInput task)
         {
             return Enumerable.Range(0, task.G.VerticesCount).SelectMany(l => Enumerable.Range(0, task.H.VerticesCount),
@@ -44,9 +39,9 @@ namespace MaxIsomorphicSubgraphProblem
             return problemSolver.Solve();
         }
 
-        public IDataFormatter<ProblemInput> TaskDataFormatter => _problemInputDataFormatter;
-        public IDataFormatter<string> TaskResultDataFormatter => _stringDataFormatter;
-        public IDataFormatter<SubtaskInput> SubtaskDataFormatter => _subtaskInputDataFormatter;
-        public IDataFormatter<ProblemResult> SubtaskResultDataFormatter => _problemResultDataFormatter;
+        public IDataFormatter<ProblemInput> TaskDataFormatter => new ProblemInputDataFormatter();
+        public IDataFormatter<string> TaskResultDataFormatter => new StringDataFormatter();
+        public IDataFormatter<SubtaskInput> SubtaskDataFormatter => new UniversalDataFormatter<SubtaskInput>();
+        public IDataFormatter<ProblemResult> SubtaskResultDataFormatter => new XmlSerializerDataFormatter<ProblemResult>();
     }
 }
