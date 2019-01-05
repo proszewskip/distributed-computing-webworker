@@ -32,9 +32,9 @@ namespace MaxIsomorphicSubgraphProblem.DataFormatters
 
             var secondGraphVerticesCount = lines[firstGraphVerticesCount].Length;
 
-            var secondGraphAdjacencyMatrix = new bool[firstGraphVerticesCount, secondGraphVerticesCount];
+            var secondGraphAdjacencyMatrix = new bool[secondGraphVerticesCount, secondGraphVerticesCount];
 
-            for (var i = 0; i < secondGraphVerticesCount; ++i) ParseLine(i, lines[i], secondGraphAdjacencyMatrix);
+            for (var i = 0; i < secondGraphVerticesCount; ++i) ParseLine(i, lines[i+firstGraphVerticesCount], secondGraphAdjacencyMatrix);
 
             return new ProblemInput
             {
