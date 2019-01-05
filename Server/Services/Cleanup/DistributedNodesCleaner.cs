@@ -35,9 +35,9 @@ namespace Server.Services.Cleanup
         /// <returns></returns>
         public async Task CleanAsync()
         {
+            var nodeExpirationDateTime = DateTime.Now.Subtract(_distributedNodeLifetime);
             var staleDistributedNodes = await _dbContext.DistributedNodes
-                .Where(distributedNode =>
-                    DateTime.Now.Subtract(distributedNode.LastKeepAliveTime) > _distributedNodeLifetime)
+                .Where(distributedNode => distributedNode.LastKeepAliveTime < nodeExpirationDateTime)
                 .Include(distributedNode => distributedNode.SubtasksInProgress)
                 .Select(distributedNode => new
                 {
