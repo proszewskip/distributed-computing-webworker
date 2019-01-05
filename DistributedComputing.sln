@@ -9,9 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server.Tests", "Server.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Packager", "Packager\Packager.csproj", "{2798A49A-9E4C-4998-B0FA-7E7C8B59FDE8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DistributedComputingLibrary", "DistributedComputingLibrary\DistributedComputingLibrary.csproj", "{FD6DEA67-1439-4F0A-BBD7-C3BE6203891F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FactorialTask", "FactorialTask\FactorialTask.csproj", "{2ACD817B-D2F0-489F-858D-8E985C06082A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DistributedComputingLibrary", "DistributedComputingLibrary\DistributedComputingLibrary.csproj", "{FD6DEA67-1439-4F0A-BBD7-C3BE6203891F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +33,6 @@ Global
 		{FD6DEA67-1439-4F0A-BBD7-C3BE6203891F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD6DEA67-1439-4F0A-BBD7-C3BE6203891F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD6DEA67-1439-4F0A-BBD7-C3BE6203891F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2ACD817B-D2F0-489F-858D-8E985C06082A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2ACD817B-D2F0-489F-858D-8E985C06082A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2ACD817B-D2F0-489F-858D-8E985C06082A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2ACD817B-D2F0-489F-858D-8E985C06082A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
