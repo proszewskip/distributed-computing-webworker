@@ -140,12 +140,18 @@ export class PureDistributedTaskDefinitionDetails extends PureComponent<
 
   private renderDistributedTasksTable = (): ReactNode => {
     const { tableData } = this.props;
+    const { id } = this.props;
 
     if (!tableData) {
       return null;
     }
 
-    return <DistributedTasksTable {...tableData} />;
+    return (
+      <DistributedTasksTable
+        {...tableData}
+        bindDistributedTaskDefinitionId={id}
+      />
+    );
   };
 
   private renderErrors = (): ReactNode => {

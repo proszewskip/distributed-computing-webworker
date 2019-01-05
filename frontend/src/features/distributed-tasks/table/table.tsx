@@ -202,7 +202,7 @@ export class PureDistributedTasksTable extends Component<
     page,
   }) => {
     const { filteringEnabled } = this.state;
-    const { kitsu } = this.props;
+    const { kitsu, bindDistributedTaskDefinitionId } = this.props;
     this.setState({ loading: true, dataFetchingError: undefined });
 
     if (!filteringEnabled) {
@@ -210,6 +210,13 @@ export class PureDistributedTasksTable extends Component<
     }
 
     filtered = this.removeInvalidFilters(filtered);
+
+    if (bindDistributedTaskDefinitionId) {
+      filtered.push({
+        id: 'distributed-task-definition-id',
+        value: bindDistributedTaskDefinitionId,
+      });
+    }
 
     return getEntities<DistributedTaskWithDefinition>(
       kitsu,
