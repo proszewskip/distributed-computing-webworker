@@ -24,7 +24,7 @@ namespace MaxIsomorphicSubgraphProblem.Problem.Models
             var cv = CV.Aggregate(string.Empty, (str, vertice) => $"{str}{vertice},");
             var cu = CU.Aggregate(string.Empty, (str, vertice) => $"{str}{vertice},");
 
-            return $"$CV mapping: {cv} CU mapping: {cu} Edges count: {SubgraphEdges}";
+            return $"CV mapping: {cv} CU mapping: {cu} Edges count: {SubgraphEdges}";
         }
     }
 }
