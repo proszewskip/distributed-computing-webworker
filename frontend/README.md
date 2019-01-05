@@ -54,7 +54,7 @@ npm run test
 Run the following command to generate the documentation for the project:
 
 ```sh
-npm run generate-documentation
+npm run generate-docs
 ```
 
 [The documentation](docs/index.html) will be generated in the `docs` directory.
