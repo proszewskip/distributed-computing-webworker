@@ -15,7 +15,6 @@ ENV FrameworkPathOverride=/usr/lib/mono/4.5/
 COPY ./Server/*.csproj ./Server/
 COPY ./Server.Tests/*.csproj ./Server.Tests/
 COPY ./DistributedComputingLibrary/*.csproj ./DistributedComputingLibrary/
-COPY ./FactorialTask/*.csproj ./FactorialTask/
 COPY ./Packager/*.csproj ./Packager/
 COPY ./*.sln ./
 RUN dotnet restore
@@ -24,7 +23,6 @@ RUN dotnet restore
 COPY ./Server/ ./Server/
 COPY ./Server.Tests/ ./Server.Tests/
 COPY ./DistributedComputingLibrary ./DistributedComputingLibrary/
-COPY ./FactorialTask ./FactorialTask/
 COPY ./Packager/ ./Packager/
 RUN nuget restore
 RUN dotnet publish Server -c Release -o out --runtime linux-x64
