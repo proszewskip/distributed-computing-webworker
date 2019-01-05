@@ -25,7 +25,7 @@ import { OnDistributedNodeStateUpdate } from './types/on-state-update';
 /**
  * The timeout between assigning next subtask
  */
-const SUBTASK_GRACE_PERIOD_TIMEOUT = 1000;
+const SUBTASK_GRACE_PERIOD_TIMEOUT = 2000;
 
 export class DistributedNodeService {
   private readonly dependencies: DistributedNodeServiceDependencies;
@@ -164,6 +164,15 @@ export class DistributedNodeService {
     }
 
     const { distributedNodeId } = this.state.data;
+
+    this.setState({
+      state: DistributedNodeState.Running,
+      data: {
+        runningState: DistributedNodeRunningState.AskingForNewTask,
+        distributedNodeId,
+        subtaskWorkers: this.state.data.subtaskWorkers,
+      },
+    });
 
     let assignNextSubtaskResponse: AssignNextResponseBody;
     try {
@@ -349,13 +358,6 @@ export class DistributedNodeService {
       runningStateData.runningState ===
         DistributedNodeRunningState.WaitingForEmptyThread
     ) {
-      this.setState({
-        state: DistributedNodeState.Running,
-        data: {
-          ...runningStateData,
-          runningState: DistributedNodeRunningState.AskingForNewTask,
-        },
-      });
       this.assignNextSubtask();
 
       return;
