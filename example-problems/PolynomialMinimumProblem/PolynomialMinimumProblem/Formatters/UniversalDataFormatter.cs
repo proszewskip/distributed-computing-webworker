@@ -4,9 +4,9 @@ using DistributedComputing;
 
 namespace PolynomialMinimumProblem.Formatters
 {
-    internal class UniversalDataFormatter : IDataFormatter<object>
+    internal class UniversalDataFormatter<T> : IDataFormatter<T>
     {
-        public byte[] Serialize(object obj)
+        public byte[] Serialize(T obj)
         {
             if (obj == null) return null;
 
@@ -21,7 +21,7 @@ namespace PolynomialMinimumProblem.Formatters
         }
 
 
-        public object Deserialize(byte[] data)
+        public T Deserialize(byte[] data)
         {
             using (var memoryStream = new MemoryStream())
             {
@@ -30,7 +30,7 @@ namespace PolynomialMinimumProblem.Formatters
                 memoryStream.Write(data, 0, data.Length);
                 memoryStream.Seek(0, SeekOrigin.Begin);
 
-                return binaryFormatter.Deserialize(memoryStream);
+                return (T)binaryFormatter.Deserialize(memoryStream);
             }
         }
     }

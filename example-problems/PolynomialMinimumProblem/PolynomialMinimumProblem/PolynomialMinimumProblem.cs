@@ -11,14 +11,9 @@ namespace PolynomialMinimumProblem
 {
     public class PolynomialMinimumProblem : IProblemPlugin<TaskInput, string, SubtaskInput, SubtaskResult>
     {
-        private readonly StringDataFormatter _stringDataFormatter = new StringDataFormatter();
-        private readonly SubtaskInputDataFormatter _subtaskInputDataFormatter = new SubtaskInputDataFormatter();
-        private readonly SubtaskResultDataFormatter _subtaskResultDataFormatter = new SubtaskResultDataFormatter();
-        private readonly TaskInputDataFormatter _taskInputDataFormatter = new TaskInputDataFormatter();
-
         public IEnumerable<SubtaskInput> DivideTask(TaskInput task)
         {
-            var length = task.UpperBound - task.LowerBound;
+            var length = (task.UpperBound - task.LowerBound) / task.SubtasksCount;
 
             var subtaskInputs = Enumerable.Range(0, task.SubtasksCount).Select(index => new SubtaskInput
             {
@@ -41,7 +36,7 @@ namespace PolynomialMinimumProblem
 
             var polynomial = new Polynomial(subtask.Coefficients);
 
-            var function = new Func<double, double>(x => polynomial.Evaluate(x));
+            var function = new Func<double, double>(polynomial.Evaluate);
 
             var objectiveFunction = ObjectiveFunction.ScalarValue(function);
 
@@ -51,12 +46,12 @@ namespace PolynomialMinimumProblem
         }
 
 
-        public IDataFormatter<string> TaskResultDataFormatter => _stringDataFormatter;
+        public IDataFormatter<string> TaskResultDataFormatter => new StringDataFormatter();
 
-        public IDataFormatter<SubtaskResult> SubtaskResultDataFormatter => _subtaskResultDataFormatter;
+        public IDataFormatter<SubtaskResult> SubtaskResultDataFormatter => new SubtaskResultDataFormatter();
 
-        public IDataFormatter<TaskInput> TaskDataFormatter => _taskInputDataFormatter;
+        public IDataFormatter<TaskInput> TaskDataFormatter => new TaskInputDataFormatter();
 
-        public IDataFormatter<SubtaskInput> SubtaskDataFormatter => _subtaskInputDataFormatter;
+        public IDataFormatter<SubtaskInput> SubtaskDataFormatter => new UniversalDataFormatter<SubtaskInput>();
     }
 }
