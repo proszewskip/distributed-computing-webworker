@@ -8,6 +8,11 @@ export interface WithRouterProps {
   router: Router;
 }
 
+/**
+ * A higher order component that injects the next.js router.
+ *
+ * @param Component
+ */
 export function withRouter<Props extends WithRouterProps>(
   Component: ComponentType<Props>,
 ) {

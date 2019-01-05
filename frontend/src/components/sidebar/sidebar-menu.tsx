@@ -10,9 +10,17 @@ export interface MenuItem {
 }
 
 export interface SidebarMenuProps {
+  /**
+   * Items that should appear in the menu.
+   */
   items: MenuItem[];
 }
 
+/**
+ * The menu for the sidebar.
+ *
+ * @param props
+ */
 export const SidebarMenu: StatelessComponent<SidebarMenuProps> = (props) => {
   return (
     <Pane display="flex" flexDirection="column" alignItems="stretch">

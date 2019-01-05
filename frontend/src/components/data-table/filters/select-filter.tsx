@@ -12,6 +12,9 @@ export interface SelectFilterOption {
   value: string;
 }
 
+/**
+ * A filter that allows for selecting a single predefined value.
+ */
 export const selectFilterFactory = (
   options: SelectFilterOption[],
 ): FilterRender => ({ filter, onChange }) => (

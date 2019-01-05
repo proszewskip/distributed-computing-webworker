@@ -10,6 +10,13 @@ export type DependenciesExtractor<
   InjectedProps extends DependenciesMap
 > = (dependencies: Dependencies) => InjectedProps;
 
+/**
+ * A higher order component that extracts the dependencies from the context and injects them into
+ * the provided component.
+ *
+ * @param dependenciesExtractor The function that extracts dependencies and provides them as props
+ * to the component.
+ */
 export const withDependencies = <
   Dependencies extends DependenciesMap,
   InjectedProps

@@ -4,6 +4,9 @@ import { KeepAliveServiceDependencies } from './types';
 
 const POLLING_INTERVAL = 5000;
 
+/**
+ * A service that sends keep-alive messages to the server.
+ */
 export class KeepAliveService {
   private readonly fetch: KeepAliveServiceDependencies['fetch'];
   private timeoutId: number | null = null;
@@ -16,6 +19,11 @@ export class KeepAliveService {
     this.fetch = dependencies.fetch;
   }
 
+  /**
+   * Sends a single keep-alive message
+   *
+   * @param distributedNodeId
+   */
   public sendKeepAlive(distributedNodeId: string): Promise<boolean> {
     const { fetch } = this;
 
@@ -33,6 +41,10 @@ export class KeepAliveService {
     });
   }
 
+  /**
+   * Starts sending keep-alive messages every once in a while
+   * @param distributedNodeId
+   */
   public startPolling(distributedNodeId: string) {
     /**
      * NOTE: set some `timeoutId` so `isPolling` returns a correct value

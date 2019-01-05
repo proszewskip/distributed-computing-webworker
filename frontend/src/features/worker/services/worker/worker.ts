@@ -12,6 +12,11 @@ import {
   WorkerOptions,
 } from './types';
 
+/**
+ * A facade that simplifies communicating with `WorkerThread`.
+ *
+ * Allows for starting and stopping the worker, notifies the consumer about worker state updates.
+ */
 export class SubtaskWorker {
   private readonly dependencies: WorkerDependencies;
   private readonly options: WorkerOptions;
@@ -28,6 +33,12 @@ export class SubtaskWorker {
     this.subtaskMetadata = subtaskMetadata;
   }
 
+  /**
+   * Starts the worker thread.
+   *
+   * The returned promise will either resolve with the computation result or reject when the worker
+   * has been cancelled.
+   */
   public start(): Promise<WorkerComputationResult> {
     if (this.workerThread) {
       return Promise.reject('Worker thread is already running');
@@ -51,6 +62,9 @@ export class SubtaskWorker {
     });
   }
 
+  /**
+   * Cancels the worker. Rejects the promise returned by the `start` method.
+   */
   public cancel() {
     if (!this.workerThread) {
       throw new Error('Worker thread is not running');

@@ -1,3 +1,7 @@
+/**
+ * Missing kitsu types
+ */
+
 declare module 'kitsu' {
   type Dictionary<V> = {
     [key: string]: V;

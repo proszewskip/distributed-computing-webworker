@@ -12,6 +12,10 @@ interface RelativeTimeState {
   updateTimeoutId?: number;
 }
 
+/**
+ * A component that displays relative time and updates once in a while so that the relative time
+ * does not become outdated.
+ */
 export class RelativeTime extends PureComponent<
   RelativeTimeProps,
   RelativeTimeState
@@ -49,8 +53,8 @@ export class RelativeTime extends PureComponent<
     const rerenderTimeout = getRerenderTimeout(eventDate, currentDate);
 
     /**
-     * NOTE: use `window.setTimeout` becuase `@types/node` override the type of `setTimeout`
-     * and use a return type that is incompatible with the browser.
+     * NOTE: use `window.setTimeout` becuase `@types/node` override the type of `setTimeout` and use
+     * a return type that is incompatible with the browser.
      */
     const updateTimeoutId = window.setTimeout(
       this.updateTimeout,

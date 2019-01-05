@@ -4,6 +4,11 @@ interface IsAuthenticatedResponseBody {
   isSignedIn: boolean;
 }
 
+/**
+ * Tests is the user is authenticated.
+ *
+ * @param fetch
+ */
 export function isAuthenticated(fetch: typeof unfetch) {
   return fetch('/users/is-authenticated')
     .then(

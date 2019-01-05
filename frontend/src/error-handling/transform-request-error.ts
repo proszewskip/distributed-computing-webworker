@@ -1,6 +1,11 @@
 import { isJsonApiErrorResponse, isNativeError } from './type-guards';
 import { RequestError } from './types';
 
+/**
+ * Transforms any request error into an internal error representation.
+ *
+ * @param error
+ */
 export function transformRequestError(error: unknown): RequestError {
   if (isJsonApiErrorResponse(error)) {
     return {

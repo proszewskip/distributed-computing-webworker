@@ -14,6 +14,14 @@ interface FilterComponentWithTooltipState {
   isTooltipShown: boolean | null;
 }
 
+/**
+ * Base component for table filters.
+ *
+ * Contains a customizable tooltip to display information to the user about the possible values
+ * of a filter.
+ *
+ * Handles filter validity.
+ */
 export class FilterComponentWithTooltip extends PureComponent<
   FilterComponentWithTooltipProps,
   FilterComponentWithTooltipState

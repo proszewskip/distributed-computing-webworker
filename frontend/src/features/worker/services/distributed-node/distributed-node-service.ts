@@ -27,6 +27,12 @@ import { OnDistributedNodeStateUpdate } from './types/on-state-update';
  */
 const SUBTASK_GRACE_PERIOD_TIMEOUT = 1000;
 
+/**
+ * A service that manages the lifecycle of a distributed node.
+ *
+ * Schedules registering the node, assigning new subtasks, orchestrates WebWorkers and sends the
+ * results back to the server.
+ */
 export class DistributedNodeService {
   private readonly dependencies: DistributedNodeServiceDependencies;
   private readonly onStateUpdate: OnDistributedNodeStateUpdate;
@@ -65,6 +71,9 @@ export class DistributedNodeService {
     this.registerNode();
   }
 
+  /**
+   * Stops all the services present on the node and kills all the workers.
+   */
   public destroy() {
     if (this.state.state === DistributedNodeState.Pristine) {
       throw new Error('DistributedNode was not initialized');
@@ -79,6 +88,9 @@ export class DistributedNodeService {
     }
   }
 
+  /**
+   * Starts the node and queries for a next subtask.
+   */
   public start() {
     if (this.state.state !== DistributedNodeState.Idle) {
       throw new Error('DistributedNode is not ready');
@@ -98,6 +110,11 @@ export class DistributedNodeService {
     this.assignNextSubtask();
   }
 
+  /**
+   * Stops the node and kills all the workers.
+   *
+   * The node remains registered and keep-alive messages are still sent.
+   */
   public stop() {
     // TODO: allow the user to stop when Registering
     if (this.state.state !== DistributedNodeState.Running) {
@@ -122,6 +139,12 @@ export class DistributedNodeService {
     });
   }
 
+  /**
+   * Changes the threads count and possibly kills existing workers or schedules new subtasks if
+   * empty workers are available.
+   *
+   * @param threadsCount
+   */
   public setThreadsCount(threadsCount: number) {
     if (threadsCount < 1) {
       throw new Error('Cannot set threads count to less than 1');
