@@ -1,4 +1,4 @@
-import { Alert, Dialog, Pane, Text } from 'evergreen-ui';
+import { Alert, Button, Dialog, minorScale, Pane, Text } from 'evergreen-ui';
 import React, { PureComponent, ReactNode } from 'react';
 
 import { Subtask, SubtaskStatus } from 'models';
@@ -37,19 +37,22 @@ class SubtaskStatusCellContent extends PureComponent<
   private getStatusMapping = (subtaskStatus: SubtaskStatus): ReactNode => {
     switch (subtaskStatus) {
       case SubtaskStatus.Done:
-        return <Text>Done</Text>;
+        return <Text marginLeft={minorScale(2)}>Done</Text>;
       case SubtaskStatus.Executing:
-        return <Text>In progress</Text>;
+        return <Text marginLeft={minorScale(2)}>In progress</Text>;
       case SubtaskStatus.Error:
         return (
-          <Pane display="flex" alignItems="center">
-            <Text color="danger" onClick={this.onStatusClick} cursor="pointer">
-              Error
-            </Text>
-          </Pane>
+          <Button
+            appearance="minimal"
+            intent="danger"
+            onClick={this.onStatusClick}
+            paddingX={minorScale(2)}
+          >
+            Error
+          </Button>
         );
       case SubtaskStatus.WaitingForExecution:
-        return <Text>Waiting for execution</Text>;
+        return <Text marginLeft={minorScale(2)}>Waiting for execution</Text>;
     }
   };
 
