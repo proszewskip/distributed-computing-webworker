@@ -3,7 +3,7 @@ import { Router } from 'next-routes';
 import { Redirect } from './types';
 
 /**
- * Returns a function that redirects that browser to a specific URL.
+ * Returns a function that redirects the browser to a specific URL.
  *
  * Works only client-side.
  *
