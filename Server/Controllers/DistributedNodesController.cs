@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using JsonApiDotNetCore.Controllers;
+using JsonApiDotNetCore.Models;
 using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using Server.Filters;
 using Server.Models;
 
@@ -59,6 +62,40 @@ namespace Server.Controllers
             await _resourceService.UpdateAsync(id, distributedNode);
 
             return Ok(distributedNode);
+        }
+
+        [SwaggerIgnore]
+        [HttpGet("{id}")]
+        public override Task<IActionResult> GetAsync(Guid id) => base.GetAsync(id);
+
+        [SwaggerIgnore]
+        public override Task<IActionResult> GetRelationshipsAsync(Guid id, string relationshipName)
+        {
+            return base.GetRelationshipsAsync(id, relationshipName);
+        }
+
+        [SwaggerIgnore]
+        public override Task<IActionResult> GetRelationshipAsync(Guid id, string relationshipName)
+        {
+            return base.GetRelationshipAsync(id, relationshipName);
+        }
+
+        [SwaggerIgnore]
+        public override Task<IActionResult> PostAsync([FromBody] DistributedNode entity)
+        {
+            return base.PostAsync(entity);
+        }
+
+        [SwaggerIgnore]
+        public override Task<IActionResult> PatchRelationshipsAsync(Guid id, string relationshipName, [FromBody] List<DocumentData> relationships)
+        {
+            return base.PatchRelationshipsAsync(id, relationshipName, relationships);
+        }
+
+                [SwaggerIgnore]
+        public override Task<IActionResult> DeleteAsync(Guid id)
+        {
+            return base.DeleteAsync(id);
         }
     }
 }
