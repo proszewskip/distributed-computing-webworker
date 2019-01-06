@@ -15,5 +15,6 @@ export const ToggleFiltersActionButton: StatelessComponent<
     onClick={onClick}
     icon="filter"
     marginX={minorScale(1)}
+    title={filtersEnabled ? 'Disable filters' : 'Enable filters'}
   />
 );
