@@ -336,6 +336,10 @@ ASALocalRun/
 # .env files
 .env
 
+# Docs
+docs/
+
+
 # Include files from the mono-wasm-sdk
 !mono-wasm-sdk/*
 
