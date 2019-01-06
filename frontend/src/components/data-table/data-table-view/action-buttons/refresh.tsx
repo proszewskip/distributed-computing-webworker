@@ -14,5 +14,6 @@ export const RefreshActionButton: StatelessComponent<
     onClick={onClick}
     icon="refresh"
     marginX={minorScale(1)}
+    title="Refresh"
   />
 );
