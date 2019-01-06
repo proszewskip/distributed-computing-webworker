@@ -27,10 +27,12 @@ export class Layout extends PureComponent<LayoutProps, LayoutState> {
   };
 
   public render() {
+    const { isSidebarShown } = this.state;
+
     return (
       <>
         <Mobile>
-          {this.state.isSidebarShown && this.renderMobileSidebar()}
+          {isSidebarShown && this.renderMobileSidebar()}
 
           <Pane
             display="flex"
@@ -42,6 +44,7 @@ export class Layout extends PureComponent<LayoutProps, LayoutState> {
               icon="menu"
               onClick={this.openSidebar}
               margin={majorScale(1)}
+              title={isSidebarShown ? 'Hide menu' : 'Open menu'}
             />
 
             {this.renderMain()}

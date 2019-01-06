@@ -34,6 +34,7 @@ export class UsedThreadsCard extends PureComponent<UsedThreadsCardProps> {
             onClick={this.onDecrement}
             marginX={majorScale(1)}
             disabled={decrementDisabled}
+            title="Decrement used threads"
           >
             -
           </IconButton>
@@ -44,6 +45,7 @@ export class UsedThreadsCard extends PureComponent<UsedThreadsCardProps> {
             icon="plus"
             onClick={this.onIncrement}
             marginX={majorScale(1)}
+            title="Increment used threads"
           >
             +
           </IconButton>

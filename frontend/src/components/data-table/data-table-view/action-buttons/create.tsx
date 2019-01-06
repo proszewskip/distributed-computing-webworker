@@ -16,5 +16,6 @@ export const CreateActionButton: StatelessComponent<
     icon="plus"
     appearance="primary"
     marginX={minorScale(1)}
+    title="Create"
   />
 );
