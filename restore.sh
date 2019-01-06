@@ -12,6 +12,7 @@ docker cp backup/task-definitions.tar.gz $(docker ps | grep backend | cut -d' ' 
 docker exec -t $(docker ps | grep backend | cut -d' ' -f1) tar -xzf /task-definitions.tar.gz -C /
 docker exec -t $(docker ps | grep backend | cut -d' ' -f1) rm /task-definitions.tar.gz
 
+#Cleanup
 rm backup -rf
 
 
