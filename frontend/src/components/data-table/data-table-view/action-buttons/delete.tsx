@@ -15,5 +15,6 @@ export const DeleteActionButton: StatelessComponent<
     onClick={onClick}
     icon="trash"
     marginX={minorScale(1)}
+    title="Delete"
   />
 );
