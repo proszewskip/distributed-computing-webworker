@@ -157,3 +157,15 @@ This will start the server on port 5000.
 
 Take a look at [the frontend server's readme](frontend/README.md) for information on how to run the
 frontend server in development mode.
+
+## Generating the documentation
+
+In order to generate documentation [doxygen](http://www.doxygen.nl/download.html) must be installed.
+
+Run the following command from main project directory to generate the documentation for the project:
+
+```sh
+doxygen
+```
+
+[The documentation](docs/index.html) will be generated in the `docs` directory.
