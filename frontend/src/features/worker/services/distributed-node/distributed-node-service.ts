@@ -23,9 +23,15 @@ import {
 import { OnDistributedNodeStateUpdate } from './types/on-state-update';
 
 /**
- * The timeout between assigning next subtask
+ * The number of milliseconds between starting a worker and asking for a new task.
  */
-const SUBTASK_GRACE_PERIOD_TIMEOUT = 2000;
+const START_NEW_TASK_INTERVAL = 200;
+
+/**
+ * The number of milliseconds after which the node is going to check if there are new tasks
+ * if there have not been any tasks previously.
+ */
+const CHECK_FOR_TASKS_DELAY = 5000;
 
 /**
  * A service that manages the lifecycle of a distributed node.
@@ -203,7 +209,11 @@ export class DistributedNodeService {
         distributedNodeId,
       );
     } catch (error) {
-      this.startTimeout(distributedNodeId, this.state.data.subtaskWorkers);
+      this.startTimeout(
+        distributedNodeId,
+        this.state.data.subtaskWorkers,
+        CHECK_FOR_TASKS_DELAY,
+      );
       return;
     }
 
@@ -250,7 +260,11 @@ export class DistributedNodeService {
     );
 
     if (updatedSubtaskWorkersMap.size < this.threadsCount) {
-      this.startTimeout(distributedNodeId, updatedSubtaskWorkersMap);
+      this.startTimeout(
+        distributedNodeId,
+        updatedSubtaskWorkersMap,
+        START_NEW_TASK_INTERVAL,
+      );
     } else {
       this.setState({
         state: DistributedNodeState.Running,
@@ -292,6 +306,7 @@ export class DistributedNodeService {
   private startTimeout = (
     distributedNodeId: string,
     subtaskWorkers: Map<number, SubtaskWorkerInfo>,
+    delay: number,
   ) => {
     this.setState({
       state: DistributedNodeState.Running,
@@ -300,10 +315,7 @@ export class DistributedNodeService {
         distributedNodeId,
         runningState: DistributedNodeRunningState.WaitingForTimeout,
         data: {
-          timeoutId: window.setTimeout(
-            this.assignNextSubtask,
-            SUBTASK_GRACE_PERIOD_TIMEOUT,
-          ),
+          timeoutId: window.setTimeout(this.assignNextSubtask, delay),
         },
       },
     });
