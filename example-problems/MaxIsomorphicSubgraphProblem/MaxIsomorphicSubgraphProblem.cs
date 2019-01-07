@@ -22,11 +22,6 @@ namespace MaxIsomorphicSubgraphProblem
                 });
         }
 
-        public string JoinSubtaskResults(IEnumerable<ProblemResult> subtaskResults)
-        {
-            return subtaskResults.OrderByDescending(subtaskResult => subtaskResult.CV.Count).First().ToString();
-        }
-
         public ProblemResult Compute(SubtaskInput subtask)
         {
             var problemSolverFactory = new ExactProblemSolverFactory();
@@ -36,6 +31,11 @@ namespace MaxIsomorphicSubgraphProblem
             var problemSolver = problemSolverFactory.Create(subtask, resultsComparator);
 
             return problemSolver.Solve();
+        }
+
+        public string JoinSubtaskResults(IEnumerable<ProblemResult> subtaskResults)
+        {
+            return subtaskResults.OrderByDescending(subtaskResult => subtaskResult.CV.Count).First().ToString();
         }
 
         public IDataFormatter<ProblemInput> TaskDataFormatter => new ProblemInputDataFormatter();
