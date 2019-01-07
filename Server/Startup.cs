@@ -52,6 +52,8 @@ namespace Server
             services.ConfigureApplicationCookie(options => { options.ExpireTimeSpan = TimeSpan.FromDays(30); });
 
             services.Configure<ServerConfig>(Configuration.GetSection("ServerConfig"));
+
+            services.AddSwaggerDocument(document => document.DocumentName = "Distributed Computing");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -62,6 +64,8 @@ namespace Server
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwaggerUi3();
+                app.UseSwagger();
             }
             else
             {
