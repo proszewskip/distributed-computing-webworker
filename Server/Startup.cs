@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using JsonApiDotNetCore.Extensions;
 using JsonApiDotNetCore.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.StaticFiles;
@@ -53,7 +54,13 @@ namespace Server
 
             services.Configure<ServerConfig>(Configuration.GetSection("ServerConfig"));
 
-            services.AddSwaggerDocument(document => document.DocumentName = "Distributed Computing");
+            services
+                .AddSwaggerDocument(document =>
+                {
+                    document.DocumentName = "swagger";
+                    document.PostProcess = d => d.Info.Title = "Distributed Computing";
+                });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -64,8 +71,22 @@ namespace Server
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwaggerUi3();
-                app.UseSwagger();
+                app.UseSwagger(options =>
+                {
+                    options.DocumentName = "swagger";
+                    options.Path = "/swagger/v1/swagger.json";
+                });
+
+                app.UseSwaggerUi3(options =>
+                {
+                    options.Path = "/swagger";
+                    options.DocumentPath = "/swagger/v1/swagger.json";
+                });
+                app.UseReDoc(options =>
+                {
+                    options.Path = "/redoc";
+                    options.DocumentPath = "/swagger/v1/swagger.json";
+                });
             }
             else
             {
