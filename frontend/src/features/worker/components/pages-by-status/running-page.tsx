@@ -89,10 +89,7 @@ const RunningStateInfo: StatelessComponent<
             <Text>Waiting...</Text>
           </Status>
 
-          <Text>
-            There are no pending tasks in the system. The worker will retry to
-            ask for a task in a while.
-          </Text>
+          <Text>The worker will try to ask for a task in a while.</Text>
         </>
       );
   }
