@@ -176,15 +176,15 @@ doxygen
 
 #### HTML document
 
-Documentation is available under [http://localhost:5000/swagger/index.html](http://localhost:5000/swagger/index.html)
-when `Server` is running in `Debug` configuration.
+Documentation is available under [http://localhost:5000/swagger](http://localhost:5000/swagger)
+when the `Server` is running in Debug configuration (when using dotnet run).
 
 #### OpenAPI JSON
 
-In order to generate OpenAPI json file `Server` must be built with following command:
+In order to generate OpenAPI json file, the `Server` must be built with the following command:
 
 ```sh
  dotnet build /p:GenerateCode=True
 ```
 
-After running mentioned command `swagger.json` will be generated in `Server/docs`.
+After running the mentioned command, `swagger.json` will be generated in Server/docs.
