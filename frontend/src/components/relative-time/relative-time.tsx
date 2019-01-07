@@ -42,7 +42,7 @@ export class RelativeTime extends PureComponent<
   public render() {
     const { eventDate } = this.props;
 
-    return <Text>{distanceInWordsToNow(eventDate)}</Text>;
+    return <Text>{distanceInWordsToNow(eventDate, { addSuffix: true })}</Text>;
   }
 
   private updateTimeout = () => {
@@ -53,8 +53,8 @@ export class RelativeTime extends PureComponent<
     const rerenderTimeout = getRerenderTimeout(eventDate, currentDate);
 
     /**
-     * NOTE: use `window.setTimeout` becuase `@types/node` override the type of `setTimeout` and use
-     * a return type that is incompatible with the browser.
+     * NOTE: use `window.setTimeout` because `@types/node` overrides the type of `setTimeout` and
+     * uses a return type that is incompatible with the browser.
      */
     const updateTimeoutId = window.setTimeout(
       this.updateTimeout,
