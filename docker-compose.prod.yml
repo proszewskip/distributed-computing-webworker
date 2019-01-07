@@ -11,6 +11,8 @@ services:
       dockerfile: ./Server/Dockerfile
     depends_on:
       - db
+    environment:
+      TZ: Europe/Warsaw
 
   frontend:
     build:
