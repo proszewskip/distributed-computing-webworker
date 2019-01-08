@@ -73,16 +73,20 @@ main directory of the repository:
 
 ```sh
 docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build --no-start
-docker save distributed-computing-webworker_backend distributed-computing-webworker_frontend postgres nginx -o docker_images.tar
-# docker_images.tar, docker-compose.yml, docker-compose.prod.yml should now be copied to the deployment server, e.g. using scp.
-scp docker_images.tar docker-compose.yml docker-compose.prod.yml username@production:~
+docker save distributed-computing-webworker_backend distributed-computing-webworker_frontend postgres nginx | gzip > docker_images.tgz
 ```
 
-After `docker_images.tar, docker-compose.yml, docker-compose.prod.yml` are copied to the deployment server, run the following commands on it:
+`docker_images.tgz`, `docker-compose.yml`, `docker-compose.prod.yml` should now be copied to the deployment server, e.g. using scp.
 
 ```sh
-docker load --input ~/docker_images.tar
-rm ~/docker_images.tar
+scp docker_images.tgz docker-compose.yml docker-compose.prod.yml username@production:~
+```
+
+After `docker_images.tgz, docker-compose.yml, docker-compose.prod.yml` are copied to the deployment server, run the following commands on it:
+
+```sh
+gunzip -c ~/docker_images.tgz | docker load
+rm ~/docker_images.tgz
 docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
 
