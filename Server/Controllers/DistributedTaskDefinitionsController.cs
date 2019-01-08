@@ -95,7 +95,7 @@ namespace Server.Controllers
             try
             {
                 var createdTaskDefinition = await _taskDefinitionResourceService.CreateAsync(distributedTaskDefinition);
-                HttpContext.Response.StatusCode = 201;
+                HttpContext.Response.StatusCode = StatusCodes.Status201Created;
 
                 return await _jsonApiResponseFactory.CreateResponseAsync(HttpContext.Response, createdTaskDefinition);
             }

@@ -55,7 +55,7 @@ namespace Server.Controllers
 
             var createdDistributedTask = await _distributedTaskResourceService.CreateAsync(distributedTask);
 
-            HttpContext.Response.StatusCode = 201;
+            HttpContext.Response.StatusCode = StatusCodes.Status201Created;
             return await _jsonApiResponseFactory.CreateResponseAsync(HttpContext.Response, createdDistributedTask);
         }
 
