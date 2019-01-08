@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using JsonApiDotNetCore.Data;
 using JsonApiDotNetCore.Internal;
 using JsonApiDotNetCore.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Server.Models;
@@ -48,7 +49,7 @@ namespace Server.Services.Api
                 .AnyAsync(taskDefinition => taskDefinition.Name == name && (id == null || taskDefinition.Id != id));
 
             if (taskDefinitionExists)
-                throw new JsonApiException(400, $"A task definition with the name {name} already exists");
+                throw new JsonApiException(StatusCodes.Status400BadRequest, $"A task definition with the name {name} already exists");
         }
     }
 }

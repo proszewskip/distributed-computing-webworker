@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using JsonApiDotNetCore.Data;
 using JsonApiDotNetCore.Internal;
 using JsonApiDotNetCore.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Server.Exceptions;
@@ -56,15 +57,15 @@ namespace Server.Services.Api
                 }
                 catch (TaskDataParsingException exception)
                 {
-                    throw new JsonApiException(400, exception.Message, exception);
+                    throw new JsonApiException(StatusCodes.Status400BadRequest, exception.Message, exception);
                 }
                 catch (TaskDivisionException exception)
                 {
-                    throw new JsonApiException(400, exception.Message, exception);
+                    throw new JsonApiException(StatusCodes.Status400BadRequest, exception.Message, exception);
                 }
                 catch (Exception exception)
                 {
-                    throw new JsonApiException(400, "Cannot create the task", exception);
+                    throw new JsonApiException(StatusCodes.Status400BadRequest, "Cannot create the task", exception);
                 }
             }
 
@@ -83,7 +84,7 @@ namespace Server.Services.Api
             var taskExists = await _dbContext.DistributedTasks
                 .AnyAsync(task => task.Name == name && (id == null || task.Id != id));
 
-            if (taskExists) throw new JsonApiException(400, $"A task with the name {name} already exists");
+            if (taskExists) throw new JsonApiException(StatusCodes.Status400BadRequest, $"A task with the name {name} already exists");
         }
 
         private async Task<DistributedTaskDefinition> GetTaskDefinitionById(int taskDefinitionId)
@@ -92,7 +93,7 @@ namespace Server.Services.Api
                 await _dbContext.DistributedTaskDefinitions.FirstOrDefaultAsync(definition =>
                     definition.Id == taskDefinitionId);
 
-            if (taskDefinition == null) throw new JsonApiException(400, "The task definition does not exist");
+            if (taskDefinition == null) throw new JsonApiException(StatusCodes.Status400BadRequest, "The task definition does not exist");
 
             return taskDefinition;
         }

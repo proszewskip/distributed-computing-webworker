@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using JsonApiDotNetCore.Controllers;
 using JsonApiDotNetCore.Internal;
 using JsonApiDotNetCore.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Server.DTO;
@@ -68,13 +69,13 @@ namespace Server.Controllers
             catch (InvalidAssemblyException exception)
             {
                 DeleteSavedDlls(taskDefinitionGuid);
-                return Error(new Error(400, exception.Message, exception.InnerException?.Message));
+                return Error(new Error(StatusCodes.Status400BadRequest, exception.Message, exception.InnerException?.Message));
             }
             catch (Exception exception)
             {
                 DeleteSavedDlls(taskDefinitionGuid);
                 _logger.LogWarning(exception, "Exception occurred when analyzing the assembly");
-                return Error(new Error(500, "Internal Server Error when analyzing the assembly"));
+                return Error(new Error(StatusCodes.Status500InternalServerError, "Internal Server Error when analyzing the assembly"));
             }
 
 
