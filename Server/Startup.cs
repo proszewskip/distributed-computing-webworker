@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using JsonApiDotNetCore.Extensions;
 using JsonApiDotNetCore.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.StaticFiles;
@@ -16,6 +17,8 @@ using Server.Services;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using NJsonSchema;
+using NSwag.AspNetCore;
 using Server.Filters;
 using Server.Services.Api;
 using Server.Services.Cleanup;
@@ -50,6 +53,14 @@ namespace Server
             services.ConfigureApplicationCookie(options => { options.ExpireTimeSpan = TimeSpan.FromDays(30); });
 
             services.Configure<ServerConfig>(Configuration.GetSection("ServerConfig"));
+
+            services
+                .AddSwaggerDocument(document =>
+                {
+                    document.DocumentName = "swagger";
+                    document.PostProcess = d => d.Info.Title = "Distributed Computing";
+                });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,6 +71,22 @@ namespace Server
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger(options =>
+                {
+                    options.DocumentName = "swagger";
+                    options.Path = "/swagger/v1/swagger.json";
+                });
+
+                app.UseSwaggerUi3(options =>
+                {
+                    options.Path = "/swagger";
+                    options.DocumentPath = "/swagger/v1/swagger.json";
+                });
+                app.UseReDoc(options =>
+                {
+                    options.Path = "/redoc";
+                    options.DocumentPath = "/swagger/v1/swagger.json";
+                });
             }
             else
             {

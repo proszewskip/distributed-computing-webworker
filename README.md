@@ -160,6 +160,8 @@ frontend server in development mode.
 
 ## Generating the documentation
 
+### Backend and library
+
 In order to generate documentation [doxygen](http://www.doxygen.nl/download.html) must be installed.
 
 Run the following command from main project directory to generate the documentation for the project:
@@ -169,3 +171,20 @@ doxygen
 ```
 
 [The documentation](docs/index.html) will be generated in the `docs` directory.
+
+### API
+
+#### HTML document
+
+Documentation is available under [http://localhost:5000/swagger](http://localhost:5000/swagger)
+when the `Server` is running in Debug configuration (when using dotnet run).
+
+#### OpenAPI JSON
+
+In order to generate OpenAPI json file, the `Server` must be built with the following command:
+
+```sh
+ dotnet build /p:GenerateSwaggerDocumentation=True
+```
+
+After running the mentioned command, `swagger.json` will be generated in Server/docs.

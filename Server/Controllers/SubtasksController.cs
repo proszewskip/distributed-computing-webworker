@@ -4,6 +4,7 @@ using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using NSwag.Annotations;
 using Server.Filters;
 using Server.Models;
 
@@ -40,5 +41,9 @@ namespace Server.Controllers
 
             return File(subtask.InputData, "application/octet-stream", $"{subtask.Id}-input-data");
         }
+
+        // This method is added only to remove it from the documentation
+        [SwaggerIgnore]
+        public override async Task<IActionResult> PostAsync(Subtask entity) => await base.PostAsync(entity);
     }
 }

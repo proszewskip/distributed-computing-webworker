@@ -1,6 +1,7 @@
 using JsonApiDotNetCore.Controllers;
 using JsonApiDotNetCore.Internal;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 
 namespace Server.Services
 {
@@ -13,6 +14,7 @@ namespace Server.Services
         IActionResult Errors(ErrorCollection errorsCollection);
     }
 
+    [SwaggerIgnore]
     public class JsonApiActionResultFactory : JsonApiControllerMixin, IJsonApiActionResultFactory 
     {
         public new IActionResult Error(Error error)
