@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using JsonApiDotNetCore.Controllers;
+using JsonApiDotNetCore.Models;
 using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using Server.Filters;
 using Server.Models;
 
@@ -60,5 +63,27 @@ namespace Server.Controllers
 
             return Ok(distributedNode);
         }
+
+
+        /// Methods below are required for swagger documentation.
+        /// All of them return 405 - Method Not Allowed
+        
+        [SwaggerIgnore]
+        public override Task<IActionResult> GetAsync(Guid id) => base.GetAsync(id);
+
+        [SwaggerIgnore]
+        public override Task<IActionResult> GetRelationshipsAsync(Guid id, string relationshipName) => base.GetRelationshipsAsync(id, relationshipName);
+
+        [SwaggerIgnore]
+        public override Task<IActionResult> GetRelationshipAsync(Guid id, string relationshipName) => base.GetRelationshipAsync(id, relationshipName);
+
+        [SwaggerIgnore]
+        public override Task<IActionResult> PostAsync([FromBody] DistributedNode entity) => base.PostAsync(entity);
+
+        [SwaggerIgnore]
+        public override Task<IActionResult> PatchRelationshipsAsync(Guid id, string relationshipName, [FromBody] List<DocumentData> relationships) => base.PatchRelationshipsAsync(id, relationshipName, relationships);
+
+        [SwaggerIgnore]
+        public override Task<IActionResult> DeleteAsync(Guid id) => base.DeleteAsync(id);
     }
 }
