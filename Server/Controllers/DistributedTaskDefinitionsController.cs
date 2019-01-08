@@ -5,6 +5,7 @@ using JsonApiDotNetCore.Internal;
 using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using NSwag.Annotations;
 using Server.DTO;
 using Server.Exceptions;
 using Server.Filters;
@@ -105,6 +106,10 @@ namespace Server.Controllers
                 throw;
             }
         }
+
+        // This method is added only to remove it from the documentation
+        [SwaggerIgnore]
+        public override async Task<IActionResult> PostAsync(DistributedTaskDefinition entity) => await base.PostAsync(entity);
 
         private Task<string> PackAssemblyAsync(Guid taskDefinitionGuid, string mainDllName)
         {

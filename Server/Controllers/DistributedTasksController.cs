@@ -6,6 +6,7 @@ using JsonApiDotNetCore.Internal;
 using JsonApiDotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using NSwag.Annotations;
 using Server.DTO;
 using Server.Filters;
 using Server.Models;
@@ -82,5 +83,9 @@ namespace Server.Controllers
 
             return File(distributedTask.Result, "application/octet-stream", $"{distributedTask.Name}-result");
         }
+
+        // This method is added only to remove it from the documentation
+        [SwaggerIgnore]
+        public override async Task<IActionResult> PostAsync(DistributedTask entity) => await base.PostAsync(entity);
     }
 }
