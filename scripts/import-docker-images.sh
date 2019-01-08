@@ -2,7 +2,7 @@
 
 # Extract docker images
 mkdir docker_images
-tar -xzf docker_images.tar.gz -C docker_images
+tar -xzf $1 -C docker_images
 
 # Import docker images
 docker load --input docker_images/frontend_docker.tar
