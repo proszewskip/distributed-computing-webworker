@@ -72,14 +72,21 @@ To build server locally and deploy it on the remote machine, run the following c
 main directory of the repository:
 
 ```sh
-./scripts/create-docker-images.sh
-scp docker_images.tar.gz docker-compose.yml docker-compose.prod.yml username@production:~
-ssh username@production 'bash -s' < scripts/import-docker-images.sh "~/docker_images.tar.gz"
-ssh username@production "rm ~/docker_images.tar.gz"
-ssh username@production "docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d"
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build --no-start
+docker save distributed-computing-webworker_backend distributed-computing-webworker_frontend postgres nginx -o docker_images.tar
+# docker_images.tar, docker-compose.yml, docker-compose.prod.yml should now be copied to the deployment server, e.g. using scp.
+scp docker_images.tar docker-compose.yml docker-compose.prod.yml username@production:~
 ```
 
-Distributed Computing server should now be running on the remote machine and it should be accessible on [http://production](http://production).
+After `docker_images.tar, docker-compose.yml, docker-compose.prod.yml` are copied to the deployment server, run the following commands on it:
+
+```sh
+docker load --input ~/docker_images.tar
+rm ~/docker_images.tar
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+```
+
+The project should now be running on the remote machine and it should be accessible on [http://production](http://production).
 
 ### Startup
 
