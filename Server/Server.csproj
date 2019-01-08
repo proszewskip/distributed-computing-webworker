@@ -27,7 +27,7 @@
     <ProjectReference Include="..\Packager\Packager.csproj" />
   </ItemGroup>
 
-  <Target Name="NSwag" AfterTargets="Build" Condition="'$(GenerateCode)'=='True' ">
+  <Target Name="NSwag" AfterTargets="Build" Condition="'$(GenerateSwaggerDocumentation)'=='True' ">
     <Exec Command="$(NSwagExe_Core22) run nswag.json" />
   </Target>
 

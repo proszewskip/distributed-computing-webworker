@@ -184,7 +184,7 @@ when the `Server` is running in Debug configuration (when using dotnet run).
 In order to generate OpenAPI json file, the `Server` must be built with the following command:
 
 ```sh
- dotnet build /p:GenerateCode=True
+ dotnet build /p:GenerateSwaggerDocumentation=True
 ```
 
 After running the mentioned command, `swagger.json` will be generated in Server/docs.
