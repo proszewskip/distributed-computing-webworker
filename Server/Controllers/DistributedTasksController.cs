@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using JsonApiDotNetCore.Controllers;
 using JsonApiDotNetCore.Internal;
 using JsonApiDotNetCore.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NSwag.Annotations;
@@ -55,7 +56,7 @@ namespace Server.Controllers
 
             var createdDistributedTask = await _distributedTaskResourceService.CreateAsync(distributedTask);
 
-            HttpContext.Response.StatusCode = 201;
+            HttpContext.Response.StatusCode = StatusCodes.Status201Created;
             return await _jsonApiResponseFactory.CreateResponseAsync(HttpContext.Response, createdDistributedTask);
         }
 
@@ -79,7 +80,7 @@ namespace Server.Controllers
                 return NotFound();
 
             if (distributedTask.Result == null)
-                return Error(new Error(400, "The result is currently not available."));
+                return Error(new Error(StatusCodes.Status400BadRequest, "The result is currently not available."));
 
             return File(distributedTask.Result, "application/octet-stream", $"{distributedTask.Name}-result");
         }
