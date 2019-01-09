@@ -23,7 +23,7 @@ namespace Server.Services.Cleanup
         {
             _logger.LogInformation("Starting cleanup service");
 
-            _timer = new Timer(Cleanup, null, TimeSpan.FromSeconds(5), TimeSpan.FromMinutes(5));
+            _timer = new Timer(Cleanup, null, TimeSpan.FromSeconds(5), TimeSpan.FromMinutes(2));
 
             return Task.CompletedTask;
         }
