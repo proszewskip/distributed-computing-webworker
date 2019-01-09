@@ -53,14 +53,14 @@ namespace Server.Tests.Services.Api
 
             using (var dbContext = new TestDbContext(dbContextOptions))
             {
-                var foundSubtaskInProgress = await dbContext.SubtasksInProgress
-                    .Include(subtaskInProgress => subtaskInProgress.Subtask)
-                    .ThenInclude(subtask => subtask.DistributedTask)
-                    .FirstAsync(subtaskInProgress => subtaskInProgress.Id == 1);
+                var foundSubtask = await dbContext.Subtasks
+                    .Include(subtask => subtask.DistributedTask)
+                    .Include(subtask => subtask.SubtasksInProgress)
+                    .FirstAsync(subtask => subtask.Id == 1);
 
-                Assert.AreEqual(SubtaskInProgressStatus.Done, foundSubtaskInProgress.Status);
-                Assert.AreEqual(SubtaskStatus.Done, foundSubtaskInProgress.Subtask.Status);
-                Assert.AreEqual(DistributedTaskStatus.Done, foundSubtaskInProgress.Subtask.DistributedTask.Status);
+                Assert.AreEqual(0, foundSubtask.SubtasksInProgress.Count);
+                Assert.AreEqual(SubtaskStatus.Done, foundSubtask.Status);
+                Assert.AreEqual(DistributedTaskStatus.Done, foundSubtask.DistributedTask.Status);
             }
         }
 
