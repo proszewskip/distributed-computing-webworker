@@ -117,7 +117,7 @@ namespace Server
 
         private static void ConfigureDependencyInjection(IServiceCollection services)
         {
-            var distributedNodeLifetime = TimeSpan.FromMinutes(60);
+            var distributedNodeLifetime = TimeSpan.FromMinutes(2);
 
             services
                 .AddScoped<IAssemblyLoader, AssemblyLoader>()
