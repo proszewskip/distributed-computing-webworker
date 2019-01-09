@@ -62,19 +62,39 @@ The following are needed for both deploying and developing the project:
 - Install [docker](https://www.docker.com/get-started)
 - Install [docker-compose](https://docs.docker.com/compose/install/)
 
-## Deployment
+## Instructions
+
+### Deployment
 
 This project uses docker and docker-compose to containerize all the components of the system.
 
-### Deployment prerequisites
+To build server locally and deploy it on the remote machine, run the following commands in the
+main directory of the repository:
 
-No other prerequisites are needed, aside from those in [General prerequisites](#general-prerequisites).
+```sh
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build --no-start
+docker save distributed-computing-webworker_backend distributed-computing-webworker_frontend postgres nginx | gzip > docker_images.tar.gz
+```
 
-## Instructions
+`docker_images.tar.gz`, `docker-compose.yml`, `docker-compose.prod.yml` should now be copied to the deployment server, e.g. using scp.
+
+```sh
+scp docker_images.tar.gz docker-compose.yml docker-compose.prod.yml username@production:~
+```
+
+After `docker_images.tar.gz, docker-compose.yml, docker-compose.prod.yml` are copied to the deployment server, run the following commands on it:
+
+```sh
+gunzip -c ~/docker_images.tar.gz | docker load
+rm ~/docker_images.tar.gz
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+```
+
+The project should now be running on the remote machine and it should be accessible on [http://production](http://production).
 
 ### Startup
 
-To deploy the project, run the following command in the main directory of the repository:
+To start the project, run the following command in the main directory of the repository:
 
 ```sh
 docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
