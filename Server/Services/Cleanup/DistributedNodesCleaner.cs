@@ -44,7 +44,7 @@ namespace Server.Services.Cleanup
                     DistributedNode = distributedNode,
                     StaleSubtasksInProgress = distributedNode.SubtasksInProgress.Where(subtaskInProgress =>
                         subtaskInProgress.Status == SubtaskInProgressStatus.Executing
-                    ),
+                    ).ToList(),
                     ShouldBeRemoved = distributedNode.SubtasksInProgress.All(subtaskInProgress =>
                         subtaskInProgress.Status == SubtaskInProgressStatus.Cancelled ||
                         subtaskInProgress.Status == SubtaskInProgressStatus.Error ||
@@ -56,7 +56,7 @@ namespace Server.Services.Cleanup
             await Task.WhenAll(
                 staleDistributedNodes.Select(async staleDistributedNode =>
                 {
-                    var cancelSubtasks = Task.WhenAll(
+                    await Task.WhenAll(
                         staleDistributedNode.StaleSubtasksInProgress.Select(
                             subtaskInProgress =>
                                 _computationCancelService.CancelSubtaskInProgressAsync(subtaskInProgress.Id)
@@ -66,11 +66,10 @@ namespace Server.Services.Cleanup
                     if (staleDistributedNode.ShouldBeRemoved)
                     {
                         _dbContext.DistributedNodes.Remove(staleDistributedNode.DistributedNode);
-                        await _dbContext.SaveChangesAsync();
                     }
-
-                    await cancelSubtasks;
                 }));
+
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
