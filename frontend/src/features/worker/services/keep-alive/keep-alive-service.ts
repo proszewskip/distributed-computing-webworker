@@ -2,7 +2,8 @@ import { config } from 'product-specific';
 
 import { KeepAliveServiceDependencies } from './types';
 
-const POLLING_INTERVAL = 5000;
+// Represented in miliseconds.
+const POLLING_INTERVAL = 30 * 1000;
 
 /**
  * A service that sends keep-alive messages to the server.
