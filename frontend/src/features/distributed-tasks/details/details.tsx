@@ -5,6 +5,7 @@ import {
   majorScale,
   minorScale,
   Pane,
+  Text,
   toaster,
 } from 'evergreen-ui';
 
@@ -90,7 +91,9 @@ export class PureDistributedTaskDetails extends PureComponent<
         <RequestErrorInfo error={dataFetchingError} />
 
         <Link route="/distributed-tasks">
-          <a>Go back to the list of distributed tasks</a>
+          <a>
+            <Text>Go back to the list of distributed tasks</Text>
+          </a>
         </Link>
       </ErrorPage>
     );

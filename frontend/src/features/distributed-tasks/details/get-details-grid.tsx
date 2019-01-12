@@ -78,7 +78,9 @@ export const DetailsGrid: StatelessComponent<DetailsGridProps> = ({
             distributedTaskDefinition.id
           }`}
         >
-          <a>{distributedTaskDefinition.name}</a>
+          <a>
+            <Text>{distributedTaskDefinition.name}</Text>
+          </a>
         </Link>
       </Pane>
 
