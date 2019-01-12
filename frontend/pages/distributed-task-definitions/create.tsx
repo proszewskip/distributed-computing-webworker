@@ -1,4 +1,4 @@
-import { Heading, majorScale, Pane } from 'evergreen-ui';
+import { Heading, majorScale, Pane, Text } from 'evergreen-ui';
 import React, { PureComponent, ReactNode } from 'react';
 
 import { ErrorPage, RequestErrorInfo } from 'components/errors';
@@ -77,7 +77,9 @@ export default class CreatePage extends PureComponent<CreatePageProps> {
         <RequestErrorInfo error={dataFetchingError} />
 
         <Link route="/distributed-task-definitions">
-          <a>Go back to the list of distributed task definitions</a>
+          <a>
+            <Text>Go back to the list of distributed task definitions</Text>
+          </a>
         </Link>
       </ErrorPage>
     );
