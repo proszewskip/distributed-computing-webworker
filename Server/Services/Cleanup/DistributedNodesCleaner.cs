@@ -59,7 +59,7 @@ namespace Server.Services.Cleanup
                     await Task.WhenAll(
                         staleDistributedNode.StaleSubtasksInProgress.Select(
                             subtaskInProgress =>
-                                _computationCancelService.CancelSubtaskInProgressAsync(subtaskInProgress.Id)
+                                _computationCancelService.CancelSubtaskInProgressWithoutSavingAsync(subtaskInProgress.Id)
                         )
                     );
 
