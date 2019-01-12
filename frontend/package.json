@@ -11,7 +11,8 @@
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "test": "jest",
     "storybook": "start-storybook -p 9001 -c .storybook",
-    "cypress:open": "cypress open"
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
   },
   "repository": {
     "type": "git",
