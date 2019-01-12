@@ -1,4 +1,4 @@
-import { Heading, majorScale, Pane } from 'evergreen-ui';
+import { Heading, majorScale, Pane, Text } from 'evergreen-ui';
 import React, { PureComponent, ReactNode } from 'react';
 
 import { ErrorPage, RequestErrorInfo } from 'components/errors';
@@ -109,7 +109,9 @@ class UpdatePage extends PureComponent<UpdatePageProps & WithRouterProps> {
         <RequestErrorInfo error={errors} />
 
         <Link route="/distributed-tasks">
-          <a>Go back to the list of distributed tasks</a>
+          <a>
+            <Text>Go back to the list of distributed tasks</Text>
+          </a>
         </Link>
       </ErrorPage>
     );

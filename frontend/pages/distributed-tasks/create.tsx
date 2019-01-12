@@ -1,4 +1,4 @@
-import { Heading, majorScale, Pane } from 'evergreen-ui';
+import { Heading, majorScale, Pane, Text } from 'evergreen-ui';
 import React, { PureComponent, ReactNode } from 'react';
 
 import { ErrorPage, RequestErrorInfo } from 'components/errors';
@@ -90,7 +90,9 @@ export default class CreatePage extends PureComponent<CreatePageProps> {
         <Link
           route={`/distributed-task-definitions/${distributedTaskDefinitionId}`}
         >
-          <a>Go back to the distributed task definition</a>
+          <a>
+            <Text>Go back to the distributed task definition</Text>
+          </a>
         </Link>
       </ErrorPage>
     );
