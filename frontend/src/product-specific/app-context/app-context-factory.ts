@@ -63,6 +63,7 @@ const fetchFactory = (
   if (typeof requestInfo === 'string') {
     return fetch(getIsomorphicUrl(requestInfo, serverUrl), {
       ...requestInit,
+      credentials: 'include',
       headers: {
         ...requestInit.headers,
         ...additionalHeaders,
@@ -72,6 +73,7 @@ const fetchFactory = (
 
   const newRequestInfo: RequestInfo = {
     ...requestInfo,
+    credentials: 'include',
     url: getIsomorphicUrl(requestInfo.url, serverUrl),
     headers: {
       ...requestInfo.headers,
