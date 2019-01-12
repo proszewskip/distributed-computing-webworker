@@ -10,6 +10,7 @@
     "generate-docs": "typedoc --out docs --mode file src",
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "test": "jest",
+    "test:watch": "npm run test -- --watch",
     "storybook": "start-storybook -p 9001 -c .storybook",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run"
