@@ -133,6 +133,7 @@ namespace Server
                 .AddScoped<IGetNextSubtaskToComputeService, GetNextSubtaskToComputeService>()
                 .AddScoped<IJsonApiResponseFactory, JsonApiResponseFactory>()
                 .AddScoped<IJsonApiActionResultFactory, JsonApiActionResultFactory>()
+                .AddScoped<ISubtasksInProgressCleanupService, SubtasksInProgressCleanupService>()
                 .AddScoped<IDistributedNodesCleaner>(serviceProvider =>
                     new DistributedNodesCleaner(serviceProvider.GetService<DistributedComputingDbContext>(),
                         serviceProvider.GetService<IComputationCancelService>(),
