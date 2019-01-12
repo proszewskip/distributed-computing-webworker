@@ -8,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using JsonApiDotNetCore.Extensions;
 using JsonApiDotNetCore.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.StaticFiles;
@@ -17,8 +16,6 @@ using Server.Services;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using NJsonSchema;
-using NSwag.AspNetCore;
 using Server.Filters;
 using Server.Services.Api;
 using Server.Services.Cleanup;
@@ -133,6 +130,7 @@ namespace Server
                 .AddScoped<IGetNextSubtaskToComputeService, GetNextSubtaskToComputeService>()
                 .AddScoped<IJsonApiResponseFactory, JsonApiResponseFactory>()
                 .AddScoped<IJsonApiActionResultFactory, JsonApiActionResultFactory>()
+                .AddScoped<ISubtasksInProgressCleanupService, SubtasksInProgressCleanupService>()
                 .AddScoped<IDistributedNodesCleaner>(serviceProvider =>
                     new DistributedNodesCleaner(serviceProvider.GetService<DistributedComputingDbContext>(),
                         serviceProvider.GetService<IComputationCancelService>(),
