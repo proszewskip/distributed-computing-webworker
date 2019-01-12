@@ -56,7 +56,7 @@ export class RelativeTime extends PureComponent<
      * NOTE: use `window.setTimeout` because `@types/node` overrides the type of `setTimeout` and
      * uses a return type that is incompatible with the browser.
      */
-    const updateTimeoutId = window.setTimeout(
+    const updateTimeoutId = (setTimeout as typeof window.setTimeout)(
       this.updateTimeout,
       rerenderTimeout,
     );

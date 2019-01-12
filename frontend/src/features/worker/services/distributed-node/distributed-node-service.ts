@@ -315,7 +315,10 @@ export class DistributedNodeService {
         distributedNodeId,
         runningState: DistributedNodeRunningState.WaitingForTimeout,
         data: {
-          timeoutId: window.setTimeout(this.assignNextSubtask, delay),
+          timeoutId: (setTimeout as typeof window.setTimeout)(
+            this.assignNextSubtask,
+            delay,
+          ),
         },
       },
     });
