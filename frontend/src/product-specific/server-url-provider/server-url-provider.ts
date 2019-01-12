@@ -24,8 +24,8 @@ export const serverUrlProvider = (req?: IncomingMessage) => {
 };
 
 const getServersideServerUrl = (req: IncomingMessage) => {
-  if (process.env.NODE_ENV === 'production') {
-    return config.productionServerUrl;
+  if (process.env.INSIDE_CONTAINER) {
+    return config.containerServerUrl;
   }
 
   /**
