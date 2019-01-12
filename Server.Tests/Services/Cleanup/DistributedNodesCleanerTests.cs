@@ -67,10 +67,10 @@ namespace Server.Tests.Services.Cleanup
             }
 
             var computationCancelServiceMock = new Mock<IComputationCancelService>();
-            computationCancelServiceMock.Setup(service => service.CancelSubtaskInProgressAsync(1))
+            computationCancelServiceMock.Setup(service => service.CancelSubtaskInProgressWithoutSavingAsync(1))
                 .Returns(Task.CompletedTask)
                 .Verifiable();
-            computationCancelServiceMock.Setup(service => service.CancelSubtaskInProgressAsync(3))
+            computationCancelServiceMock.Setup(service => service.CancelSubtaskInProgressWithoutSavingAsync(3))
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
@@ -82,8 +82,8 @@ namespace Server.Tests.Services.Cleanup
                 await cleaner.CleanAsync();
             }
 
-            computationCancelServiceMock.Verify(service => service.CancelSubtaskInProgressAsync(1));
-            computationCancelServiceMock.Verify(service => service.CancelSubtaskInProgressAsync(3));
+            computationCancelServiceMock.Verify(service => service.CancelSubtaskInProgressWithoutSavingAsync(1));
+            computationCancelServiceMock.Verify(service => service.CancelSubtaskInProgressWithoutSavingAsync(3));
             computationCancelServiceMock.VerifyNoOtherCalls();
 
             using (var dbContext = new TestDbContext(dbContextOptions))
@@ -133,7 +133,7 @@ namespace Server.Tests.Services.Cleanup
             }
 
             var computationCancelServiceMock = new Mock<IComputationCancelService>();
-            computationCancelServiceMock.Setup(service => service.CancelSubtaskInProgressAsync(It.IsAny<int>()))
+            computationCancelServiceMock.Setup(service => service.CancelSubtaskInProgressWithoutSavingAsync(It.IsAny<int>()))
                 .Returns(Task.CompletedTask);
 
             using (var dbContext = new TestDbContext(dbContextOptions))
@@ -193,7 +193,7 @@ namespace Server.Tests.Services.Cleanup
             }
 
             var computationCancelServiceMock = new Mock<IComputationCancelService>();
-            computationCancelServiceMock.Setup(service => service.CancelSubtaskInProgressAsync(It.IsAny<int>()))
+            computationCancelServiceMock.Setup(service => service.CancelSubtaskInProgressWithoutSavingAsync(It.IsAny<int>()))
                 .Returns(Task.CompletedTask);
 
             using (var dbContext = new TestDbContext(dbContextOptions))
