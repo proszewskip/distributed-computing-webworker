@@ -243,4 +243,10 @@ Then, start the frontend server:
 npm start
 ```
 
-<!-- TODO: add notes on how to run e2e tests -->
+After that, in another console, run the following command to run the end-to-end tests:
+
+```sh
+npm run cypress:run
+```
+
+The results of the tests should be displayed in the console.
