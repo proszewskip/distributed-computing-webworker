@@ -1,3 +1,4 @@
+import { Text } from 'evergreen-ui';
 import React from 'react';
 
 import { Link } from 'components/link';
@@ -27,7 +28,7 @@ export const LinkCell = (row: { value: LinkCellProps }) => {
   return (
     <Link route={row.value.route}>
       <a onClick={preventPropagationHandler} title={value.text}>
-        {value.text}
+        <Text>{value.text}</Text>
       </a>
     </Link>
   );

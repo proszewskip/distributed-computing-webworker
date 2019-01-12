@@ -1,4 +1,12 @@
-import { Card, Code, Heading, majorScale, Pane, Paragraph } from 'evergreen-ui';
+import {
+  Card,
+  Code,
+  Heading,
+  majorScale,
+  Pane,
+  Paragraph,
+  Text,
+} from 'evergreen-ui';
 import { NextStatelessComponent } from 'next';
 import React from 'react';
 
@@ -57,7 +65,7 @@ const IndexPage: NextStatelessComponent<
               computes tasks using{' '}
               <Link route="https://webassembly.org/">
                 <a target="_blank" rel="noopener noreferrer">
-                  WebAssembly
+                  <Text>WebAssembly</Text>
                 </a>
               </Link>
               .
@@ -66,7 +74,9 @@ const IndexPage: NextStatelessComponent<
             <Paragraph marginTop="default">
               Become a worker node by clicking the{' '}
               <Link route="/worker">
-                <a>Worker</a>
+                <a>
+                  <Text>Worker</Text>
+                </a>
               </Link>{' '}
               in the sidebar.
             </Paragraph>
@@ -75,7 +85,9 @@ const IndexPage: NextStatelessComponent<
               <Paragraph marginTop="default">
                 If you are an administrator, click{' '}
                 <Link route={config.loginPageUrl}>
-                  <a>Login</a>
+                  <a>
+                    <Text>Login</Text>
+                  </a>
                 </Link>{' '}
                 in the sidebar to manage the system.
               </Paragraph>
