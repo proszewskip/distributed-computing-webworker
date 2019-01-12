@@ -208,3 +208,39 @@ In order to generate OpenAPI json file, the `Server` must be built with the foll
 ```
 
 After running the mentioned command, `swagger.json` will be generated in Server/docs.
+
+## End-to-end tests
+
+### Setup
+
+To run end-to-end tests, first run the Docker containers in the development environment:
+
+```sh
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+```
+
+Afterwards, build the frontend project:
+
+```sh
+cd frontend
+npm build
+```
+
+### Running the tests
+
+First, run the server with the `ServerE2ETests` launch-profile:
+
+```sh
+dotnet -p Server --launch-profile ServerE2ETests
+```
+
+Using this launch profile will make sure that the database is pristine upon launch.
+Moreover, this will use a separate database, therefore no development data will be lost.
+
+Then, start the frontend server:
+
+```sh
+npm start
+```
+
+<!-- TODO: add notes on how to run e2e tests -->

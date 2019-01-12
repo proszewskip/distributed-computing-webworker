@@ -27,6 +27,8 @@ namespace Server
 {
     public class Startup
     {
+        private static string E2ETestsEnvironmentName = "E2ETests";
+
         public IConfiguration Configuration { get; }
 
         public Startup(IConfiguration configuration)
@@ -66,6 +68,11 @@ namespace Server
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, UserManager<IdentityUser> userManager)
         {
+            if (env.IsEnvironment(E2ETestsEnvironmentName))
+            {
+                EnsureDatabaseDeleted(app);
+            }
+
             EnsureDatabaseCreated(app);
 
             if (env.IsDevelopment())
@@ -174,6 +181,15 @@ namespace Server
             {
                 var context = serviceScope.ServiceProvider.GetRequiredService<DistributedComputingDbContext>();
                 context.Database.EnsureCreated();
+            }
+        }
+
+        private static void EnsureDatabaseDeleted(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                var context = serviceScope.ServiceProvider.GetRequiredService<DistributedComputingDbContext>();
+                context.Database.EnsureDeleted();
             }
         }
     }
