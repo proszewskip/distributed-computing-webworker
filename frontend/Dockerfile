@@ -1,6 +1,7 @@
 FROM node:10
 
 WORKDIR /app
+ENV INSIDE_CONTAINER=1
 
 # Install dependencies
 COPY ./package.json ./package.json

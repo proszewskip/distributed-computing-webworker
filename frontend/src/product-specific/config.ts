@@ -8,7 +8,7 @@ export const config = {
   /**
    * Server URL when the app runs in production (as a Docker container)
    */
-  productionServerUrl: 'http://backend:5000',
+  containerServerUrl: 'http://backend:5000',
 
   loginPageUrl: '/authentication/login',
 };
