@@ -3,6 +3,9 @@ using Server.Models;
 
 namespace Server.Services.Api
 {
+    /// <summary>
+    /// A service for cancelling SubtasksInProgress.
+    /// </summary>
     public interface IComputationCancelService
     {
         Task CancelSubtaskInProgressAsync(int subtaskInProgressId);
