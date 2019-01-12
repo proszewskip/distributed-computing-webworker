@@ -9,6 +9,12 @@ namespace Server.Services.Cleanup
 {
     public interface IDistributedNodesCleaner
     {
+        /// <summary>
+        /// Cancels currently executed subtasks of stale distributed nodes
+        /// (those, which did not send a keep alive in a specific time window)
+        /// and possibly removes them if they have not completed any other subtask.
+        /// </summary>
+        /// <returns></returns>
         Task CleanAsync();
     }
 
@@ -27,12 +33,6 @@ namespace Server.Services.Cleanup
             _distributedNodeLifetime = distributedNodeLifetime;
         }
 
-        /// <summary>
-        /// Cancels currently executed subtasks of stale distributed nodes
-        /// (those, which did not send a keep alive in a specific time window)
-        /// and possibly removes them if they have not completed any other subtask.
-        /// </summary>
-        /// <returns></returns>
         public async Task CleanAsync()
         {
             var nodeExpirationDateTime = DateTime.Now.Subtract(_distributedNodeLifetime);
@@ -59,7 +59,7 @@ namespace Server.Services.Cleanup
                     await Task.WhenAll(
                         staleDistributedNode.StaleSubtasksInProgress.Select(
                             subtaskInProgress =>
-                                _computationCancelService.CancelSubtaskInProgressAsync(subtaskInProgress.Id)
+                                _computationCancelService.CancelSubtaskInProgressWithoutSavingAsync(subtaskInProgress.Id)
                         )
                     );
 

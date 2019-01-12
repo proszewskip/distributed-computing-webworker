@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using NUnit.Framework;
 using Server.Models;
 using Server.Services.Api;
+using Server.Services.Cleanup;
 
 namespace Server.Tests.Services.Api
 {
@@ -21,9 +23,13 @@ namespace Server.Tests.Services.Api
                 await dbContext.SaveChangesAsync();
             }
 
+            var subtaskInProgressCleanupServiceMock = new Mock<ISubtasksInProgressCleanupService>();
+            subtaskInProgressCleanupServiceMock.Setup(service => service.RemoveSubtasksInProgress(It.IsAny<int>()));
+
             using (var dbContext = new TestDbContext(dbContextOptions))
             {
-                var computationFailService = new ComputationFailService(dbContext);
+                var computationFailService =
+                    new ComputationFailService(dbContext, subtaskInProgressCleanupServiceMock.Object);
 
                 await computationFailService.FailSubtaskInProgressAsync(1, new[] {"Some error"});
             }
@@ -57,12 +63,18 @@ namespace Server.Tests.Services.Api
                 await dbContext.SaveChangesAsync();
             }
 
+            var subtaskInProgressCleanupServiceMock = new Mock<ISubtasksInProgressCleanupService>();
+            subtaskInProgressCleanupServiceMock.Setup(service => service.RemoveSubtasksInProgress(It.IsAny<int>()));
+
             using (var dbContext = new TestDbContext(dbContextOptions))
             {
-                var computationFailService = new ComputationFailService(dbContext);
+                var computationFailService =
+                    new ComputationFailService(dbContext, subtaskInProgressCleanupServiceMock.Object);
 
                 await computationFailService.FailSubtaskInProgressAsync(2, new[] {"Some error"});
             }
+
+            subtaskInProgressCleanupServiceMock.Verify(service => service.RemoveSubtasksInProgress(1), Times.Once);
 
             using (var dbContext = new TestDbContext(dbContextOptions))
             {

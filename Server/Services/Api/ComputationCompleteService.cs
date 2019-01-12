@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Server.Exceptions;
 using Server.Models;
+using Server.Services.Cleanup;
 
 namespace Server.Services.Api
 {
@@ -29,14 +30,17 @@ namespace Server.Services.Api
     {
         private readonly DistributedComputingDbContext _dbContext;
         private readonly IProblemPluginFacadeProvider _problemPluginFacadeProvider;
+        private readonly ISubtasksInProgressCleanupService _subtasksInProgressCleanupService;
 
         public ComputationCompleteService(
             DistributedComputingDbContext dbContext,
-            IProblemPluginFacadeProvider problemPluginFacadeProvider
+            IProblemPluginFacadeProvider problemPluginFacadeProvider,
+            ISubtasksInProgressCleanupService subtasksInProgressCleanupService
         )
         {
             _dbContext = dbContext;
             _problemPluginFacadeProvider = problemPluginFacadeProvider;
+            _subtasksInProgressCleanupService = subtasksInProgressCleanupService;
         }
 
         public async Task CompleteSubtaskInProgressAsync(int subtaskInProgressId, Stream subtaskInProgressResult)
@@ -81,6 +85,8 @@ namespace Server.Services.Api
 
             finishedSubtask.Result = subtaskResult;
             finishedSubtask.Status = SubtaskStatus.Done;
+
+            _subtasksInProgressCleanupService.RemoveSubtasksInProgress(subtaskId);
 
             await _dbContext.SaveChangesAsync();
 
@@ -136,17 +142,7 @@ namespace Server.Services.Api
                 finishedDistributedTask.Errors = finishedDistributedTask.Errors.Append(exception.ToString()).ToArray();
             }
 
-            RemoveSubtasksInProgress(distributedTaskId);
-
             await _dbContext.SaveChangesAsync();
-        }
-
-        private void RemoveSubtasksInProgress(int distributedTaskId)
-        {
-            var subtasksInProgress = _dbContext.SubtasksInProgress.Where(subtaskInProgress =>
-                subtaskInProgress.Subtask.DistributedTaskId == distributedTaskId);
-
-            _dbContext.SubtasksInProgress.RemoveRange(subtasksInProgress);
         }
 
         private bool IsDistributedTaskFullyComputed(int distributedTaskId)

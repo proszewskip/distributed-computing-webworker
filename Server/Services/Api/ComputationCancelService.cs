@@ -3,9 +3,14 @@ using Server.Models;
 
 namespace Server.Services.Api
 {
+    /// <summary>
+    /// A service for cancelling SubtasksInProgress.
+    /// </summary>
     public interface IComputationCancelService
     {
         Task CancelSubtaskInProgressAsync(int subtaskInProgressId);
+
+        Task CancelSubtaskInProgressWithoutSavingAsync(int subtaskInProgressId);
     }
 
     public class ComputationCancelService : IComputationCancelService
@@ -19,11 +24,15 @@ namespace Server.Services.Api
 
         public async Task CancelSubtaskInProgressAsync(int subtaskInProgressId)
         {
+            await CancelSubtaskInProgressWithoutSavingAsync(subtaskInProgressId);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task CancelSubtaskInProgressWithoutSavingAsync(int subtaskInProgressId)
+        {
             var subtaskInProgress = await _dbContext.SubtasksInProgress.FindAsync(subtaskInProgressId);
 
             subtaskInProgress.Status = SubtaskInProgressStatus.Cancelled;
-
-            await _dbContext.SaveChangesAsync();
         }
     }
 }
