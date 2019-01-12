@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Server.Models;
+using Server.Services.Cleanup;
 
 namespace Server.Services.Api
 {
@@ -24,11 +25,15 @@ namespace Server.Services.Api
         private static int MaxSubtaskRetries { get; } = 2;
 
         private readonly DistributedComputingDbContext _dbContext;
+        private readonly ISubtasksInProgressCleanupService _subtasksInProgressCleanupService;
 
         public ComputationFailService(
-            DistributedComputingDbContext dbContext)
+            DistributedComputingDbContext dbContext,
+            ISubtasksInProgressCleanupService subtasksInProgressCleanupService
+        )
         {
             _dbContext = dbContext;
+            _subtasksInProgressCleanupService = subtasksInProgressCleanupService;
         }
 
         public async Task FailSubtaskInProgressAsync(int subtaskInProgressId, string[] computationErrors)
@@ -65,19 +70,21 @@ namespace Server.Services.Api
 
         private async Task FailSubtaskAsync(SubtaskInProgress failedSubtaskInProgress)
         {
-            var subtask = await _dbContext.Subtasks.FindAsync(failedSubtaskInProgress.SubtaskId);
-            subtask.Status = SubtaskStatus.Error;
-            subtask.Errors = failedSubtaskInProgress.Errors;
+            var failedSubtask = await _dbContext.Subtasks.FindAsync(failedSubtaskInProgress.SubtaskId);
+            failedSubtask.Status = SubtaskStatus.Error;
+            failedSubtask.Errors = failedSubtaskInProgress.Errors;
 
-            await FailDistributedTask(subtask);
+            _subtasksInProgressCleanupService.RemoveSubtasksInProgress(failedSubtask.Id);
+
+            await FailDistributedTask(failedSubtask);
         }
 
-        private async Task FailDistributedTask(Subtask subtask)
+        private async Task FailDistributedTask(Subtask failedSubtask)
         {
-            var finishedDistributedTask = await _dbContext.DistributedTasks.FindAsync(subtask.DistributedTaskId);
+            var finishedDistributedTask = await _dbContext.DistributedTasks.FindAsync(failedSubtask.DistributedTaskId);
 
             finishedDistributedTask.Status = DistributedTaskStatus.Error;
-            finishedDistributedTask.Errors = subtask.Errors;
+            finishedDistributedTask.Errors = failedSubtask.Errors;
         }
     }
 }
