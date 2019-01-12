@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Server.Models;
 using Server.Services;
 using Server.Services.Api;
+using Server.Services.Cleanup;
 
 namespace Server.Tests.Services.Api
 {
@@ -35,10 +36,14 @@ namespace Server.Tests.Services.Api
                         It.Is<DistributedTaskDefinition>(taskDefinition => taskDefinition.Name == "Task definition")))
                 .Returns(() => problemPluginFacadeMock.Object);
 
+            var subtaskInProgressCleanupServiceMock = new Mock<ISubtasksInProgressCleanupService>();
+            subtaskInProgressCleanupServiceMock.Setup(service => service.RemoveSubtasksInProgress(It.IsAny<int>()));
+
             using (var dbContext = new TestDbContext(dbContextOptions))
             {
                 var computationCompleteService =
-                    new ComputationCompleteService(dbContext, problemPluginFacadeProviderMock.Object);
+                    new ComputationCompleteService(dbContext, problemPluginFacadeProviderMock.Object,
+                        subtaskInProgressCleanupServiceMock.Object);
 
                 using (var stream = new MemoryStream(new byte[] {4, 5, 6}))
                 {
@@ -58,7 +63,6 @@ namespace Server.Tests.Services.Api
                     .Include(subtask => subtask.SubtasksInProgress)
                     .FirstAsync(subtask => subtask.Id == 1);
 
-                Assert.AreEqual(0, foundSubtask.SubtasksInProgress.Count);
                 Assert.AreEqual(SubtaskStatus.Done, foundSubtask.Status);
                 Assert.AreEqual(DistributedTaskStatus.Done, foundSubtask.DistributedTask.Status);
             }
@@ -83,16 +87,25 @@ namespace Server.Tests.Services.Api
 
             var problemPluginFacadeProviderMock = new Mock<IProblemPluginFacadeProvider>();
 
+            var subtaskInProgressCleanupServiceMock = new Mock<ISubtasksInProgressCleanupService>();
+            subtaskInProgressCleanupServiceMock.Setup(service => service.RemoveSubtasksInProgress(It.IsAny<int>()));
+
             using (var dbContext = new TestDbContext(dbContextOptions))
             {
-                var computationCompleteService =
-                    new ComputationCompleteService(dbContext, problemPluginFacadeProviderMock.Object);
-
-                using (var stream = new MemoryStream(new byte[] {4, 5, 6}))
+                if (subtaskInProgressCleanupServiceMock.Object != null)
                 {
-                    await computationCompleteService.CompleteSubtaskInProgressAsync(1, stream);
+                    var computationCompleteService =
+                        new ComputationCompleteService(dbContext, problemPluginFacadeProviderMock.Object,
+                            subtaskInProgressCleanupServiceMock.Object);
+
+                    using (var stream = new MemoryStream(new byte[] {4, 5, 6}))
+                    {
+                        await computationCompleteService.CompleteSubtaskInProgressAsync(1, stream);
+                    }
                 }
             }
+
+            subtaskInProgressCleanupServiceMock.Verify(service => service.RemoveSubtasksInProgress(1), Times.Once);
 
             using (var dbContext = new TestDbContext(dbContextOptions))
             {
@@ -123,10 +136,13 @@ namespace Server.Tests.Services.Api
 
             var problemPluginFacadeProviderMock = new Mock<IProblemPluginFacadeProvider>();
 
+            var subtaskInProgressCleanupServiceMock = new Mock<ISubtasksInProgressCleanupService>();
+
             using (var dbContext = new TestDbContext(dbContextOptions))
             {
                 var computationCompleteService =
-                    new ComputationCompleteService(dbContext, problemPluginFacadeProviderMock.Object);
+                    new ComputationCompleteService(dbContext, problemPluginFacadeProviderMock.Object,
+                        subtaskInProgressCleanupServiceMock.Object);
 
                 using (var stream = new MemoryStream(new byte[] {4, 5, 6}))
                 {
@@ -188,10 +204,14 @@ namespace Server.Tests.Services.Api
 
             var problemPluginFacadeProviderMock = new Mock<IProblemPluginFacadeProvider>();
 
+            var subtaskInProgressCleanupServiceMock = new Mock<ISubtasksInProgressCleanupService>();
+            subtaskInProgressCleanupServiceMock.Setup(service => service.RemoveSubtasksInProgress(It.IsAny<int>()));
+
             using (var dbContext = new TestDbContext(dbContextOptions))
             {
                 var computationCompleteService =
-                    new ComputationCompleteService(dbContext, problemPluginFacadeProviderMock.Object);
+                    new ComputationCompleteService(dbContext, problemPluginFacadeProviderMock.Object,
+                        subtaskInProgressCleanupServiceMock.Object);
 
                 using (var stream = new MemoryStream(new byte[] {4, 5, 6}))
                 {
