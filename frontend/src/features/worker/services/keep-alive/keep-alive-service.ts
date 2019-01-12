@@ -78,10 +78,10 @@ export class KeepAliveService {
 
   private queueNextRequest = (distributedNodeId: string) => {
     /**
-     * NOTE: use `window.setTimeout` becuase `@types/node` override the type of `setTimeout`
+     * NOTE: use `window.setTimeout` because `@types/node` override the type of `setTimeout`
      * and use a return type that is incompatible with the browser.
      */
-    this.timeoutId = window.setTimeout(
+    this.timeoutId = (setTimeout as typeof window.setTimeout)(
       this.sendKeepAliveWithPolling(distributedNodeId),
       POLLING_INTERVAL,
     );
