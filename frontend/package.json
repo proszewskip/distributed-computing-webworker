@@ -10,7 +10,8 @@
     "generate-docs": "typedoc --out docs --mode file src",
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "test": "jest",
-    "storybook": "start-storybook -p 9001 -c .storybook"
+    "storybook": "start-storybook -p 9001 -c .storybook",
+    "cypress:open": "cypress open"
   },
   "repository": {
     "type": "git",
@@ -67,6 +68,7 @@
     "@zeit/next-typescript": "^1.1.1",
     "awesome-typescript-loader": "^5.2.1",
     "cross-env": "^5.2.0",
+    "cypress": "^3.1.4",
     "fork-ts-checker-webpack-plugin": "^0.4.10",
     "husky": "^1.1.2",
     "jest": "^23.6.0",
