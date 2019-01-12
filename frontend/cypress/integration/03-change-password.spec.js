@@ -8,6 +8,8 @@ const changePassword = (oldPassword, newPassword) => () => {
   cy.get('[name=confirm-new-password]').type(newPassword);
 
   cy.contains('Submit').click();
+
+  cy.contains('Password changed successfully');
 };
 
 describe('change password', () => {
