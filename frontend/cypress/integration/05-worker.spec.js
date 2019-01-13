@@ -18,7 +18,7 @@ describe('worker', () => {
 
     cy.wait(2000);
 
-    cy.contains('p', 'Active threads: 0', { timeout: 10000 });
+    cy.contains('p', 'Active threads: 0', { timeout: 25000 });
 
     cy.contains('Stop the worker').click();
   });
