@@ -246,7 +246,7 @@ npm start
 After that, in another console, run the following command to run the end-to-end tests:
 
 ```sh
-npm run cypress:open
+npm run cypress:run
 ```
 
-A GUI will be opened with test suites. Click on one of them to run it.
+The tests will be run in a headless browser and their results will be visible in the console.
