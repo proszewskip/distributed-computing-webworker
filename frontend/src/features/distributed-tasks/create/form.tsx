@@ -127,6 +127,7 @@ export class PureCreateDistributedTaskForm extends Component<
     const response = await fetch(urlToFetch, {
       method: 'POST',
       body: formData,
+      credentials: 'include',
     });
 
     const responseBody = await response.json();
