@@ -108,6 +108,7 @@ export class PureChangePasswordForm extends Component<
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
     });
 
     if (!response.ok) {

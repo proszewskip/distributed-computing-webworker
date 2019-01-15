@@ -90,6 +90,7 @@ export class PureLoginForm extends Component<
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
     });
 
     if (!response.ok) {

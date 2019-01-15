@@ -113,6 +113,7 @@ export class PureCreateDistributedTaskDefinitionForm extends Component<
     const response = await fetch(urlToFetch, {
       method: 'post',
       body: formData,
+      credentials: 'include',
     });
 
     const responseBody = await response.json();

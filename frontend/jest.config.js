@@ -5,6 +5,7 @@ module.exports = {
       tsConfig: 'jest.tsconfig.json',
     },
   },
+  testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/cypress/'],
   moduleDirectories: ['node_modules', 'src'],
   preset: 'ts-jest',
   testEnvironment: 'node',
