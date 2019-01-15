@@ -231,7 +231,7 @@ npm build
 First, run the server with the `ServerE2ETests` launch-profile:
 
 ```sh
-dotnet -p Server --launch-profile ServerE2ETests
+dotnet run -p Server --launch-profile ServerE2ETests
 ```
 
 Using this launch profile will make sure that the database is pristine upon launch.
