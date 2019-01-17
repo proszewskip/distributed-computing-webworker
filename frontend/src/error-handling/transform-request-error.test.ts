@@ -1,4 +1,5 @@
 import { JsonApiErrorResponse } from 'kitsu';
+
 import { transformRequestError } from './transform-request-error';
 import { JsonApiErrors, NativeError } from './types';
 
@@ -14,7 +15,7 @@ describe('transformRequestError', () => {
     expect((transformedError as JsonApiErrors).errors).toBe(error.errors);
   });
 
-  it('should native errors', () => {
+  it('should transform native errors', () => {
     const error = new Error('some message');
 
     const transformedError = transformRequestError(error);
