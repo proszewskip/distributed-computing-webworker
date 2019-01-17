@@ -1,4 +1,4 @@
-import { isJsonApiErrorResponse, isNativeError } from './type-guards';
+import { isJsonApiErrorResponse } from './type-guards';
 import { RequestError } from './types';
 
 /**
@@ -14,7 +14,7 @@ export function transformRequestError(error: unknown): RequestError {
     };
   }
 
-  if (isNativeError(error)) {
+  if (error instanceof Error) {
     return {
       type: 'nativeError',
       name: error.name,

@@ -70,7 +70,7 @@ export class SubtaskWorker {
       throw new Error('Worker thread is not running');
     }
 
-    this.rejectComputationPromise();
+    this.rejectComputationPromise('Worker has been cancelled');
     this.destroyWorkerThread();
   }
 
