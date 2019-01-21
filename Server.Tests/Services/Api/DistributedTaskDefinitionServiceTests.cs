@@ -23,7 +23,7 @@ namespace Server.Tests.Services.Api
             var jsonApiContext = services.GetService<IJsonApiContext>();
             var repository = services.GetService<IEntityRepository<DistributedTaskDefinition>>();
             var loggerFactory = services.GetService<ILoggerFactory>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
 
             await CreateMockData(dbContext);
 
@@ -52,7 +52,7 @@ namespace Server.Tests.Services.Api
             var jsonApiContext = services.GetService<IJsonApiContext>();
             var repository = services.GetService<IEntityRepository<DistributedTaskDefinition>>();
             var loggerFactory = services.GetService<ILoggerFactory>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
 
             await CreateMockData(dbContext);
 
@@ -81,7 +81,7 @@ namespace Server.Tests.Services.Api
             var jsonApiContext = services.GetService<IJsonApiContext>();
             var repository = services.GetService<IEntityRepository<DistributedTaskDefinition>>();
             var loggerFactory = services.GetService<ILoggerFactory>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
 
             await CreateMockData(dbContext);
 
@@ -109,7 +109,7 @@ namespace Server.Tests.Services.Api
             var jsonApiContext = services.GetService<IJsonApiContext>();
             var repository = services.GetService<IEntityRepository<DistributedTaskDefinition>>();
             var loggerFactory = services.GetService<ILoggerFactory>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
 
             await CreateMockData(dbContext);
 
@@ -129,7 +129,7 @@ namespace Server.Tests.Services.Api
         }
 
 
-        private static async Task CreateMockData(IDistributedComputingDbContext dbContext)
+        private static async Task CreateMockData(DistributedComputingDbContext dbContext)
         {
             dbContext.DistributedTaskDefinitions.Add(new DistributedTaskDefinition
             {

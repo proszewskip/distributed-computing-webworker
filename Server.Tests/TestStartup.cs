@@ -106,7 +106,7 @@ namespace Server.Tests
                         distributedNodeLifetime))
                 .AddScoped<FormatErrorActionFilter>()
                 .AddScoped<AuthorizationFilter>()
-                .AddScoped<IDistributedComputingDbContext>(provider => provider.GetService<TestDbContext>());
+                .AddScoped<DistributedComputingDbContext>(provider => provider.GetService<TestDbContext>());
 
             services.AddHostedService<CleanupHostedService>();
 

@@ -26,7 +26,7 @@ namespace Server.Tests.Services.Api
             var jsonApiContext = services.GetService<IJsonApiContext>();
             var repository = services.GetService<IEntityRepository<DistributedTask>>();
             var loggerFactory = services.GetService<ILoggerFactory>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
 
             var problemPluginFacadeMock = new Mock<IProblemPluginFacade>();
             problemPluginFacadeMock.Setup(_ => _.GetSubtasksFromData(It.IsAny<byte[]>())).Returns(new List<byte[]>());
@@ -65,7 +65,7 @@ namespace Server.Tests.Services.Api
             var jsonApiContext = services.GetService<IJsonApiContext>();
             var repository = services.GetService<IEntityRepository<DistributedTask>>();
             var loggerFactory = services.GetService<ILoggerFactory>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
             var problemPluginFacadeProvider = services.GetService<IProblemPluginFacadeProvider>();
 
             await CreateMockData(dbContext);
@@ -96,7 +96,7 @@ namespace Server.Tests.Services.Api
             var jsonApiContext = services.GetService<IJsonApiContext>();
             var repository = services.GetService<IEntityRepository<DistributedTask>>();
             var loggerFactory = services.GetService<ILoggerFactory>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
             var problemPluginFacadeProvider = services.GetService<IProblemPluginFacadeProvider>();
 
             await CreateMockData(dbContext);
@@ -125,7 +125,7 @@ namespace Server.Tests.Services.Api
             var jsonApiContext = services.GetService<IJsonApiContext>();
             var repository = services.GetService<IEntityRepository<DistributedTask>>();
             var loggerFactory = services.GetService<ILoggerFactory>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
             var problemPluginFacadeProvider = services.GetService<IProblemPluginFacadeProvider>();
 
             await CreateMockData(dbContext);
@@ -146,7 +146,7 @@ namespace Server.Tests.Services.Api
         }
 
 
-        private static async Task CreateMockData(IDistributedComputingDbContext dbContext)
+        private static async Task CreateMockData(DistributedComputingDbContext dbContext)
         {
             dbContext.DistributedTasks.Add(new DistributedTask
             {

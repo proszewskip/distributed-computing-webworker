@@ -31,7 +31,7 @@ namespace Server.Tests.Services.Controllers
             var computationCompleteService = services.GetService<IComputationCompleteService>();
             var computationCancelService = services.GetService<IComputationCancelService>();
             var subtaskInProgressResourceService = services.GetService<IResourceService<SubtaskInProgress>>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
 
             await CreateMockData(dbContext);
 
@@ -64,7 +64,7 @@ namespace Server.Tests.Services.Controllers
             var computationCompleteService = services.GetService<IComputationCompleteService>();
             var computationCancelService = services.GetService<IComputationCancelService>();
             var subtaskInProgressResourceService = services.GetService<IResourceService<SubtaskInProgress>>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
 
             await CreateMockData(dbContext);
 
@@ -97,7 +97,7 @@ namespace Server.Tests.Services.Controllers
             var computationCompleteService = services.GetService<IComputationCompleteService>();
             var computationCancelService = services.GetService<IComputationCancelService>();
             var subtaskInProgressResourceService = services.GetService<IResourceService<SubtaskInProgress>>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
 
             await CreateMockData(dbContext);
 
@@ -134,7 +134,7 @@ namespace Server.Tests.Services.Controllers
             var computationCompleteService = services.GetService<IComputationCompleteService>();
             var computationCancelService = services.GetService<IComputationCancelService>();
             var subtaskInProgressResourceService = services.GetService<IResourceService<SubtaskInProgress>>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
 
             await CreateMockData(dbContext);
 
@@ -170,7 +170,7 @@ namespace Server.Tests.Services.Controllers
             var computationCompleteService = services.GetService<IComputationCompleteService>();
             var computationCancelService = services.GetService<IComputationCancelService>();
             var subtaskInProgressResourceService = services.GetService<IResourceService<SubtaskInProgress>>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
 
             await CreateMockData(dbContext);
 
@@ -207,7 +207,7 @@ namespace Server.Tests.Services.Controllers
             var computationCompleteService = services.GetService<IComputationCompleteService>();
             var computationCancelService = services.GetService<IComputationCancelService>();
             var subtaskInProgressResourceService = services.GetService<IResourceService<SubtaskInProgress>>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
 
             await CreateMockData(dbContext);
 
@@ -252,7 +252,7 @@ namespace Server.Tests.Services.Controllers
             var computationCompleteService = services.GetService<IComputationCompleteService>();
             var computationCancelService = services.GetService<IComputationCancelService>();
             var subtaskInProgressResourceService = services.GetService<IResourceService<SubtaskInProgress>>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
 
             await CreateMockData(dbContext);
 
@@ -285,7 +285,7 @@ namespace Server.Tests.Services.Controllers
             var computationCompleteService = services.GetService<IComputationCompleteService>();
             var computationCancelService = services.GetService<IComputationCancelService>();
             var subtaskInProgressResourceService = services.GetService<IResourceService<SubtaskInProgress>>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
 
             await CreateMockData(dbContext);
 
@@ -318,7 +318,7 @@ namespace Server.Tests.Services.Controllers
             var computationCompleteService = services.GetService<IComputationCompleteService>();
             var computationCancelService = services.GetService<IComputationCancelService>();
             var subtaskInProgressResourceService = services.GetService<IResourceService<SubtaskInProgress>>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
 
             await CreateMockData(dbContext);
 
@@ -363,7 +363,7 @@ namespace Server.Tests.Services.Controllers
             var computationCompleteService = services.GetService<IComputationCompleteService>();
             var computationCancelService = services.GetService<IComputationCancelService>();
             var subtaskInProgressResourceService = services.GetService<IResourceService<SubtaskInProgress>>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
 
             await CreateMockData(dbContext);
 
@@ -395,7 +395,7 @@ namespace Server.Tests.Services.Controllers
             var computationCompleteService = services.GetService<IComputationCompleteService>();
             var computationCancelService = services.GetService<IComputationCancelService>();
             var subtaskInProgressResourceService = services.GetService<IResourceService<SubtaskInProgress>>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
 
             await CreateMockData(dbContext);
 
@@ -420,7 +420,7 @@ namespace Server.Tests.Services.Controllers
         }
 
 
-        private static async Task CreateMockData(IDistributedComputingDbContext dbContext)
+        private static async Task CreateMockData(DistributedComputingDbContext dbContext)
         {
             dbContext.DistributedTasks.Add(new DistributedTask
             {

@@ -27,7 +27,7 @@ namespace Server.Tests.Services.Controllers
             var services = testServer.Host.Services;
             var getNextSubtaskToComputeService = services.GetService<IGetNextSubtaskToComputeService>();
             var pathsProvider = services.GetService<IPathsProvider>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
             var subtaskInProgressResourceService = services.GetService<IResourceService<SubtaskInProgress>>();
             var distributedNodeResourceService = services.GetService<IResourceService<DistributedNode, Guid>>();
 
@@ -65,7 +65,7 @@ namespace Server.Tests.Services.Controllers
             var services = testServer.Host.Services;
             var getNextSubtaskToComputeService = services.GetService<IGetNextSubtaskToComputeService>();
             var pathsProvider = services.GetService<IPathsProvider>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
             var subtaskInProgressResourceService = services.GetService<IResourceService<SubtaskInProgress>>();
             var distributedNodeResourceService = services.GetService<IResourceService<DistributedNode, Guid>>();
 
@@ -92,7 +92,7 @@ namespace Server.Tests.Services.Controllers
             var services = testServer.Host.Services;
             var getNextSubtaskToComputeService = services.GetService<IGetNextSubtaskToComputeService>();
             var pathsProvider = services.GetService<IPathsProvider>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
             var subtaskInProgressResourceService = services.GetService<IResourceService<SubtaskInProgress>>();
             var distributedNodeResourceService = services.GetService<IResourceService<DistributedNode, Guid>>();
 
@@ -119,7 +119,7 @@ namespace Server.Tests.Services.Controllers
             var services = testServer.Host.Services;
             var getNextSubtaskToComputeService = services.GetService<IGetNextSubtaskToComputeService>();
             var pathsProvider = services.GetService<IPathsProvider>();
-            var dbContext = services.GetService<IDistributedComputingDbContext>();
+            var dbContext = services.GetService<DistributedComputingDbContext>();
             var subtaskInProgressResourceService = services.GetService<IResourceService<SubtaskInProgress>>();
             var distributedNodeResourceService = services.GetService<IResourceService<DistributedNode, Guid>>();
 
@@ -142,7 +142,7 @@ namespace Server.Tests.Services.Controllers
             Assert.AreEqual(StatusCodes.Status404NotFound, result.StatusCode);
         }
 
-        private static async Task CreateMockData(IDistributedComputingDbContext dbContext)
+        private static async Task CreateMockData(DistributedComputingDbContext dbContext)
         {
             dbContext.DistributedTasks.Add(new DistributedTask
             {
