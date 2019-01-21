@@ -34,7 +34,7 @@ namespace Server
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public virtual void ConfigureServices(IServiceCollection services)
         {
             AddMvc(services);
             ConfigureDependencyInjection(services);
@@ -63,7 +63,7 @@ namespace Server
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, UserManager<IdentityUser> userManager)
+        public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env, UserManager<IdentityUser> userManager)
         {
             if (env.IsEnvironment(E2ETestsEnvironmentName))
             {
